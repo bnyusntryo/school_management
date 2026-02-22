@@ -69,6 +69,16 @@ class ClassActivityPage extends StatefulWidget {
 }
 
 class _ClassActivityPageState extends State<ClassActivityPage> {
+  // Array warna pastel untuk membedakan icon tiap kelas
+  final List<Color> _iconColors = [
+    Colors.blue.shade400,
+    Colors.orange.shade400,
+    Colors.pink.shade400,
+    Colors.green.shade400,
+    Colors.purple.shade400,
+    Colors.red.shade400,
+  ];
+
   void _showAddClassDialog() {
     final nameCtrl = TextEditingController();
     final gradeCtrl = TextEditingController();
@@ -79,7 +89,7 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
-            Icon(Icons.class_rounded, color: Colors.teal.shade600),
+            Icon(Icons.class_rounded, color: Colors.indigo.shade500),
             const SizedBox(width: 10),
             const Text("Add New Class", style: TextStyle(fontWeight: FontWeight.bold)),
           ],
@@ -97,7 +107,7 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Colors.grey))),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.teal.shade600, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.indigo.shade500, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
             onPressed: () {
               if (nameCtrl.text.isNotEmpty) {
                 setState(() {
@@ -122,7 +132,7 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
       controller: ctrl,
       decoration: InputDecoration(
         hintText: hint,
-        prefixIcon: Icon(icon, color: Colors.teal.shade300, size: 20),
+        prefixIcon: Icon(icon, color: Colors.indigo.shade300, size: 20),
         filled: true,
         fillColor: Colors.grey.shade50,
         contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -144,16 +154,17 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
             backgroundColor: Colors.transparent,
             flexibleSpace: Container(
               decoration: BoxDecoration(
+                // Menggunakan gradien perpaduan Teal (dari School Activity) dan Indigo
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Colors.teal.shade400, Colors.teal.shade800], // Konsisten dengan Announcement
+                  colors: [Colors.indigo.shade400, Colors.teal.shade500],
                 ),
                 borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
               ),
               child: const FlexibleSpaceBar(
                 titlePadding: EdgeInsets.only(left: 60, bottom: 20),
-                title: Text("Class Activity List", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
+                title: Text("Class Activity", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
               ),
             ),
             leading: Container(
@@ -175,18 +186,21 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.9, // Disesuaikan agar card tidak terlalu bantet
+                childAspectRatio: 0.85, // Disesuaikan agar card lebih tinggi sedikit
                 crossAxisSpacing: 15,
                 mainAxisSpacing: 15,
               ),
               delegate: SliverChildBuilderDelegate(
                     (context, index) {
                   final item = ClassActivityData.classes[index];
+                  // Pilih warna icon berdasarkan index
+                  final Color currentIconColor = _iconColors[index % _iconColors.length];
+
                   return Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: [BoxShadow(color: Colors.teal.withOpacity(0.08), blurRadius: 15, offset: const Offset(0, 8))],
+                      boxShadow: [BoxShadow(color: Colors.indigo.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 8))],
                     ),
                     child: Column(
                       children: [
@@ -196,19 +210,34 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Ikon Kelas Besar
+                                // Ikon Kelas Colorful
                                 Container(
                                   padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(color: Colors.teal.shade50, shape: BoxShape.circle),
-                                  child: Icon(Icons.school_rounded, color: Colors.teal.shade600, size: 24),
+                                  decoration: BoxDecoration(
+                                      color: currentIconColor.withOpacity(0.1),
+                                      shape: BoxShape.circle
+                                  ),
+                                  child: Icon(Icons.school_rounded, color: currentIconColor, size: 28),
                                 ),
-                                const SizedBox(height: 10),
-                                Text(item['name']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2D3142)), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 12),
+                                Text(
+                                    item['name']!,
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2D3142)),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis
+                                ),
+                                const SizedBox(height: 6),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(color: Colors.amber.shade50, borderRadius: BorderRadius.circular(6)),
-                                  child: Text(item['grade']!, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.amber.shade800)),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                      color: Colors.indigo.shade50,
+                                      borderRadius: BorderRadius.circular(8)
+                                  ),
+                                  child: Text(
+                                      item['grade']!,
+                                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.indigo.shade700)
+                                  ),
                                 ),
                                 const Spacer(),
                                 Row(
@@ -216,7 +245,7 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
                                   children: [
                                     Icon(Icons.flag_rounded, size: 12, color: Colors.grey.shade400),
                                     const SizedBox(width: 4),
-                                    Text("Year: ${item['year']!}", style: TextStyle(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.bold)),
+                                    Text("Year: ${item['year']!}", style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
                                   ],
                                 ),
                               ],
@@ -232,7 +261,7 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
-                              color: Colors.teal.shade600,
+                              color: Colors.indigo.shade500,
                               borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
                             ),
                             child: Row(
@@ -272,8 +301,16 @@ class SubjectListPage extends StatefulWidget {
 }
 
 class _SubjectListPageState extends State<SubjectListPage> {
+  // Warna pastel untuk subjek
+  final List<Color> _subjectColors = [
+    Colors.teal.shade500,
+    Colors.deepOrange.shade400,
+    Colors.lightBlue.shade500,
+    Colors.pink.shade400,
+    Colors.amber.shade600,
+  ];
+
   void _showAddSubjectDialog() {
-    // Dialog Add Sama Seperti Sebelumnya, cuma dipercantik
     final nameCtrl = TextEditingController();
     final codeCtrl = TextEditingController();
     final teacherCtrl = TextEditingController();
@@ -283,7 +320,7 @@ class _SubjectListPageState extends State<SubjectListPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
-            Icon(Icons.library_books_rounded, color: Colors.teal.shade600),
+            Icon(Icons.library_books_rounded, color: Colors.indigo.shade500),
             const SizedBox(width: 10),
             const Text("Add Subject", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           ],
@@ -301,7 +338,7 @@ class _SubjectListPageState extends State<SubjectListPage> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Colors.grey))),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.teal.shade600, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.indigo.shade500, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
             onPressed: () {
               if (nameCtrl.text.isNotEmpty) {
                 setState(() {
@@ -327,7 +364,7 @@ class _SubjectListPageState extends State<SubjectListPage> {
   Widget _buildDialogInput(String hint, TextEditingController ctrl, IconData icon) {
     return TextField(
       controller: ctrl,
-      decoration: InputDecoration(hintText: hint, prefixIcon: Icon(icon, color: Colors.teal.shade300, size: 20), filled: true, fillColor: Colors.grey.shade50, contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10), border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none)),
+      decoration: InputDecoration(hintText: hint, prefixIcon: Icon(icon, color: Colors.indigo.shade300, size: 20), filled: true, fillColor: Colors.grey.shade50, contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10), border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none)),
     );
   }
 
@@ -345,7 +382,7 @@ class _SubjectListPageState extends State<SubjectListPage> {
             backgroundColor: Colors.transparent,
             flexibleSpace: Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.teal.shade400, Colors.teal.shade800]),
+                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.indigo.shade400, Colors.teal.shade500]),
                 borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
               ),
               child: FlexibleSpaceBar(
@@ -371,9 +408,11 @@ class _SubjectListPageState extends State<SubjectListPage> {
               delegate: SliverChildBuilderDelegate(
                     (context, index) {
                   final item = subjectList[index];
+                  final currentColor = _subjectColors[index % _subjectColors.length];
+
                   return Container(
                     margin: const EdgeInsets.only(bottom: 15),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.teal.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 8))]),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.indigo.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 8))]),
                     child: InkWell(
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => ActivityListPage(subjectName: item['name']!, subjectCode: "${widget.className}_${item['code']}")));
@@ -383,7 +422,11 @@ class _SubjectListPageState extends State<SubjectListPage> {
                         padding: const EdgeInsets.all(20.0),
                         child: Row(
                           children: [
-                            Container(padding: const EdgeInsets.all(15), decoration: BoxDecoration(color: Colors.amber.shade50, borderRadius: BorderRadius.circular(15)), child: Icon(Icons.menu_book_rounded, color: Colors.amber.shade600, size: 28)),
+                            Container(
+                                padding: const EdgeInsets.all(15),
+                                decoration: BoxDecoration(color: currentColor.withOpacity(0.1), borderRadius: BorderRadius.circular(15)),
+                                child: Icon(Icons.menu_book_rounded, color: currentColor, size: 28)
+                            ),
                             const SizedBox(width: 15),
                             Expanded(
                               child: Column(
@@ -399,7 +442,7 @@ class _SubjectListPageState extends State<SubjectListPage> {
                                   const SizedBox(height: 8),
                                   Row(
                                     children: [
-                                      Icon(Icons.person_pin_circle_rounded, size: 14, color: Colors.teal.shade500),
+                                      Icon(Icons.person_pin_circle_rounded, size: 14, color: Colors.indigo.shade400),
                                       const SizedBox(width: 4),
                                       Expanded(child: Text(item['teacher']!.isEmpty ? "Teacher Not Assigned" : item['teacher']!, style: TextStyle(fontSize: 12, color: Colors.grey.shade700, fontWeight: FontWeight.w500), maxLines: 1, overflow: TextOverflow.ellipsis)),
                                     ],
@@ -407,7 +450,7 @@ class _SubjectListPageState extends State<SubjectListPage> {
                                 ],
                               ),
                             ),
-                            Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400),
+                            Icon(Icons.chevron_right_rounded, color: Colors.grey.shade300),
                           ],
                         ),
                       ),
@@ -452,7 +495,7 @@ class _ActivityListPageState extends State<ActivityListPage> {
             pinned: true,
             backgroundColor: Colors.transparent,
             flexibleSpace: Container(
-              decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.teal.shade400, Colors.teal.shade800]), borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30))),
+              decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.indigo.shade400, Colors.teal.shade500]), borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30))),
               child: const FlexibleSpaceBar(titlePadding: EdgeInsets.only(left: 60, bottom: 20), title: Text("Activities", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white))),
             ),
             leading: Container(margin: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)), child: IconButton(icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white), onPressed: () => Navigator.pop(context))),
@@ -475,11 +518,11 @@ class _ActivityListPageState extends State<ActivityListPage> {
             child: Container(
               margin: const EdgeInsets.all(20),
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.teal.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 5))]),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.indigo.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 5))]),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(children: [Icon(Icons.info_outline_rounded, color: Colors.teal.shade400, size: 20), const SizedBox(width: 8), const Text("Subject Info", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1A237E)))]),
+                  Row(children: [Icon(Icons.info_outline_rounded, color: Colors.indigo.shade400, size: 20), const SizedBox(width: 8), const Text("Subject Info", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1A237E)))]),
                   const Padding(padding: EdgeInsets.symmetric(vertical: 10), child: Divider()),
                   _detailInfo("Code", widget.subjectCode),
                   const SizedBox(height: 6),
@@ -498,7 +541,7 @@ class _ActivityListPageState extends State<ActivityListPage> {
                   final item = activities[index];
                   return Container(
                     margin: const EdgeInsets.only(bottom: 15),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 5))]),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.indigo.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))]),
                     child: InkWell(
                       onTap: () async {
                         final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ActivityFormPage(subjectName: widget.subjectName, subjectCode: widget.subjectCode, existingActivity: item)));
@@ -515,8 +558,8 @@ class _ActivityListPageState extends State<ActivityListPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("ID: ${item['id']}", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.teal.shade700)),
-                                Icon(Icons.edit_note_rounded, color: Colors.teal.shade300, size: 20)
+                                Text("ID: ${item['id']}", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.indigo.shade700)),
+                                Icon(Icons.edit_note_rounded, color: Colors.indigo.shade300, size: 20)
                               ],
                             ),
                             const SizedBox(height: 8),
@@ -524,7 +567,7 @@ class _ActivityListPageState extends State<ActivityListPage> {
                             const SizedBox(height: 12),
                             Row(
                               children: [
-                                Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(6)), child: Row(children: [Icon(Icons.calendar_today_rounded, size: 12, color: Colors.blue.shade600), const SizedBox(width: 4), Text(item['date'], style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.blue.shade800))])),
+                                Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: Colors.teal.shade50, borderRadius: BorderRadius.circular(6)), child: Row(children: [Icon(Icons.calendar_today_rounded, size: 12, color: Colors.teal.shade600), const SizedBox(width: 4), Text(item['date'], style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.teal.shade800))])),
                                 const SizedBox(width: 10),
                                 Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: Colors.orange.shade50, borderRadius: BorderRadius.circular(6)), child: Row(children: [Icon(Icons.access_time_filled_rounded, size: 12, color: Colors.orange.shade600), const SizedBox(width: 4), Text(item['time'], style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.orange.shade800))])),
                               ],
@@ -604,7 +647,7 @@ class _ActivityFormPageState extends State<ActivityFormPage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.teal.shade400, Colors.teal.shade800]), borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20))),
+          decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.indigo.shade400, Colors.teal.shade500]), borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20))),
         ),
         leading: IconButton(icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white), onPressed: () => Navigator.pop(context)),
         title: Text(widget.existingActivity == null ? "Add Activity" : "Edit Activity", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
@@ -617,11 +660,11 @@ class _ActivityFormPageState extends State<ActivityFormPage> {
             // KARTU FORM
             Container(
               padding: const EdgeInsets.all(25),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.teal.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 5))]),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.indigo.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 5))]),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(children: [Icon(Icons.assignment_rounded, color: Colors.teal.shade600), const SizedBox(width: 8), const Text("Activity Details", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))]),
+                  Row(children: [Icon(Icons.assignment_rounded, color: Colors.indigo.shade500), const SizedBox(width: 8), const Text("Activity Details", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))]),
                   const Padding(padding: EdgeInsets.symmetric(vertical: 15), child: Divider(height: 1)),
                   _buildFormInput("Activity Name", _nameCtrl, Icons.title_rounded),
                   const SizedBox(height: 15),
@@ -644,11 +687,11 @@ class _ActivityFormPageState extends State<ActivityFormPage> {
             // KARTU ATTENDANCE
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.teal.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 5))]),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.indigo.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 5))]),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(children: [Icon(Icons.how_to_reg_rounded, color: Colors.teal.shade600), const SizedBox(width: 8), const Text("Student Attendance", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))]),
+                  Row(children: [Icon(Icons.how_to_reg_rounded, color: Colors.indigo.shade500), const SizedBox(width: 8), const Text("Student Attendance", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))]),
                   const SizedBox(height: 15),
                   Container(
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.grey.shade200)),
@@ -656,11 +699,11 @@ class _ActivityFormPageState extends State<ActivityFormPage> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                          decoration: BoxDecoration(color: Colors.teal.shade50, borderRadius: const BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+                          decoration: BoxDecoration(color: Colors.indigo.shade50, borderRadius: const BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15))),
                           child: Row(children: [
                             const SizedBox(width: 25, child: Text("#", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                            Expanded(child: Text("Student Name", style: TextStyle(color: Colors.teal.shade800, fontWeight: FontWeight.bold, fontSize: 12))),
-                            Text("Present", style: TextStyle(color: Colors.teal.shade800, fontWeight: FontWeight.bold, fontSize: 12)),
+                            Expanded(child: Text("Student Name", style: TextStyle(color: Colors.indigo.shade800, fontWeight: FontWeight.bold, fontSize: 12))),
+                            Text("Present", style: TextStyle(color: Colors.indigo.shade800, fontWeight: FontWeight.bold, fontSize: 12)),
                           ]),
                         ),
                         ListView.separated(
@@ -675,7 +718,7 @@ class _ActivityFormPageState extends State<ActivityFormPage> {
                               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(_attendance[index]['fullName'], style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)), Text(_attendance[index]['userId'], style: TextStyle(fontSize: 10, color: Colors.grey.shade500))])),
                               Checkbox(
                                   value: _attendance[index]['present'],
-                                  activeColor: Colors.teal.shade600,
+                                  activeColor: Colors.indigo.shade500,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                                   onChanged: (v) => setState(() => _attendance[index]['present'] = v!)
                               ),
@@ -714,7 +757,7 @@ class _ActivityFormPageState extends State<ActivityFormPage> {
                   "attendance": _attendance,
                 });
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.teal.shade600, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), elevation: 0),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.indigo.shade500, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), elevation: 0),
               child: const Text("Save Activity", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             )),
           ],
@@ -744,12 +787,12 @@ class _ActivityFormPageState extends State<ActivityFormPage> {
             }
           },
           decoration: InputDecoration(
-            prefixIcon: maxLines == 1 ? Icon(icon, color: Colors.teal.shade300, size: 20) : null,
+            prefixIcon: maxLines == 1 ? Icon(icon, color: Colors.indigo.shade300, size: 20) : null,
             filled: true,
             fillColor: Colors.grey.shade50,
             contentPadding: const EdgeInsets.all(15),
             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.grey.shade300)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.teal.shade400, width: 1.5)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.indigo.shade400, width: 1.5)),
           ),
         ),
       ],

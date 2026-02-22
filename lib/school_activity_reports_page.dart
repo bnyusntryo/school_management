@@ -2,80 +2,125 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'class_activity_page.dart';
 
+// ============================================================================
+// HALAMAN 1: DASHBOARD LAPORAN (SCHOOL ACTIVITY REPORTS)
+// ============================================================================
+
 class SchoolActivityReportsPage extends StatelessWidget {
   const SchoolActivityReportsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text("School Activity Reports", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Available Reports", style: TextStyle(fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w500)),
-            const SizedBox(height: 15),
-            Container(
-              padding: const EdgeInsets.all(20),
+      backgroundColor: const Color(0xFFF5F7FA),
+      body: CustomScrollView(
+        slivers: [
+          // --- HEADER MELENGKUNG (TEMA EMERALD/HIJAU) ---
+          SliverAppBar(
+            expandedHeight: 120,
+            floating: false,
+            pinned: true,
+            backgroundColor: Colors.transparent,
+            flexibleSpace: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(25),
-                boxShadow: [
-                  BoxShadow(color: Colors.indigo.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10)),
-                ],
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  // Warna hijau Emerald/Teal yang berbeda dari halaman sebelumnya
+                  colors: [Colors.teal.shade500, Colors.green.shade700],
+                ),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                ),
               ),
+              child: const FlexibleSpaceBar(
+                titlePadding: EdgeInsets.only(left: 60, bottom: 20),
+                title: Text(
+                  "Activity Reports",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
+                ),
+              ),
+            ),
+            leading: Container(
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+              child: IconButton(icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white), onPressed: () => Navigator.pop(context)),
+            ),
+          ),
+
+          // --- BODY: DAFTAR LAPORAN ---
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-                        child: const Icon(Icons.assignment_rounded, color: Colors.blueAccent),
-                      ),
-                      const SizedBox(width: 15),
-                      const Expanded(
-                        child: Text("Class Activity Report", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    "Show activity that has been recorded in class by teacher. Filter by date and class to generate a detailed summary.",
-                    style: TextStyle(fontSize: 12, color: Colors.grey, height: 1.5),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ClassActivityFilterPage())),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4A90E2),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                      ),
-                      child: const Text("Preview Report", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text("Available Reports", style: TextStyle(fontSize: 14, color: Colors.grey.shade600, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 15),
+                  Container(
+                    padding: const EdgeInsets.all(25),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(color: Colors.teal.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 10)),
+                      ],
+                      border: Border.all(color: Colors.grey.shade100),
                     ),
-                  )
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(15)),
+                              child: Icon(Icons.assignment_rounded, color: Colors.green.shade600, size: 28),
+                            ),
+                            const SizedBox(width: 15),
+                            const Expanded(
+                              child: Text("Class Activity Report", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 15),
+                        Text(
+                          "Show activity that has been recorded in class by teacher. Filter by date and class to generate a detailed summary.",
+                          style: TextStyle(fontSize: 13, color: Colors.grey.shade600, height: 1.5),
+                        ),
+                        const SizedBox(height: 25),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ClassActivityFilterPage())),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.teal.shade600,
+                              foregroundColor: Colors.white,
+                              elevation: 4,
+                              shadowColor: Colors.teal.withOpacity(0.4),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                            ),
+                            child: const Text("Preview Report", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
+
+// ============================================================================
+// HALAMAN 2: FILTER LAPORAN
+// ============================================================================
 
 class ClassActivityFilterPage extends StatefulWidget {
   const ClassActivityFilterPage({super.key});
@@ -98,102 +143,137 @@ class _ClassActivityFilterPageState extends State<ClassActivityFilterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text("Filter Report", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(25),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSectionTitle("Date Range"),
-            TextField(
-              controller: _dateRangeCtrl,
-              readOnly: true,
-              onTap: () async {
-                final picked = await showDateRangePicker(
-                  context: context, 
-                  firstDate: DateTime(2020), 
-                  lastDate: DateTime(2030),
-                  builder: (context, child) {
-                    return Theme(
-                      data: Theme.of(context).copyWith(
-                        colorScheme: const ColorScheme.light(primary: Color(0xFF1A237E)),
-                      ),
-                      child: child!,
-                    );
-                  },
-                );
-                if (picked != null) {
-                  setState(() {
-                    _dateRangeCtrl.text = "${DateFormat('dd MMM yyyy').format(picked.start)} - ${DateFormat('dd MMM yyyy').format(picked.end)}";
-                  });
-                }
-              },
-              decoration: InputDecoration(
-                hintText: "Select Period", 
-                prefixIcon: const Icon(Icons.calendar_month_outlined, size: 20),
-                filled: true,
-                fillColor: Colors.grey[500]!.withOpacity(0.05),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
-              ),
-            ),
-            const SizedBox(height: 30),
-            _buildSectionTitle("Select Class"),
-            Container(
+      backgroundColor: const Color(0xFFF5F7FA),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 120,
+            floating: false,
+            pinned: true,
+            backgroundColor: Colors.transparent,
+            flexibleSpace: Container(
               decoration: BoxDecoration(
-                color: Colors.grey[500]!.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(15),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.teal.shade500, Colors.green.shade700],
+                ),
+                borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
               ),
-              child: Column(
-                children: _availableClasses.map((className) {
-                  return CheckboxListTile(
-                    title: Text(className, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                    value: _selectedClasses.contains(className),
-                    activeColor: const Color(0xFF1A237E),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-                    onChanged: (val) {
-                      setState(() {
-                        if (val!) {
-                          _selectedClasses.add(className);
-                        } else {
-                          _selectedClasses.remove(className);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
+              child: const FlexibleSpaceBar(
+                titlePadding: EdgeInsets.only(left: 60, bottom: 20),
+                title: Text("Filter Report", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
               ),
             ),
-            const SizedBox(height: 40),
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (_dateRangeCtrl.text.isEmpty || _selectedClasses.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select date and classes")));
-                    return;
-                  }
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => ClassActivityReportResultPage(
-                    selectedClasses: _selectedClasses,
-                    dateRange: _dateRangeCtrl.text,
-                  )));
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1A237E),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                  elevation: 5,
-                  shadowColor: const Color(0xFF1A237E).withOpacity(0.4),
-                ),
-                child: const Text("Generate Report", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+            leading: Container(
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+              child: IconButton(icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white), onPressed: () => Navigator.pop(context)),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionTitle("Date Range"),
+                  TextField(
+                    controller: _dateRangeCtrl,
+                    readOnly: true,
+                    onTap: () async {
+                      final picked = await showDateRangePicker(
+                        context: context,
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2030),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(colorScheme: ColorScheme.light(primary: Colors.teal.shade600)),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          _dateRangeCtrl.text = "${DateFormat('dd MMM yyyy').format(picked.start)} - ${DateFormat('dd MMM yyyy').format(picked.end)}";
+                        });
+                      }
+                    },
+                    style: const TextStyle(fontWeight: FontWeight.w500),
+                    decoration: InputDecoration(
+                      hintText: "Select Period",
+                      prefixIcon: Icon(Icons.calendar_month_outlined, color: Colors.teal.shade400, size: 22),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.all(16),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.teal.shade400, width: 1.5)),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+
+                  _buildSectionTitle("Select Class"),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.grey.shade200),
+                      boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))],
+                    ),
+                    child: Column(
+                      children: _availableClasses.map((className) {
+                        bool isSelected = _selectedClasses.contains(className);
+                        return CheckboxListTile(
+                          title: Text(className, style: TextStyle(fontSize: 14, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500, color: isSelected ? Colors.teal.shade800 : Colors.black87)),
+                          value: isSelected,
+                          activeColor: Colors.teal.shade600,
+                          checkboxShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
+                          onChanged: (val) {
+                            setState(() {
+                              if (val!) {
+                                _selectedClasses.add(className);
+                              } else {
+                                _selectedClasses.remove(className);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                ],
               ),
-            )
-          ],
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))]),
+        child: SizedBox(
+          width: double.infinity,
+          height: 55,
+          child: ElevatedButton(
+            onPressed: () {
+              if (_dateRangeCtrl.text.isEmpty || _selectedClasses.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text("Please select date and classes", style: TextStyle(color: Colors.white)), backgroundColor: Colors.red.shade600, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), behavior: SnackBarBehavior.floating));
+                return;
+              }
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ClassActivityReportResultPage(
+                selectedClasses: _selectedClasses,
+                dateRange: _dateRangeCtrl.text,
+              )));
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.teal.shade600,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              elevation: 4,
+              shadowColor: Colors.teal.withOpacity(0.4),
+            ),
+            child: const Text("Generate Report", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
         ),
       ),
     );
@@ -201,9 +281,13 @@ class _ClassActivityFilterPageState extends State<ClassActivityFilterPage> {
 
   Widget _buildSectionTitle(String title) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
-    child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.blueGrey)),
+    child: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.teal.shade800)),
   );
 }
+
+// ============================================================================
+// HALAMAN 3: HASIL LAPORAN (REPORT RESULT)
+// ============================================================================
 
 class ClassActivityReportResultPage extends StatelessWidget {
   final List<String> selectedClasses;
@@ -211,29 +295,28 @@ class ClassActivityReportResultPage extends StatelessWidget {
 
   const ClassActivityReportResultPage({super.key, required this.selectedClasses, required this.dateRange});
 
-  // Fungsi Simulasi Export PDF
+  // Fungsi Simulasi Export PDF (Tidak diubah)
   void _exportPdf(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Row(
-          children: [
+          children: const [
             CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
             SizedBox(width: 15),
             Text("Generating PDF document..."),
           ],
         ),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.teal.shade600,
+        behavior: SnackBarBehavior.floating,
       ),
     );
-    
     Future.delayed(const Duration(seconds: 2), () {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(backgroundColor: Colors.green, content: Text("PDF Report exported successfully!")),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.green, content: Text("PDF Report exported successfully!"), behavior: SnackBarBehavior.floating));
     });
   }
 
-  // Fungsi Simulasi Share
+  // Fungsi Simulasi Share (Dipercantik sedikit tampilannya)
   void _shareReport(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -248,9 +331,9 @@ class ClassActivityReportResultPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _shareOption(Icons.message, "WhatsApp", Colors.green),
-                _shareOption(Icons.email, "Email", Colors.redAccent),
-                _shareOption(Icons.copy, "Copy Link", Colors.blue),
+                _shareOption(Icons.message_rounded, "WhatsApp", Colors.green),
+                _shareOption(Icons.email_rounded, "Email", Colors.redAccent),
+                _shareOption(Icons.copy_rounded, "Copy Link", Colors.blue),
               ],
             ),
             const SizedBox(height: 20),
@@ -265,7 +348,7 @@ class ClassActivityReportResultPage extends StatelessWidget {
       children: [
         CircleAvatar(radius: 25, backgroundColor: color.withOpacity(0.1), child: Icon(icon, color: color)),
         const SizedBox(height: 8),
-        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -273,7 +356,7 @@ class ClassActivityReportResultPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> filteredActivities = [];
-    
+
     ClassActivityData.allActivities.forEach((key, list) {
       for (var className in selectedClasses) {
         if (key.startsWith(className)) {
@@ -283,153 +366,175 @@ class ClassActivityReportResultPage extends StatelessWidget {
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text("Report Result", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        actions: [
-          IconButton(
-            onPressed: () => _shareReport(context), 
-            icon: const Icon(Icons.share_outlined, color: Colors.blue)
-          ),
-          IconButton(
-            onPressed: () => _exportPdf(context), 
-            icon: const Icon(Icons.picture_as_pdf_outlined, color: Colors.red)
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
+      backgroundColor: const Color(0xFFF5F7FA),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 120,
+            floating: false,
+            pinned: true,
+            backgroundColor: Colors.transparent,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.teal.shade500, Colors.green.shade700]),
+                borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
+              ),
+              child: const FlexibleSpaceBar(
+                titlePadding: EdgeInsets.only(left: 60, bottom: 20),
+                title: Text("Report Result", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+            leading: Container(
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+              child: IconButton(icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white), onPressed: () => Navigator.pop(context)),
+            ),
+            actions: [
+              IconButton(onPressed: () => _shareReport(context), icon: const Icon(Icons.share_rounded, color: Colors.white)),
+              IconButton(onPressed: () => _exportPdf(context), icon: const Icon(Icons.picture_as_pdf_rounded, color: Colors.white)),
+              const SizedBox(width: 5),
+            ],
+          ),
+
+          SliverToBoxAdapter(
+            child: Container(
+              margin: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.teal.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 5))]),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.date_range_rounded, size: 16, color: Colors.teal.shade600),
+                      const SizedBox(width: 8),
+                      Text(dateRange, style: const TextStyle(fontSize: 13, color: Colors.black87, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: Divider(height: 1)),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: selectedClasses.map((c) => Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.green.shade100)),
+                      child: Text(c, style: TextStyle(fontSize: 11, color: Colors.green.shade700, fontWeight: FontWeight.bold)),
+                    )).toList(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            sliver: filteredActivities.isEmpty
+                ? SliverToBoxAdapter(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.date_range, size: 14, color: Colors.grey),
-                    const SizedBox(width: 5),
-                    Text(dateRange, style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 50),
+                    Icon(Icons.folder_off_rounded, size: 80, color: Colors.grey.shade300),
+                    const SizedBox(height: 15),
+                    Text("No activities found", style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold, fontSize: 16)),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: selectedClasses.map((c) => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-                    child: Text(c, style: const TextStyle(fontSize: 10, color: Colors.blue, fontWeight: FontWeight.bold)),
-                  )).toList(),
-                ),
-              ],
-            ),
-          ),
-          
-          Expanded(
-            child: filteredActivities.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.folder_open_outlined, size: 80, color: Colors.grey[300]),
-                        const SizedBox(height: 10),
-                        const Text("No data found", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-                      ],
+              ),
+            )
+                : SliverList(
+              delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                  final item = filteredActivities[index];
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.grey.shade200),
+                      boxShadow: [BoxShadow(color: Colors.teal.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 5))],
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(20),
-                    itemCount: filteredActivities.length,
-                    itemBuilder: (context, index) {
-                      final item = filteredActivities[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 5)),
-                          ],
-                        ),
-                        child: InkWell(
-                          onTap: () => _showAttendanceDetail(context, item),
-                          borderRadius: BorderRadius.circular(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                height: 8,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF4A90E2),
-                                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                    child: InkWell(
+                      onTap: () => _showAttendanceDetail(context, item),
+                      borderRadius: BorderRadius.circular(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Pita Header Kartu
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.teal.shade50,
+                              borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(child: Text(item['name'], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.teal.shade800), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                                Icon(Icons.chevron_right_rounded, size: 20, color: Colors.teal.shade300),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(item['description'], style: TextStyle(fontSize: 13, color: Colors.grey.shade700, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+                                const SizedBox(height: 15),
+                                Row(
                                   children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Text(item['name'], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
-                                        ),
-                                        const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.blueGrey),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(item['description'], style: const TextStyle(fontSize: 13, color: Colors.black54, height: 1.4)),
-                                    const SizedBox(height: 15),
-                                    const Divider(),
-                                    const SizedBox(height: 10),
-                                    Row(
-                                      children: [
-                                        _buildTimeInfo(Icons.calendar_today, item['date']),
-                                        const SizedBox(width: 20),
-                                        _buildTimeInfo(Icons.access_time, item['time']),
-                                      ],
-                                    ),
+                                    _buildTimeInfo(Icons.calendar_today_rounded, item['date'], Colors.blue),
+                                    const SizedBox(width: 20),
+                                    _buildTimeInfo(Icons.access_time_filled_rounded, item['time'], Colors.orange),
                                   ],
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                childCount: filteredActivities.length,
+              ),
+            ),
           ),
+          const SliverPadding(padding: EdgeInsets.only(bottom: 40)),
         ],
       ),
     );
   }
 
-  Widget _buildTimeInfo(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 14, color: Colors.blueAccent),
-        const SizedBox(width: 6),
-        Text(text, style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w600)),
-      ],
+  Widget _buildTimeInfo(IconData icon, String text, MaterialColor color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(color: color.shade50, borderRadius: BorderRadius.circular(6)),
+      child: Row(
+        children: [
+          Icon(icon, size: 12, color: color.shade600),
+          const SizedBox(width: 6),
+          Text(text, style: TextStyle(fontSize: 10, color: color.shade800, fontWeight: FontWeight.bold)),
+        ],
+      ),
     );
   }
 
+  // Fungsi Tampil Absen Modal (Tampilan Dipercantik)
   void _showAttendanceDetail(BuildContext context, Map<String, dynamic> activity) {
     final List attendance = activity['attendance'] as List;
+
+    // Hitung statistik
+    int presentCount = attendance.where((s) => s['present'] == true).length;
+    int absentCount = attendance.length - presentCount;
+
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.75,
         padding: const EdgeInsets.all(25),
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -437,27 +542,48 @@ class ClassActivityReportResultPage extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Container(width: 40, height: 5, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10))),
+            Container(width: 50, height: 5, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10))),
             const SizedBox(height: 20),
-            Text("Attendance: ${activity['name']}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            const SizedBox(height: 20),
+            Text(activity['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18), textAlign: TextAlign.center),
+            const SizedBox(height: 15),
+
+            // Statistik Singkat
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildStatBadge("Present", presentCount.toString(), Colors.green),
+                const SizedBox(width: 15),
+                _buildStatBadge("Absent", absentCount.toString(), Colors.red),
+              ],
+            ),
+            const Padding(padding: EdgeInsets.symmetric(vertical: 15), child: Divider()),
+
+            // Daftar Absensi
             Expanded(
               child: ListView.builder(
                 itemCount: attendance.length,
                 itemBuilder: (context, index) {
                   final student = attendance[index];
+                  bool isPresent = student['present'];
+
                   return Container(
                     margin: const EdgeInsets.only(bottom: 10),
-                    decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(15)),
+                    decoration: BoxDecoration(
+                        color: isPresent ? Colors.green.shade50.withOpacity(0.5) : Colors.red.shade50.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(color: isPresent ? Colors.green.shade100 : Colors.red.shade100)
+                    ),
                     child: ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: student['present'] ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
-                        child: Text("${index + 1}", style: TextStyle(fontSize: 12, color: student['present'] ? Colors.green : Colors.red)),
+                        backgroundColor: isPresent ? Colors.green.shade100 : Colors.red.shade100,
+                        child: Text("${index + 1}", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isPresent ? Colors.green.shade700 : Colors.red.shade700)),
                       ),
-                      title: Text(student['fullName'], style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                      trailing: Icon(
-                        student['present'] ? Icons.check_circle : Icons.cancel,
-                        color: student['present'] ? Colors.green : Colors.red,
+                      title: Text(student['fullName'], style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                      subtitle: Text("ID: ${student['userId']}", style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(color: isPresent ? Colors.green.shade500 : Colors.red.shade500, borderRadius: BorderRadius.circular(10)),
+                        child: Text(isPresent ? "Present" : "Absent", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   );
@@ -466,6 +592,20 @@ class ClassActivityReportResultPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildStatBadge(String label, String count, MaterialColor color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(color: color.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: color.shade200)),
+      child: Row(
+        children: [
+          Icon(label == "Present" ? Icons.check_circle_rounded : Icons.cancel_rounded, size: 14, color: color.shade600),
+          const SizedBox(width: 6),
+          Text("$count $label", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color.shade700)),
+        ],
       ),
     );
   }

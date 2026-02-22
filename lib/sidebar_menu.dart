@@ -12,6 +12,7 @@ import 'school_activity_reports_page.dart';
 import 'question_library_page.dart';
 import 'exam_management_page.dart';
 import 'exam_period_page.dart';
+import 'staff_information_page.dart';
 import 'dart:math' as math;
 
 class SidebarMenu extends StatefulWidget {
@@ -333,7 +334,7 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
             if (_isCBTExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "Staff") {
             _isStaffExpanded = !_isStaffExpanded;
-            if (_isStaffExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
+            if (_isStaffExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "Attendance") {
             _isAttendanceExpanded = !_isAttendanceExpanded;
             if (_isAttendanceExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
@@ -460,7 +461,9 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
                                 })),
                               if (title == "Staff")
                                 ..._staffSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
-                                  // TODO: Staff navigation
+                                  if (subMenu == "Staff Information") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const StaffInformationPage()));
+                                  }
                                 })),
                               if (title == "Attendance")
                                 ..._attendanceSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {

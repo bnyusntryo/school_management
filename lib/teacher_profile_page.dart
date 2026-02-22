@@ -45,189 +45,217 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            backgroundColor: Colors.grey[100],
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black, size: 20),
-              onPressed: () => Navigator.pop(context),
+      backgroundColor: const Color(0xFFF5F7FA), // Background abu-abu muda
+      body: CustomScrollView(
+        slivers: [
+          // --- HEADER MELENGKUNG PROFILE GURU ---
+          SliverAppBar(
+            expandedHeight: 220,
+            floating: false,
+            pinned: true,
+            backgroundColor: Colors.transparent,
+            leading: Container(
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+              child: IconButton(icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white), onPressed: () => Navigator.pop(context)),
+            ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        // Gradasi Pink Magenta
+                        colors: [Colors.pink.shade400, Colors.pink.shade700],
+                      ),
+                      borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(40), bottomRight: Radius.circular(40)),
+                    ),
+                  ),
+                  Positioned(
+                    top: 60,
+                    left: 0,
+                    right: 0,
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(0.3)),
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundColor: Colors.white,
+                            backgroundImage: NetworkImage(widget.teacherData['image']!),
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        Text(
+                          widget.teacherData['name']!,
+                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                        const SizedBox(height: 5),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+                          decoration: BoxDecoration(color: Colors.black.withOpacity(0.15), borderRadius: BorderRadius.circular(20)),
+                          child: Text(
+                            "NIP: ${widget.teacherData['nip']}",
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        title: const Text("Teacher Profile", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        centerTitle: false,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            // --- TOP PROFILE CARD ---
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF0F5), // Light Pink for Teacher
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Column(
-                children: [
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.pinkAccent.withOpacity(0.2), width: 3),
-                        ),
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: NetworkImage(widget.teacherData['image']!),
-                        ),
-                      ),
-                      Positioned(
-                        top: 0,
-                        right: -40,
-                        child: TextButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(Icons.edit_note, size: 18, color: Colors.pinkAccent),
-                          label: const Text("Edit", style: TextStyle(color: Colors.pinkAccent, fontSize: 12)),
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  Text(
-                    widget.teacherData['name']!,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
-                  ),
-                  Text(
-                    "NIP: ${widget.teacherData['nip']}",
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 20),
-                  const Divider(),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildHeaderInfo("Subject", widget.teacherData['subject']!),
-                      _buildHeaderInfo("Main Class", widget.teacherData['class']!),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(height: 25),
 
-            // --- TEACHER DETAILS FORM ---
-            Container(
+          // --- BODY KONTEN (CARD ACADEMIC & FORM INFO) ---
+          SliverToBoxAdapter(
+            child: Padding(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF0F5),
-                borderRadius: BorderRadius.circular(25),
-              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("Professional Details", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
-                      TextButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.edit_note, size: 18, color: Colors.pinkAccent),
-                        label: const Text("Edit", style: TextStyle(color: Colors.pinkAccent, fontSize: 12)),
-                      ),
-                    ],
+                  // --- PROFESSIONAL ROLE CARD ---
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [BoxShadow(color: Colors.pink.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 5))],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildProfessionalInfo(Icons.menu_book_rounded, "Subject", widget.teacherData['subject'] ?? "-", Colors.indigo),
+                        Container(height: 40, width: 1, color: Colors.grey.shade200),
+                        _buildProfessionalInfo(Icons.class_rounded, "Main Class", widget.teacherData['class'] ?? "-", Colors.blue),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  _buildInputField("Full Name", _nameController),
-                  _buildInputField("NIP", _nipController),
-                  _buildInputField("Expertise", _subjectController),
-                  _buildInputField("Email", _emailController),
-                  _buildInputField("Phone", _phoneController),
-                  _buildInputField("Address", _addressController, isMultiline: true),
-                  
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFE53E3E),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                          ),
-                          child: const Text("Remove", style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 25),
+
+                  // --- PROFESSIONAL DETAILS FORM CARD ---
+                  Container(
+                    padding: const EdgeInsets.all(25),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, 10))],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.assignment_ind_rounded, color: Colors.pink.shade500, size: 20),
+                                const SizedBox(width: 10),
+                                const Text("Professional Details", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(color: Colors.pink.shade50, borderRadius: BorderRadius.circular(8)),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.edit_note_rounded, size: 14, color: Colors.pink.shade600),
+                                  const SizedBox(width: 4),
+                                  Text("Edit", style: TextStyle(color: Colors.pink.shade700, fontSize: 11, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            )
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFC2185B),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                          ),
-                          child: const Text("Save Changes", style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                      ),
-                    ],
-                  )
+                        const Padding(padding: EdgeInsets.symmetric(vertical: 15), child: Divider(height: 1)),
+
+                        _buildInputField("Full Name", _nameController, Icons.person_rounded),
+                        _buildInputField("NIP", _nipController, Icons.badge_rounded),
+                        _buildInputField("Expertise (Subject)", _subjectController, Icons.school_rounded),
+                        _buildInputField("Email", _emailController, Icons.email_rounded),
+                        _buildInputField("Phone", _phoneController, Icons.phone_android_rounded),
+                        _buildInputField("Address", _addressController, Icons.home_rounded, isMultiline: true),
+
+                        const SizedBox(height: 30),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {},
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFE57373),
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                    elevation: 0
+                                ),
+                                child: const Text("Delete", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                            const SizedBox(width: 15),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {},
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.pink.shade600,
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                    elevation: 4,
+                                    shadowColor: Colors.pink.withOpacity(0.4)
+                                ),
+                                child: const Text("Save", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildHeaderInfo(String label, String value) {
+  Widget _buildProfessionalInfo(IconData icon, String label, String value, MaterialColor color) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: color.shade50, shape: BoxShape.circle),
+            child: Icon(icon, color: color.shade500, size: 20)
+        ),
+        const SizedBox(height: 8),
+        Text(label, style: TextStyle(fontSize: 11, color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
         Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
       ],
     );
   }
 
-  Widget _buildInputField(String label, TextEditingController controller, {bool isMultiline = false}) {
+  Widget _buildInputField(String label, TextEditingController controller, IconData icon, {bool isMultiline = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
-      child: Row(
-        crossAxisAlignment: isMultiline ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 100,
-            child: Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-          ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.pinkAccent.withOpacity(0.1)),
-              ),
-              child: TextField(
-                controller: controller,
-                maxLines: isMultiline ? 3 : 1,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                decoration: const InputDecoration(border: InputBorder.none),
-              ),
+          Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
+          const SizedBox(height: 8),
+          TextField(
+            controller: controller,
+            maxLines: isMultiline ? 3 : 1,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            decoration: InputDecoration(
+              prefixIcon: !isMultiline ? Icon(icon, color: Colors.pink.shade300, size: 20) : null,
+              filled: true,
+              fillColor: const Color(0xFFF8F9FA),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.pink.shade400, width: 1.5)),
             ),
           ),
         ],
