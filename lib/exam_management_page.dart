@@ -708,7 +708,7 @@ class EditExamManagementPage extends StatefulWidget {
 
 class _EditExamManagementPageState extends State<EditExamManagementPage> {
   // Dummy data untuk tabel "Session" yang ada di bawah form
-  List<Map<String, dynamic>> _sessionList = [];
+  final List<Map<String, dynamic>> _sessionList = [];
 
   @override
   Widget build(BuildContext context) {

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // <-- TAMBAHKAN INI UNTUK FORMATTER
 import 'class_activity_page.dart';
 import 'package:file_picker/file_picker.dart';
-import 'dart:io';
-import 'dart:math' as math;
 
 class QuestionLibraryPage extends StatefulWidget {
   const QuestionLibraryPage({super.key});
@@ -632,7 +630,7 @@ class _QuestionLibraryPageState extends State<QuestionLibraryPage> {
         children: [
           _buildLabel(label, icon),
           DropdownButtonFormField<String>(
-            value: value,
+            initialValue: value,
             decoration: _inputDeco("", icon),
             items: items
                 .map((e) => DropdownMenuItem(
@@ -940,7 +938,7 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                         ],
                       ),
                       child: DropdownButtonFormField<String>(
-                        value: selectedUploadType,
+                        initialValue: selectedUploadType,
                         isExpanded: true,
                         icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blue.shade600),
                         decoration: InputDecoration(
@@ -1862,7 +1860,7 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: items.contains(value) ? value : null,
+              initialValue: items.contains(value) ? value : null,
               isExpanded: true,
               decoration: InputDecoration(
                 filled: true,
@@ -2120,7 +2118,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                                   groupValue: _correctIndex,
                                   onChanged: (v) => setState(() => _correctIndex = v!),
                                   activeColor: Colors.white,
-                                  fillColor: MaterialStateProperty.all(Colors.white),
+                                  fillColor: WidgetStateProperty.all(Colors.white),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -2313,7 +2311,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
         children: [
           _buildLabel(label, icon),
           DropdownButtonFormField<String>(
-            value: value,
+            initialValue: value,
             items: items
                 .map((e) => DropdownMenuItem(
               value: e,

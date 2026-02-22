@@ -633,7 +633,7 @@ class _PreviewReportPageState extends State<PreviewReportPage> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
-                  headingRowColor: MaterialStateProperty.resolveWith((states) => const Color(0xFF283593)), // Biru gelap header tabel
+                  headingRowColor: WidgetStateProperty.resolveWith((states) => const Color(0xFF283593)), // Biru gelap header tabel
                   headingTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
                   dataTextStyle: const TextStyle(color: Colors.black87, fontSize: 12),
                   columnSpacing: 25, // Jarak antar kolom
@@ -654,7 +654,7 @@ class _PreviewReportPageState extends State<PreviewReportPage> {
                   rows: List.generate(reportData.length, (index) {
                     final data = reportData[index];
                     return DataRow(
-                      color: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+                      color: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
                         // Belang-belang warna baris (Zebra Striping)
                         if (index.isEven) return Colors.grey.withOpacity(0.05);
                         return null;
