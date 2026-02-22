@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:io';
 import 'sidebar_menu.dart';
 import 'schedule_page.dart';
+import 'announcement_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,27 +27,8 @@ class _HomePageState extends State<HomePage> {
       "time": "5 Minutes Ago",
       "content": "Hey there! Just wanted to share some thoughts with you. It's all about keeping things light and fun, right? Let's dive into the good stuff!",
       "likes": 12,
-      "commentList": [
-        "Great insights, Alex!",
-        "Agreed, keep it positive.",
-        "Nice post!",
-        "Very inspiring.",
-        "Totally agree with this."
-      ],
+      "commentList": ["Great insights, Alex!", "Agreed, keep it positive."],
       "isLiked": false,
-    },
-  ];
-
-  final List<Map<String, String>> _bannerItems = [
-    {
-      "title": "Announcement",
-      "subtitle": "+100 lessons",
-      "image": "https://img.freepik.com/free-vector/hand-drawn-phone-social-media-concept_23-2149118557.jpg"
-    },
-    {
-      "title": "School Event",
-      "subtitle": "Sports Day 2024",
-      "image": "https://img.freepik.com/free-vector/sports-concept-illustration_114360-3934.jpg"
     },
   ];
 
@@ -56,14 +39,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _startAutoSlider() {
+    final bannerCount = AnnouncementPage.announcements.where((a) => a['show'] == 'Yes').length;
+    
     _timer = Timer.periodic(const Duration(seconds: 4), (Timer timer) {
-      if (_currentPage < _bannerItems.length - 1) {
-        _currentPage++;
-      } else {
-        _currentPage = 0;
-      }
-      if (_pageController.hasClients) {
-        _pageController.animateToPage(_currentPage, duration: const Duration(milliseconds: 800), curve: Curves.easeInOutCubic);
+      if (bannerCount > 0) {
+        if (_currentPage < bannerCount - 1) {
+          _currentPage++;
+        } else {
+          _currentPage = 0;
+        }
+        if (_pageController.hasClients) {
+          _pageController.animateToPage(_currentPage, duration: const Duration(milliseconds: 800), curve: Curves.easeInOutCubic);
+        }
       }
     });
   }
@@ -82,7 +69,6 @@ class _HomePageState extends State<HomePage> {
         });
         _postController.clear();
       });
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Post uploaded!")));
     }
   }
 
@@ -137,7 +123,6 @@ class _HomePageState extends State<HomePage> {
                       });
                       _commentController.clear();
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Comment posted!")));
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -166,6 +151,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // MENGAMBIL DATA PENGUMUMAN DARI ANNOUNCEMENT PAGE
+    final List<Map<String, String>> activeAnnouncements = 
+        AnnouncementPage.announcements.where((a) => a['show'] == 'Yes').toList();
+
     return Scaffold(
       key: _scaffoldKey,
       drawer: const SidebarMenu(),
@@ -195,6 +184,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // PROFILE SECTION
             Row(
               children: [
                 const CircleAvatar(radius: 28, backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=12')),
@@ -209,45 +199,58 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             const SizedBox(height: 25),
-            SizedBox(
-              height: 180,
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: (int page) => setState(() => _currentPage = page),
-                itemCount: _bannerItems.length,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 5),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(25)),
-                    child: Stack(
-                      children: [
-                        Positioned.fill(child: ClipRRect(borderRadius: BorderRadius.circular(25), child: Image.network(_bannerItems[index]['image']!, fit: BoxFit.cover))),
-                        Positioned.fill(child: Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(25), gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Colors.black.withOpacity(0.6), Colors.black.withOpacity(0.1)])))),
-                        Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(_bannerItems[index]['title']!, style: const TextStyle(color: Colors.white70, fontSize: 14)),
-                              const SizedBox(height: 8),
-                              Text(_bannerItems[index]['subtitle']!, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-                              const SizedBox(height: 15),
-                              ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4A90E2), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text("Explore more")),
-                            ],
+            
+            // BANNER DINAMIS
+            if (activeAnnouncements.isNotEmpty) ...[
+              SizedBox(
+                height: 180,
+                child: PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (int page) => setState(() => _currentPage = page),
+                  itemCount: activeAnnouncements.length,
+                  itemBuilder: (context, index) {
+                    final item = activeAnnouncements[index];
+                    return Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 5),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(25)),
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(25), 
+                              child: item['isLocal'] == 'true' 
+                                ? Image.file(File(item['image']!), fit: BoxFit.cover)
+                                : Image.network(item['image']!, fit: BoxFit.cover),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                          Positioned.fill(child: Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(25), gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Colors.black.withOpacity(0.6), Colors.black.withOpacity(0.1)])))),
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text("Announcement", style: TextStyle(color: Colors.white70, fontSize: 14)),
+                                const SizedBox(height: 8),
+                                Text(item['title']!, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 15),
+                                ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4A90E2), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text("Explore more")),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-            const SizedBox(height: 15),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_bannerItems.length, (index) => Container(width: _currentPage == index ? 20 : 8, height: 6, margin: const EdgeInsets.only(right: 5), decoration: BoxDecoration(color: _currentPage == index ? Colors.blue[400] : Colors.grey[300], borderRadius: BorderRadius.circular(3)))),
-            ),
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(activeAnnouncements.length, (index) => Container(width: _currentPage == index ? 20 : 8, height: 6, margin: const EdgeInsets.only(right: 5), decoration: BoxDecoration(color: _currentPage == index ? Colors.blue[400] : Colors.grey[300], borderRadius: BorderRadius.circular(3)))),
+              ),
+            ],
+
             const SizedBox(height: 30),
             const Text("Explore Class", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
             const SizedBox(height: 15),
@@ -270,12 +273,12 @@ class _HomePageState extends State<HomePage> {
                             padding: const EdgeInsets.all(20.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(children: const [Icon(Icons.calendar_today_rounded, color: Colors.black, size: 16), SizedBox(width: 8), Text("Schedule", style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w500))]),
-                                const SizedBox(height: 4),
-                                const Text("My Class", style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold)),
-                                const Spacer(),
-                                Align(alignment: Alignment.centerRight, child: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle), child: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black54, size: 16))),
+                              children: const [
+                                Row(children: [Icon(Icons.calendar_today_rounded, color: Colors.black, size: 16), SizedBox(width: 8), Text("Schedule", style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w500))]),
+                                SizedBox(height: 4),
+                                Text("My Class", style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold)),
+                                Spacer(),
+                                Align(alignment: Alignment.centerRight, child: Icon(Icons.arrow_forward_ios_rounded, color: Colors.black54, size: 16)),
                               ],
                             ),
                           ),
@@ -378,8 +381,8 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(color: Colors.white.withOpacity(0.2)),
                       ), 
-                      child: Center(
-                        child: Text(buttonText, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold))
+                      child: const Center(
+                        child: Text("Check In", style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold))
                       )
                     )
                   )

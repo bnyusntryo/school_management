@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'sidebar_menu.dart';
+import 'teacher_profile_page.dart';
+import 'add_teacher_page.dart';
 
 class TeacherListPage extends StatefulWidget {
   const TeacherListPage({super.key});
@@ -119,7 +121,21 @@ class _TeacherListPageState extends State<TeacherListPage> {
                       style: TextStyle(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500),
                     ),
                     TextButton.icon(
-                      onPressed: () {},
+                      onPressed: () async {
+                        // Navigasi ke Add Teacher Page
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const AddTeacherPage()),
+                        );
+
+                        // Jika ada data baru yang dikirim balik
+                        if (result != null && result is Map<String, String>) {
+                          setState(() {
+                            _teachers.insert(0, result);
+                            _filteredTeachers = _teachers;
+                          });
+                        }
+                      },
                       icon: const Icon(Icons.add_circle_outline, size: 18),
                       label: const Text("Add Teacher", style: TextStyle(fontWeight: FontWeight.bold)),
                       style: TextButton.styleFrom(foregroundColor: Colors.blueAccent),
@@ -137,7 +153,18 @@ class _TeacherListPageState extends State<TeacherListPage> {
               itemCount: _filteredTeachers.length,
               itemBuilder: (context, index) {
                 final teacher = _filteredTeachers[index];
-                return _buildTeacherCard(teacher);
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TeacherProfilePage(teacherData: teacher),
+                      ),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(20),
+                  child: _buildTeacherCard(teacher),
+                );
               },
             ),
           ),
@@ -169,9 +196,9 @@ class _TeacherListPageState extends State<TeacherListPage> {
               // Subject Color Indicator
               Container(
                 width: 6,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [const Color(0xFFFF4081), const Color(0xFFC2185B)],
+                    colors: [Color(0xFFFF4081), Color(0xFFC2185B)],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),

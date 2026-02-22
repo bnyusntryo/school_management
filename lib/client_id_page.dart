@@ -84,7 +84,7 @@ class _ClientIdPageState extends State<ClientIdPage> {
                           Icon(Icons.school, size: 40, color: Color(0xFF2E3E5C)),
                           SizedBox(width: 10),
                           Text(
-                            "PEDE",
+                            "GLORA",
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -101,14 +101,14 @@ class _ClientIdPageState extends State<ClientIdPage> {
                           children: [
                             TextSpan(text: "Welcome To "),
                             TextSpan(
-                              text: "PEDE",
+                              text: "GLORA",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,
                                 color: Color(0xFF2962FF),
                               ),
                             ),
-                            TextSpan(text: " by Tjipta"),
+                            TextSpan(text: " by Faryandra"),
                           ],
                         ),
                       ),
@@ -223,7 +223,7 @@ class _ClientIdPageState extends State<ClientIdPage> {
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: const Text(
-                    "© 2025 Tjipta ID. All rights reserved.",
+                    "© 2025 Faryandra Tech. All rights reserved.",
                     style: TextStyle(color: Colors.black54, fontSize: 12),
                   ),
                 ),

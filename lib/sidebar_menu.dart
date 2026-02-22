@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:school_management/cbt_report_page.dart';
+import 'package:school_management/exam_period_page.dart' hide ExamPeriodPage;
+import 'package:school_management/monitoring_exam_page.dart';
 import 'student_list_page.dart';
 import 'home_page.dart';
 import 'teacher_list_page.dart';
 import 'teacher_certificate_page.dart';
+import 'teacher_performance_page.dart';
+import 'announcement_page.dart';
+import 'class_activity_page.dart';
+import 'school_activity_reports_page.dart';
+import 'question_library_page.dart';
+import 'exam_management_page.dart';
+import 'exam_period_page.dart';
 import 'dart:math' as math;
 
 class SidebarMenu extends StatefulWidget {
@@ -15,6 +25,7 @@ class SidebarMenu extends StatefulWidget {
 class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   int _selectedIndex = -1;
+  
   bool _isStudentExpanded = false;
   bool _isTeacherExpanded = false;
   bool _isCBTExpanded = false;
@@ -22,24 +33,16 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
   bool _isAttendanceExpanded = false;
   bool _isBankMiniExpanded = false;
   bool _isELearningExpanded = false;
+  bool _isSchoolActivityExpanded = false;
 
   final List<String> _studentSubMenus = [
     "Student Information",
-    "Subject history",
-    "Class History",
-    "Family Data",
-    "Skill",
-    "Interest",
-    "Disiplinary",
-    "Ekskul",
   ];
 
   final List<String> _teacherSubMenus = [
     "Teacher Information",
     "Teacher Certificate",
-    "Performance Planning",
-    "Performance Monitoring",
-    "Performance Evaluation",
+    "Teacher Performance",
   ];
 
   final List<String> _cbtSubMenus = [
@@ -72,6 +75,12 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
     "E-Learning Reports",
   ];
 
+  final List<String> _schoolActivitySubMenus = [
+    "Announcement",
+    "Class Activity",
+    "School Activity Reports",
+  ];
+
   final List<Map<String, dynamic>> _menuItems = [
     {
       "title": "Home",
@@ -94,6 +103,14 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
         const Color(0xFFE91E63).withOpacity(0.2),
         const Color(0xFFFFEB3B).withOpacity(0.2),
         Colors.white.withOpacity(0.15),
+      ],
+    },
+    {
+      "title": "School Activity",
+      "colors": [const Color(0xFF4DB6AC), const Color(0xFF00796B)],
+      "patternColors": [
+        const Color(0xFF004D40).withOpacity(0.2),
+        const Color(0xFF80CBC4).withOpacity(0.15),
       ],
     },
     {
@@ -157,16 +174,16 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
     super.dispose();
   }
 
-  // Menambah tinggi expanded agar tidak overflow
   double _getExpandedHeight(String title) {
     switch (title) {
-      case "Student": return 500.0;
-      case "Teacher": return 360.0;
-      case "CBT": return 360.0;
-      case "Attendance": return 260.0;
-      case "Bank Mini": return 300.0;
-      case "E-Learning": return 220.0;
+      case "Student": return 180.0;
+      case "Teacher": return 280.0;
+      case "CBT": return 380.0;
+      case "Attendance": return 280.0;
+      case "Bank Mini": return 320.0;
+      case "E-Learning": return 240.0;
       case "Staff": return 180.0;
+      case "School Activity": return 240.0;
       default: return 120.0;
     }
   }
@@ -226,15 +243,7 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 40),
                       child: SizedBox(
-                        // Tinggi total dinamis yang lebih lega
-                        height: 1200 + 
-                                (_isStudentExpanded ? 380 : 0) + 
-                                (_isTeacherExpanded ? 240 : 0) + 
-                                (_isCBTExpanded ? 240 : 0) + 
-                                (_isStaffExpanded ? 60 : 0) + 
-                                (_isAttendanceExpanded ? 140 : 0) + 
-                                (_isBankMiniExpanded ? 180 : 0) + 
-                                (_isELearningExpanded ? 100 : 0),
+                        height: 1800, 
                         child: Stack(
                           children: _buildMenuItems(),
                         ),
@@ -264,7 +273,8 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
                          (title == "Staff" && _isStaffExpanded) ||
                          (title == "Attendance" && _isAttendanceExpanded) ||
                          (title == "Bank Mini" && _isBankMiniExpanded) ||
-                         (title == "E-Learning" && _isELearningExpanded);
+                         (title == "E-Learning" && _isELearningExpanded) ||
+                         (title == "School Activity" && _isSchoolActivityExpanded);
 
       list.add(
         AnimatedPositioned(
@@ -277,7 +287,7 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
       );
 
       if (isExpanded) {
-        currentTop += _getExpandedHeight(title) - 35.0; 
+        currentTop += _getExpandedHeight(title) - 30.0; 
       } else {
         currentTop += 85.0;
       }
@@ -315,25 +325,28 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
         setState(() {
           if (title == "Student") {
             _isStudentExpanded = !_isStudentExpanded;
-            if (_isStudentExpanded) { _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; }
+            if (_isStudentExpanded) { _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "Teacher") {
             _isTeacherExpanded = !_isTeacherExpanded;
-            if (_isTeacherExpanded) { _isStudentExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; }
+            if (_isTeacherExpanded) { _isStudentExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "CBT") {
             _isCBTExpanded = !_isCBTExpanded;
-            if (_isCBTExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; }
+            if (_isCBTExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "Staff") {
             _isStaffExpanded = !_isStaffExpanded;
-            if (_isStaffExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; }
+            if (_isStaffExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "Attendance") {
             _isAttendanceExpanded = !_isAttendanceExpanded;
-            if (_isAttendanceExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; }
+            if (_isAttendanceExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
+          } else if (title == "School Activity") {
+            _isSchoolActivityExpanded = !_isSchoolActivityExpanded;
+            if (_isSchoolActivityExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; }
           } else if (title == "Bank Mini") {
             _isBankMiniExpanded = !_isBankMiniExpanded;
-            if (_isBankMiniExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isELearningExpanded = false; }
+            if (_isBankMiniExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "E-Learning") {
             _isELearningExpanded = !_isELearningExpanded;
-            if (_isELearningExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; }
+            if (_isELearningExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "Home") {
             Navigator.pushAndRemoveUntil(
               context,
@@ -406,7 +419,6 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
                     ),
                     if (isExpanded) ...[
                       const SizedBox(height: 20),
-                      // Membungkus sub-menu dengan Expanded agar tidak overflow jika konten terlalu banyak
                       Expanded(
                         child: SingleChildScrollView(
                           physics: const NeverScrollableScrollPhysics(),
@@ -418,35 +430,61 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
                                   if (subMenu == "Student Information") {
                                     Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentListPage()));
                                   }
-                                })).toList(),
+                                })),
                               if (title == "Teacher")
                                 ..._teacherSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
                                   if (subMenu == "Teacher Information") {
                                     Navigator.push(context, MaterialPageRoute(builder: (context) => const TeacherListPage()));
                                   } else if (subMenu == "Teacher Certificate") {
                                     Navigator.push(context, MaterialPageRoute(builder: (context) => const TeacherCertificatePage()));
+                                  } else if (subMenu == "Teacher Performance") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const TeacherPerformancePage()));
                                   }
-                                })).toList(),
+                                })),
                               if (title == "CBT")
                                 ..._cbtSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
-                                  // TODO: CBT navigation
-                                })).toList(),
+                                  if (subMenu == "Question Library") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const QuestionLibraryPage()));
+                                  }
+                                  if (subMenu == "Exam Management") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ExamManagementPage()));
+                                  }
+                                  if (subMenu == "Exam Period") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ExamPeriodPage()));
+                                  }
+                                  if (subMenu == "Monitoring Exam") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const MonitoringExamPage()));
+                                  }
+                                  if (subMenu == "CBT Reports") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const CBTReportsPage()));
+                                  }
+                                })),
                               if (title == "Staff")
                                 ..._staffSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
                                   // TODO: Staff navigation
-                                })).toList(),
+                                })),
                               if (title == "Attendance")
                                 ..._attendanceSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
                                   // TODO: Attendance navigation
-                                })).toList(),
+                                })),
+                              if (title == "School Activity")
+                                ..._schoolActivitySubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
+                                  if (subMenu == "Announcement") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const AnnouncementPage()));
+                                  } else if (subMenu == "Class Activity") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ClassActivityPage()));
+                                  } else if (subMenu == "School Activity Reports") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const SchoolActivityReportsPage()));
+                                  }
+                                })),
                               if (title == "Bank Mini")
                                 ..._bankMiniSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
                                   // TODO: Bank Mini navigation
-                                })).toList(),
+                                })),
                               if (title == "E-Learning")
                                 ..._eLearningSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
                                   // TODO: E-Learning navigation
-                                })).toList(),
+                                })),
                             ],
                           ),
                         ),

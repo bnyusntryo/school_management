@@ -14,7 +14,7 @@ class _StudentListPageState extends State<StudentListPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
   
-  List<Map<String, String>> _students = [
+  final List<Map<String, String>> _students = [
     {"name": "Yoga Pratama", "nis": "30291737282", "kelas": "XII", "jurusan": "Teknik Komputer Jaringan"},
     {"name": "Budi Santoso", "nis": "30291737283", "kelas": "XII", "jurusan": "Rekayasa Perangkat Lunak"},
     {"name": "Diana Sari", "nis": "30291737284", "kelas": "XII", "jurusan": "Desain Komunikasi Visual"},
