@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:school_management/bank_account_page.dart';
+import 'package:school_management/bank_mini_reports_page.dart';
 import 'package:school_management/cbt_report_page.dart';
 import 'package:school_management/monitoring_exam_page.dart';
 import 'student_list_page.dart';
@@ -13,6 +15,10 @@ import 'question_library_page.dart';
 import 'exam_management_page.dart';
 import 'exam_period_page.dart';
 import 'staff_information_page.dart';
+import 'bank_account_page.dart';
+import 'transaction_list_page.dart';
+import 'bank_mini_reports_page.dart';
+import 'bank_mini_print_out_page.dart';
 import 'dart:math' as math;
 
 class SidebarMenu extends StatefulWidget {
@@ -25,7 +31,7 @@ class SidebarMenu extends StatefulWidget {
 class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   int _selectedIndex = -1;
-  
+
   bool _isStudentExpanded = false;
   bool _isTeacherExpanded = false;
   bool _isCBTExpanded = false;
@@ -66,7 +72,7 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
   final List<String> _bankMiniSubMenus = [
     "My Account",
     "Transaction",
-    "Bank Mini Reports",
+    "Reports",
     "Print Out",
   ];
 
@@ -174,16 +180,17 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
     super.dispose();
   }
 
+  // ✅ PERBAIKAN 1: Ukuran tinggi kartu ditekan jauh lebih kecil agar tidak bolong di bawah
   double _getExpandedHeight(String title) {
     switch (title) {
-      case "Student": return 180.0;
-      case "Teacher": return 280.0;
-      case "CBT": return 380.0;
-      case "Attendance": return 280.0;
-      case "Bank Mini": return 320.0;
-      case "E-Learning": return 240.0;
-      case "Staff": return 180.0;
-      case "School Activity": return 240.0;
+      case "Student": return 150.0;         // 1 Submenu
+      case "Staff": return 150.0;           // 1 Submenu
+      case "E-Learning": return 180.0;      // 2 Submenu
+      case "Teacher": return 210.0;         // 3 Submenu
+      case "Attendance": return 210.0;      // 3 Submenu
+      case "School Activity": return 210.0; // 3 Submenu
+      case "Bank Mini": return 240.0;       // 4 Submenu
+      case "CBT": return 270.0;             // 5 Submenu
       default: return 120.0;
     }
   }
@@ -243,7 +250,7 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 40),
                       child: SizedBox(
-                        height: 1800, 
+                        height: 1800,
                         child: Stack(
                           children: _buildMenuItems(),
                         ),
@@ -266,15 +273,15 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
     for (int i = 0; i < _menuItems.length; i++) {
       final item = _menuItems[i];
       final title = item['title'];
-      
-      final isExpanded = (title == "Student" && _isStudentExpanded) || 
-                         (title == "Teacher" && _isTeacherExpanded) ||
-                         (title == "CBT" && _isCBTExpanded) ||
-                         (title == "Staff" && _isStaffExpanded) ||
-                         (title == "Attendance" && _isAttendanceExpanded) ||
-                         (title == "Bank Mini" && _isBankMiniExpanded) ||
-                         (title == "E-Learning" && _isELearningExpanded) ||
-                         (title == "School Activity" && _isSchoolActivityExpanded);
+
+      final isExpanded = (title == "Student" && _isStudentExpanded) ||
+          (title == "Teacher" && _isTeacherExpanded) ||
+          (title == "CBT" && _isCBTExpanded) ||
+          (title == "Staff" && _isStaffExpanded) ||
+          (title == "Attendance" && _isAttendanceExpanded) ||
+          (title == "Bank Mini" && _isBankMiniExpanded) ||
+          (title == "E-Learning" && _isELearningExpanded) ||
+          (title == "School Activity" && _isSchoolActivityExpanded);
 
       list.add(
         AnimatedPositioned(
@@ -286,8 +293,9 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
         ),
       );
 
+      // ✅ PERBAIKAN 2: Overlap diatur menjadi -35 agar kartu di bawahnya naik lebih rapat
       if (isExpanded) {
-        currentTop += _getExpandedHeight(title) - 30.0; 
+        currentTop += _getExpandedHeight(title) - 35.0;
       } else {
         currentTop += 85.0;
       }
@@ -343,7 +351,7 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
             if (_isSchoolActivityExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; }
           } else if (title == "Bank Mini") {
             _isBankMiniExpanded = !_isBankMiniExpanded;
-            if (_isBankMiniExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
+            if (_isBankMiniExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "E-Learning") {
             _isELearningExpanded = !_isELearningExpanded;
             if (_isELearningExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isSchoolActivityExpanded = false; }
@@ -351,7 +359,7 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const HomePage()),
-              (route) => false,
+                  (route) => false,
             );
           }
           _selectedIndex = isSelected ? -1 : index;
@@ -418,7 +426,8 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
                       ),
                     ),
                     if (isExpanded) ...[
-                      const SizedBox(height: 20),
+                      // ✅ PERBAIKAN 3: Spasi antara judul menu besar dan submenunya dikecilkan
+                      const SizedBox(height: 15),
                       Expanded(
                         child: SingleChildScrollView(
                           physics: const NeverScrollableScrollPhysics(),
@@ -481,7 +490,18 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
                                 })),
                               if (title == "Bank Mini")
                                 ..._bankMiniSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
-                                  // TODO: Bank Mini navigation
+                                  if (subMenu == "My Account") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const BankAccountPage()));
+                                  }
+                                  else if (subMenu == "Transaction") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const TransactionListPage()));
+                                  }
+                                  else if (subMenu == "Reports") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const BankMiniReportsPage()));
+                                  }
+                                  else if (subMenu == "Print Out") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const BankMiniPrintOutPage()));
+                                  }
                                 })),
                               if (title == "E-Learning")
                                 ..._eLearningSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
@@ -504,7 +524,8 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
 
   Widget _buildSubMenuItem(String title, VoidCallback onTap) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      // ✅ PERBAIKAN 4: Spasi antar menu anak dikecilkan
+      padding: const EdgeInsets.only(bottom: 10),
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -513,7 +534,7 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
           textAlign: TextAlign.right,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 15, // Dikecilkan sedikit agar proporsional
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -534,6 +555,8 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
     }
   }
 }
+
+// ... Sisa kode Painter tidak ada yang berubah, biarkan seperti biasa ...
 
 class DrawerBackgroundPainter extends CustomPainter {
   @override
@@ -592,9 +615,9 @@ class ThickDiagonalLinesPainter extends CustomPainter {
       double startY = rng.nextDouble() * size.height;
       double length = rng.nextDouble() * 40 + 20;
       canvas.drawLine(
-        Offset(startX, startY), 
-        Offset(startX + length, startY + length), 
-        paint
+          Offset(startX, startY),
+          Offset(startX + length, startY + length),
+          paint
       );
     }
   }
@@ -618,7 +641,7 @@ class ZigZagPainter extends CustomPainter {
       paint.color = colors[rng.nextInt(colors.length)];
       double x = rng.nextDouble() * size.width;
       double y = rng.nextDouble() * size.height;
-      
+
       Path path = Path();
       path.moveTo(x, y);
       path.lineTo(x + 10, y + 10);
@@ -645,7 +668,7 @@ class WavePainter extends CustomPainter {
     for (int i = 0; i < 8; i++) {
       paint.color = colors[rng.nextInt(colors.length)];
       double yBase = rng.nextDouble() * size.height;
-      
+
       Path path = Path();
       path.moveTo(0, yBase);
       for (double x = 0; x < size.width; x += 20) {
@@ -671,7 +694,7 @@ class CrossPainter extends CustomPainter {
       double x = rng.nextDouble() * size.width;
       double y = rng.nextDouble() * size.height;
       double s = 6;
-      
+
       canvas.drawLine(Offset(x - s, y), Offset(x + s, y), paint);
       canvas.drawLine(Offset(x, y - s), Offset(x, y + s), paint);
     }

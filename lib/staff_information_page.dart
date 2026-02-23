@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'add_staff_page.dart';
+import 'staff_profile_page.dart';
 
 class StaffInformationPage extends StatefulWidget {
   const StaffInformationPage({super.key});
@@ -101,11 +102,28 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
                 child: IconButton(
                   icon: const Icon(Icons.person_add_alt_1_rounded, color: Colors.white, size: 24),
                   tooltip: "Add Staff",
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    // ✅ MENANGKAP DATA KEMBALIAN DARI ADD STAFF PAGE
+                    final result = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const AddStaffPage())
                     );
+
+                    if (result != null && result is Map<String, String>) {
+                      setState(() {
+                        _staffs.insert(0, result);
+                        _filteredStaffs = List.from(_staffs);
+                      });
+
+                      if(mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("${result['name']} added successfully"),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    }
                   },
                 ),
               ),
@@ -302,11 +320,33 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
 
           // Bagian Bawah: Tombol Action (Persis seperti Web)
           InkWell(
-            onTap: () {
-              // Navigasi ke Staff Detail Page
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Selected: ${staff['name']}"))
+            onTap: () async {
+              // ✅ MENANGKAP DATA KEMBALIAN DARI STAFF PROFILE PAGE
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => StaffProfilePage(staffData: staff),
+                ),
               );
+
+              if (result != null && result is Map<String, dynamic>) {
+                if (result['action'] == 'update') {
+                  final updatedData = result['data'] as Map<String, String>;
+                  setState(() {
+                    final index = _staffs.indexWhere((s) => s['id'] == updatedData['id']);
+                    if (index != -1) {
+                      _staffs[index] = updatedData;
+                    }
+                    _filteredStaffs = List.from(_staffs);
+                  });
+                } else if (result['action'] == 'delete') {
+                  final deletedId = result['id'];
+                  setState(() {
+                    _staffs.removeWhere((s) => s['id'] == deletedId);
+                    _filteredStaffs = List.from(_staffs);
+                  });
+                }
+              }
             },
             child: Container(
               width: double.infinity,
