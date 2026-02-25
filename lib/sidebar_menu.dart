@@ -19,6 +19,7 @@ import 'bank_account_page.dart';
 import 'transaction_list_page.dart';
 import 'bank_mini_reports_page.dart';
 import 'bank_mini_print_out_page.dart';
+import 'e_learning_class_page.dart';
 import 'dart:math' as math;
 
 class SidebarMenu extends StatefulWidget {
@@ -505,7 +506,10 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
                                 })),
                               if (title == "E-Learning")
                                 ..._eLearningSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
-                                  // TODO: E-Learning navigation
+                                  if (subMenu == "E-Learning Class") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ELearningClassPage()));
+                                  } else if (subMenu == "E-Learning Reports") {
+                                  }
                                 })),
                             ],
                           ),
