@@ -57,10 +57,6 @@ class ClassActivityData {
   static Map<String, List<Map<String, dynamic>>> allActivities = {};
 }
 
-// ============================================================================
-// HALAMAN 1: CLASS ACTIVITY LIST
-// ============================================================================
-
 class ClassActivityPage extends StatefulWidget {
   const ClassActivityPage({super.key});
 
@@ -69,7 +65,6 @@ class ClassActivityPage extends StatefulWidget {
 }
 
 class _ClassActivityPageState extends State<ClassActivityPage> {
-  // Array warna pastel untuk membedakan icon tiap kelas
   final List<Color> _iconColors = [
     Colors.blue.shade400,
     Colors.orange.shade400,
@@ -154,7 +149,6 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
             backgroundColor: Colors.transparent,
             flexibleSpace: Container(
               decoration: BoxDecoration(
-                // Menggunakan gradien perpaduan Teal (dari School Activity) dan Indigo
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -186,14 +180,13 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.85, // Disesuaikan agar card lebih tinggi sedikit
+                childAspectRatio: 0.85,
                 crossAxisSpacing: 15,
                 mainAxisSpacing: 15,
               ),
               delegate: SliverChildBuilderDelegate(
                     (context, index) {
                   final item = ClassActivityData.classes[index];
-                  // Pilih warna icon berdasarkan index
                   final Color currentIconColor = _iconColors[index % _iconColors.length];
 
                   return Container(
@@ -210,7 +203,6 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Ikon Kelas Colorful
                                 Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
@@ -288,10 +280,6 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
   }
 }
 
-// ============================================================================
-// HALAMAN 2: SUBJECT LIST
-// ============================================================================
-
 class SubjectListPage extends StatefulWidget {
   final String className;
   const SubjectListPage({super.key, required this.className});
@@ -301,7 +289,6 @@ class SubjectListPage extends StatefulWidget {
 }
 
 class _SubjectListPageState extends State<SubjectListPage> {
-  // Warna pastel untuk subjek
   final List<Color> _subjectColors = [
     Colors.teal.shade500,
     Colors.deepOrange.shade400,
@@ -467,10 +454,6 @@ class _SubjectListPageState extends State<SubjectListPage> {
   }
 }
 
-// ============================================================================
-// HALAMAN 3: ACTIVITY LIST
-// ============================================================================
-
 class ActivityListPage extends StatefulWidget {
   final String subjectName;
   final String subjectCode;
@@ -591,10 +574,6 @@ class _ActivityListPageState extends State<ActivityListPage> {
   Widget _detailInfo(String label, String value) => Row(crossAxisAlignment: CrossAxisAlignment.start, children: [SizedBox(width: 80, child: Text(label, style: TextStyle(fontSize: 12, color: Colors.grey.shade500, fontWeight: FontWeight.w600))), const Text(": ", style: TextStyle(color: Colors.grey)), Expanded(child: Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87)))]);
 }
 
-// ============================================================================
-// HALAMAN 4: ACTIVITY FORM (ADD/EDIT)
-// ============================================================================
-
 class ActivityFormPage extends StatefulWidget {
   final String subjectName;
   final String subjectCode;
@@ -657,7 +636,6 @@ class _ActivityFormPageState extends State<ActivityFormPage> {
         padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 100),
         child: Column(
           children: [
-            // KARTU FORM
             Container(
               padding: const EdgeInsets.all(25),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.indigo.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 5))]),
@@ -684,7 +662,6 @@ class _ActivityFormPageState extends State<ActivityFormPage> {
             ),
             const SizedBox(height: 20),
 
-            // KARTU ATTENDANCE
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.indigo.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 5))]),

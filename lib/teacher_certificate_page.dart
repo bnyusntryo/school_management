@@ -5,7 +5,6 @@ class TeacherCertificatePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Data dummy disesuaikan agar lebih masuk akal sebagai "Sertifikat"
     final List<Map<String, String>> certificates = [
       {"id": "TC-2024-001", "teacher": "Sarah Wijaya, M.Pd", "training": "Advanced Pedagogy", "amount": "\$250.00", "date": "15 Jan 2025"},
       {"id": "TC-2024-002", "teacher": "Bambang Hermawan, S.T", "training": "Digital Classroom", "amount": "\$120.00", "date": "10 Feb 2025"},
@@ -14,7 +13,6 @@ class TeacherCertificatePage extends StatelessWidget {
       {"id": "TC-2024-005", "teacher": "Sarah Wijaya, M.Pd", "training": "Child Psychology", "amount": "\$200.00", "date": "12 May 2025"},
     ];
 
-    // Array warna untuk memberi aksen colorful pada kartu
     final List<Color> cardColors = [
       Colors.pink.shade400,
       Colors.purple.shade400,
@@ -24,10 +22,9 @@ class TeacherCertificatePage extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA), // Latar abu-abu lembut
+      backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER MELENGKUNG (TEMA PINK GURU) ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -69,7 +66,6 @@ class TeacherCertificatePage extends StatelessWidget {
                   icon: const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 24),
                   tooltip: "Add Certificate",
                   onPressed: () {
-                    // Logika add certificate di sini
                   },
                 ),
               ),
@@ -77,7 +73,6 @@ class TeacherCertificatePage extends StatelessWidget {
             ],
           ),
 
-          // --- INFO HEADER (SUMMARY) ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),
@@ -101,7 +96,6 @@ class TeacherCertificatePage extends StatelessWidget {
             ),
           ),
 
-          // --- LIST SERTIFIKAT (CARD STYLE) ---
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
             sliver: certificates.isEmpty
@@ -141,7 +135,6 @@ class TeacherCertificatePage extends StatelessWidget {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // Pita Warna Samping
                             Container(width: 8, color: cardColor),
 
                             Expanded(
@@ -150,7 +143,6 @@ class TeacherCertificatePage extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // HEADER KARTU: ID dan Tanggal
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
@@ -169,7 +161,6 @@ class TeacherCertificatePage extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 12),
 
-                                    // NAMA TRAINING & GURU
                                     Text(
                                       item['training']!,
                                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
@@ -186,7 +177,6 @@ class TeacherCertificatePage extends StatelessWidget {
                                     const Divider(height: 1),
                                     const SizedBox(height: 15),
 
-                                    // BOTTOM KARTU: Harga & Action
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [

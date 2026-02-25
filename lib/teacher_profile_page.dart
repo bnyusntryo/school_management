@@ -45,10 +45,9 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA), // Background abu-abu muda
+      backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER MELENGKUNG PROFILE GURU ---
           SliverAppBar(
             expandedHeight: 220,
             floating: false,
@@ -67,7 +66,6 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        // Gradasi Pink Magenta
                         colors: [Colors.pink.shade400, Colors.pink.shade700],
                       ),
                       borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(40), bottomRight: Radius.circular(40)),
@@ -110,13 +108,11 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
             ),
           ),
 
-          // --- BODY KONTEN (CARD ACADEMIC & FORM INFO) ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  // --- PROFESSIONAL ROLE CARD ---
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -135,7 +131,6 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
                   ),
                   const SizedBox(height: 25),
 
-                  // --- PROFESSIONAL DETAILS FORM CARD ---
                   Container(
                     padding: const EdgeInsets.all(25),
                     decoration: BoxDecoration(

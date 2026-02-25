@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-// --- DATA PUSAT (SINGLE SOURCE OF TRUTH) ---
 class PerformanceData {
   static final List<Map<String, dynamic>> planningList = [];
 }
 
-// ============================================================================
-// MAIN PAGE: TEACHER PERFORMANCE (TABS)
-// ============================================================================
 class TeacherPerformancePage extends StatefulWidget {
   const TeacherPerformancePage({super.key});
 
@@ -244,9 +240,6 @@ class _TeacherPerformancePageState extends State<TeacherPerformancePage> with Si
   }
 }
 
-// ============================================================================
-// SUB PAGE 1: LIST GURU DALAM SEBUAH PERIODE
-// ============================================================================
 class SubTeacherListPage extends StatefulWidget {
   final Map<String, dynamic> periodData;
   final String mode;
@@ -416,9 +409,6 @@ class _SubTeacherListPageState extends State<SubTeacherListPage> {
   }
 }
 
-// ============================================================================
-// SUB PAGE 2: PLANNING (DI TAMBAH DESCRIPTION DAN WEIGHT)
-// ============================================================================
 class SubKPIListPage extends StatefulWidget {
   final Map<String, dynamic> teacherData;
   final Map<String, dynamic> periodData;
@@ -430,7 +420,6 @@ class SubKPIListPage extends StatefulWidget {
 
 class _SubKPIListPageState extends State<SubKPIListPage> {
 
-  // ✅ Form Planning sekarang mencakup Description dan Weight sesuai Web
   void _showKPIDialog({Map<String, dynamic>? existingKpi, int? index}) {
     final nameCtrl = TextEditingController(text: existingKpi?['name']);
     final descCtrl = TextEditingController(text: existingKpi?['description'] ?? "-");
@@ -474,7 +463,7 @@ class _SubKPIListPageState extends State<SubKPIListPage> {
                     "description": descCtrl.text,
                     "weight": weightCtrl.text,
                     "target": targetCtrl.text,
-                    "assessment": "", // Kosong, nanti diisi di menu Evaluasi
+                    "assessment": "",
                     "monthlyData": List.filled(12, "0"),
                   });
                 } else {
@@ -580,9 +569,6 @@ class _SubKPIListPageState extends State<SubKPIListPage> {
   }
 }
 
-// ============================================================================
-// SUB PAGE 3: MONITORING (MONTHLY INPUT)
-// ============================================================================
 class SubMonitoringKPIList extends StatelessWidget {
   final Map<String, dynamic> teacherData;
   final String periodName;
@@ -681,9 +667,6 @@ class SubMonthlyInputPage extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// SUB PAGE 4: EVALUATION (FINAL SCORE CALCULATED AUTOMATICALLY)
-// ============================================================================
 class SubEvaluationFormPage extends StatefulWidget {
   final Map<String, dynamic> teacherData;
   const SubEvaluationFormPage({super.key, required this.teacherData});
@@ -707,7 +690,6 @@ class _SubEvaluationFormPageState extends State<SubEvaluationFormPage> {
     _refreshKpiScore();
   }
 
-  // Menghitung rata-rata dari field Assessment di setiap KPI
   void _refreshKpiScore() {
     final kpis = widget.teacherData['kpis'] as List;
     if (kpis.isEmpty) {
@@ -735,7 +717,6 @@ class _SubEvaluationFormPageState extends State<SubEvaluationFormPage> {
     });
   }
 
-  // ✅ MODAL 1: DAFTAR KPI (Dengan Tombol Mata, Jam, dan Input Dropdown Score)
   void _showKpiListModal() {
     final kpis = widget.teacherData['kpis'] as List;
 
@@ -805,7 +786,6 @@ class _SubEvaluationFormPageState extends State<SubEvaluationFormPage> {
                             Text(kpi['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF2D3142))),
                             const SizedBox(height: 15),
 
-                            // Baris Target dan Weight
                             Row(
                               children: [
                                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("TARGET", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey.shade500)), const SizedBox(height: 4), Text(kpi['target'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14))])),
@@ -814,7 +794,6 @@ class _SubEvaluationFormPageState extends State<SubEvaluationFormPage> {
                             ),
                             const Padding(padding: EdgeInsets.symmetric(vertical: 10), child: Divider(height: 1)),
 
-                            // Baris Aksi (Mata, Jam, Dropdown)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
@@ -877,7 +856,6 @@ class _SubEvaluationFormPageState extends State<SubEvaluationFormPage> {
     );
   }
 
-  // ✅ MODAL 2: TAMPILAN DETAIL KPI (Gambar Pertama Anda)
   void _showKpiDetailModal(Map<String, dynamic> kpi) {
     showModalBottomSheet(
       context: context,
@@ -922,7 +900,6 @@ class _SubEvaluationFormPageState extends State<SubEvaluationFormPage> {
     );
   }
 
-  // ✅ MODAL 3: TAMPILAN MONITORING BULANAN (Gambar Kedua Anda)
   void _showKpiMonitoringModal(Map<String, dynamic> kpi) {
     showModalBottomSheet(
       context: context,

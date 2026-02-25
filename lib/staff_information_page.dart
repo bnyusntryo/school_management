@@ -13,7 +13,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
 
-  // Dummy Data Staf
   final List<Map<String, String>> _staffs = [
     {"id": "staf1", "name": "Budi Santoso", "position": "Tata Usaha"},
     {"id": "staf2", "name": "Siti Aminah, S.E", "position": "Bendahara / Keuangan"},
@@ -25,7 +24,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
 
   List<Map<String, String>> _filteredStaffs = [];
 
-  // Palet Warna Colorful untuk tiap kartu staf
   final List<MaterialColor> _cardColors = [
     Colors.blue,
     Colors.purple,
@@ -41,7 +39,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
     _filteredStaffs = _staffs;
   }
 
-  // Logika Pencarian
   void _filterStaffs(String query) {
     setState(() {
       _filteredStaffs = _staffs
@@ -57,10 +54,9 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: const Color(0xFFF5F7FA), // Background abu-abu muda bersih
+      backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER MELENGKUNG (TEMA INDIGO / BLUE GREY) ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -71,7 +67,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  // Warna elegan untuk Staff
                   colors: [Colors.indigo.shade400, Colors.blueGrey.shade700],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -82,7 +77,7 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
               child: const FlexibleSpaceBar(
                 titlePadding: EdgeInsets.only(left: 60, bottom: 20),
                 title: Text(
-                  "Staff Information", // Diubah dari Staff Directory
+                  "Staff Information",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
                 ),
               ),
@@ -103,7 +98,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
                   icon: const Icon(Icons.person_add_alt_1_rounded, color: Colors.white, size: 24),
                   tooltip: "Add Staff",
                   onPressed: () async {
-                    // ✅ MENANGKAP DATA KEMBALIAN DARI ADD STAFF PAGE
                     final result = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const AddStaffPage())
@@ -131,7 +125,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
             ],
           ),
 
-          // --- AREA PENCARIAN & INFO COUNTER ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),
@@ -139,7 +132,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
                 children: [
                   Row(
                     children: [
-                      // Search Bar
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
@@ -165,7 +157,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      // Clear Button
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -185,7 +176,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  // Indikator Jumlah Staf
                   Row(
                     children: [
                       Container(
@@ -205,7 +195,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
             ),
           ),
 
-          // --- DAFTAR STAF (GRID / LIST STYLE) ---
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
             sliver: _filteredStaffs.isEmpty
@@ -223,13 +212,12 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
                 ),
               ),
             )
-            // Menggunakan GridView agar mirip dengan proporsi web
                 : SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // 2 kolom sejajar
+                crossAxisCount: 2,
                 crossAxisSpacing: 15,
                 mainAxisSpacing: 15,
-                childAspectRatio: 0.75, // Mengatur tinggi card
+                childAspectRatio: 0.75,
               ),
               delegate: SliverChildBuilderDelegate(
                     (context, index) {
@@ -247,7 +235,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
     );
   }
 
-  // --- DESAIN KARTU STAF COLORFUL ---
   Widget _buildStaffCard(BuildContext context, Map<String, String> staff, MaterialColor color) {
     return Container(
       decoration: BoxDecoration(
@@ -260,14 +247,12 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
       ),
       child: Column(
         children: [
-          // Bagian Atas: Info Profil
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(15.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Avatar Ikon
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -278,7 +263,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Nama Staf
                   Text(
                     staff['name']!,
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF2D3142)),
@@ -288,7 +272,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
                   ),
                   const SizedBox(height: 4),
 
-                  // User ID
                   Text(
                     "ID: ${staff['id']}",
                     style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontWeight: FontWeight.w600),
@@ -296,7 +279,6 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
 
                   const Spacer(),
 
-                  // Badge Posisi
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -318,10 +300,8 @@ class _StaffInformationPageState extends State<StaffInformationPage> {
             ),
           ),
 
-          // Bagian Bawah: Tombol Action (Persis seperti Web)
           InkWell(
             onTap: () async {
-              // ✅ MENANGKAP DATA KEMBALIAN DARI STAFF PROFILE PAGE
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(

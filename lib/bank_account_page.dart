@@ -9,7 +9,6 @@ class BankAccountPage extends StatefulWidget {
 }
 
 class _BankAccountPageState extends State<BankAccountPage> {
-  // Dummy Data Transaksi
   final List<Map<String, dynamic>> _transactions = [
     {'date': '23 Feb 2026', 'desc': 'Setoran Tabungan Wajib', 'amount': 150000, 'type': 'in'},
     {'date': '20 Feb 2026', 'desc': 'Pembayaran Buku LKS', 'amount': -75000, 'type': 'out'},
@@ -18,7 +17,6 @@ class _BankAccountPageState extends State<BankAccountPage> {
     {'date': '01 Feb 2026', 'desc': 'Saldo Awal Bulan', 'amount': 2300000, 'type': 'in'},
   ];
 
-  // Helper untuk format currency IDR
   String formatCurrency(num amount) {
     final format = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
     return format.format(amount);
@@ -26,17 +24,14 @@ class _BankAccountPageState extends State<BankAccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Warna Aksen Bank Mini (Pink/Magenta dari sidebar)
     const Color bankMiniAccent = Color(0xFFF06292);
-    // Warna Base Bank Mini yang baru (Deep Indigo/Purple)
     const Color bankMiniBaseDark = Color(0xFF2E3192);
     const Color bankMiniBaseLight = Color(0xFF662D91);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F6FF), // Latar belakang sedikit kebiruan agar segar
+      backgroundColor: const Color(0xFFF2F6FF),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER MELENGKUNG (TEMA BANK MINI) ---
           SliverAppBar(
             expandedHeight: 100,
             floating: false,
@@ -48,14 +43,12 @@ class _BankAccountPageState extends State<BankAccountPage> {
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    // Menggunakan tema warna baru: Deep Indigo ke Purple
                     colors: [bankMiniBaseDark, bankMiniBaseLight],
                   ),
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(30),
                     bottomRight: Radius.circular(30),
                   ),
-                  // Sedikit ornamen pink di header (opsional, agar nyambung dengan sidebar)
                   boxShadow: [
                     BoxShadow(color: bankMiniAccent.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 5))
                   ]
@@ -63,7 +56,7 @@ class _BankAccountPageState extends State<BankAccountPage> {
               child: const FlexibleSpaceBar(
                 titlePadding: EdgeInsets.only(left: 60, bottom: 25),
                 title: Text(
-                  "Bank Account", // Disesuaikan dengan nama baru
+                  "Bank Account",
                   style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20, color: Colors.white),
                 ),
               ),
@@ -81,12 +74,10 @@ class _BankAccountPageState extends State<BankAccountPage> {
             ),
           ),
 
-          // --- KARTU ATM VIRTUAL (HERO SECTION) ---
           SliverToBoxAdapter(
             child: _buildVirtualBankCard(bankMiniBaseDark, bankMiniBaseLight, bankMiniAccent),
           ),
 
-          // --- JUDUL TRANSAKSI ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(25, 30, 25, 15),
@@ -103,7 +94,6 @@ class _BankAccountPageState extends State<BankAccountPage> {
             ),
           ),
 
-          // --- DAFTAR TRANSAKSI ---
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             sliver: SliverList(
@@ -117,36 +107,30 @@ class _BankAccountPageState extends State<BankAccountPage> {
             ),
           ),
 
-          // Padding bawah tambahan
           const SliverToBoxAdapter(child: SizedBox(height: 40)),
         ],
       ),
     );
   }
 
-  // --- WIDGET: KARTU ATM VIRTUAL YANG ELEGAN ---
   Widget _buildVirtualBankCard(Color darkColor, Color lightColor, Color accentColor) {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 25, 20, 10),
       height: 220,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(25),
-        // Gradien Base yang elegan
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [darkColor, lightColor],
         ),
         boxShadow: [
-          // Shadow dengan sedikit warna aksen pink agar "pop"
           BoxShadow(color: accentColor.withOpacity(0.4), blurRadius: 25, offset: const Offset(0, 12)),
           BoxShadow(color: darkColor.withOpacity(0.5), blurRadius: 10, offset: const Offset(0, 5)),
         ],
       ),
-      // Menggunakan Stack untuk menumpuk ornamen dan konten
       child: Stack(
         children: [
-          // Ornamen 1: Lingkaran/Glow Pink di pojok kanan atas
           Positioned(
             top: -50,
             right: -50,
@@ -155,11 +139,10 @@ class _BankAccountPageState extends State<BankAccountPage> {
               height: 150,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: accentColor.withOpacity(0.2), // Warna pink transparan
+                color: accentColor.withOpacity(0.2),
               ),
             ),
           ),
-          // Ornamen 2: Garis gelombang halus di bawah
           Positioned(
             bottom: -30,
             left: -20,
@@ -178,14 +161,12 @@ class _BankAccountPageState extends State<BankAccountPage> {
             ),
           ),
 
-          // Konten Utama Kartu
           Padding(
             padding: const EdgeInsets.all(25.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Bagian Atas: Chip & Info Siswa
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,7 +179,6 @@ class _BankAccountPageState extends State<BankAccountPage> {
                         Text("Class X RPL 2", style: TextStyle(color: Colors.white70, fontSize: 13)),
                       ],
                     ),
-                    // Ikon Chip & Contactless
                     Row(
                       children: [
                         Icon(Icons.nfc_rounded, color: Colors.white70, size: 28),
@@ -218,20 +198,18 @@ class _BankAccountPageState extends State<BankAccountPage> {
                   ],
                 ),
 
-                // Bagian Tengah: Saldo
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Total Balance", style: TextStyle(color: accentColor.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w500)),
                     const SizedBox(height: 5),
                     Text(
-                      formatCurrency(2500000), // Contoh saldo dummy
+                      formatCurrency(2500000),
                       style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 1),
                     ),
                   ],
                 ),
 
-                // Bagian Bawah: NISN & Logo Bank Mini
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -242,7 +220,6 @@ class _BankAccountPageState extends State<BankAccountPage> {
                         Text("0045928371", style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 2)),
                       ],
                     ),
-                    // Logo Bank Mini Sederhana
                     Row(
                       children: [
                         Icon(Icons.account_balance_rounded, color: accentColor),
@@ -260,7 +237,6 @@ class _BankAccountPageState extends State<BankAccountPage> {
     );
   }
 
-  // --- WIDGET: LIST TILE TRANSAKSI ---
   Widget _buildTransactionTile(Map<String, dynamic> tx) {
     final bool isIn = tx['type'] == 'in';
     final Color statusColor = isIn ? Colors.green.shade600 : Colors.red.shade600;

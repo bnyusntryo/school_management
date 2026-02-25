@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:school_management/attendance_report_page.dart';
 import 'package:school_management/bank_account_page.dart';
 import 'package:school_management/bank_mini_reports_page.dart';
 import 'package:school_management/cbt_report_page.dart';
 import 'package:school_management/monitoring_exam_page.dart';
+import 'package:school_management/task_assignment_page.dart';
 import 'student_list_page.dart';
 import 'home_page.dart';
 import 'teacher_list_page.dart';
@@ -15,11 +17,11 @@ import 'question_library_page.dart';
 import 'exam_management_page.dart';
 import 'exam_period_page.dart';
 import 'staff_information_page.dart';
-import 'bank_account_page.dart';
+// import 'task_assignment_page.dart';
 import 'transaction_list_page.dart';
-import 'bank_mini_reports_page.dart';
 import 'bank_mini_print_out_page.dart';
 import 'e_learning_class_page.dart';
+import 'record_attendance_page.dart';
 import 'dart:math' as math;
 
 class SidebarMenu extends StatefulWidget {
@@ -33,6 +35,8 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
   late AnimationController _controller;
   int _selectedIndex = -1;
 
+  // ✅ TAMBAHAN STATE UNTUK PRINCIPAL
+  bool _isPrincipalExpanded = false;
   bool _isStudentExpanded = false;
   bool _isTeacherExpanded = false;
   bool _isCBTExpanded = false;
@@ -41,6 +45,11 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
   bool _isBankMiniExpanded = false;
   bool _isELearningExpanded = false;
   bool _isSchoolActivityExpanded = false;
+
+  // ✅ TAMBAHAN SUBMENU PRINCIPAL
+  final List<String> _principalSubMenus = [
+    "Task Assignment",
+  ];
 
   final List<String> _studentSubMenus = [
     "Student Information",
@@ -66,7 +75,6 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
 
   final List<String> _attendanceSubMenus = [
     "Record Attendance",
-    "Class Activity",
     "Attendance Reports",
   ];
 
@@ -88,11 +96,21 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
     "School Activity Reports",
   ];
 
+  // ✅ TAMBAHAN MENU PRINCIPAL DI DALAM LIST KARTU
   final List<Map<String, dynamic>> _menuItems = [
     {
       "title": "Home",
       "colors": [const Color(0xFF4FC3F7), const Color(0xFF1976D2)],
       "patternColors": [Colors.white.withOpacity(0.15), Colors.white.withOpacity(0.05)],
+    },
+    {
+      "title": "Principal", // ✅ KARTU BARU UNTUK KEPSEK (Biru Dongker Eksklusif)
+      "colors": [const Color(0xFF3949AB), const Color(0xFF1A237E)],
+      "patternColors": [
+        const Color(0xFF5C6BC0).withOpacity(0.25),
+        const Color(0xFF7986CB).withOpacity(0.2),
+        Colors.white.withOpacity(0.1),
+      ],
     },
     {
       "title": "Teacher",
@@ -181,9 +199,9 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
     super.dispose();
   }
 
-  // ✅ PERBAIKAN 1: Ukuran tinggi kartu ditekan jauh lebih kecil agar tidak bolong di bawah
   double _getExpandedHeight(String title) {
     switch (title) {
+      case "Principal": return 150.0;       // ✅ 1 Submenu
       case "Student": return 150.0;         // 1 Submenu
       case "Staff": return 150.0;           // 1 Submenu
       case "E-Learning": return 180.0;      // 2 Submenu
@@ -275,14 +293,16 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
       final item = _menuItems[i];
       final title = item['title'];
 
-      final isExpanded = (title == "Student" && _isStudentExpanded) ||
-          (title == "Teacher" && _isTeacherExpanded) ||
-          (title == "CBT" && _isCBTExpanded) ||
-          (title == "Staff" && _isStaffExpanded) ||
-          (title == "Attendance" && _isAttendanceExpanded) ||
-          (title == "Bank Mini" && _isBankMiniExpanded) ||
-          (title == "E-Learning" && _isELearningExpanded) ||
-          (title == "School Activity" && _isSchoolActivityExpanded);
+      final isExpanded =
+          (title == "Principal" && _isPrincipalExpanded) || // ✅
+              (title == "Student" && _isStudentExpanded) ||
+              (title == "Teacher" && _isTeacherExpanded) ||
+              (title == "CBT" && _isCBTExpanded) ||
+              (title == "Staff" && _isStaffExpanded) ||
+              (title == "Attendance" && _isAttendanceExpanded) ||
+              (title == "Bank Mini" && _isBankMiniExpanded) ||
+              (title == "E-Learning" && _isELearningExpanded) ||
+              (title == "School Activity" && _isSchoolActivityExpanded);
 
       list.add(
         AnimatedPositioned(
@@ -294,7 +314,6 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
         ),
       );
 
-      // ✅ PERBAIKAN 2: Overlap diatur menjadi -35 agar kartu di bawahnya naik lebih rapat
       if (isExpanded) {
         currentTop += _getExpandedHeight(title) - 35.0;
       } else {
@@ -332,30 +351,34 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
     return GestureDetector(
       onTap: () {
         setState(() {
-          if (title == "Student") {
+          // ✅ UPDATE LOGIKA PENUTUPAN KARTU OTOMATIS
+          if (title == "Principal") {
+            _isPrincipalExpanded = !_isPrincipalExpanded;
+            if (_isPrincipalExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
+          } else if (title == "Student") {
             _isStudentExpanded = !_isStudentExpanded;
-            if (_isStudentExpanded) { _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
+            if (_isStudentExpanded) { _isPrincipalExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "Teacher") {
             _isTeacherExpanded = !_isTeacherExpanded;
-            if (_isTeacherExpanded) { _isStudentExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
+            if (_isTeacherExpanded) { _isPrincipalExpanded = false; _isStudentExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "CBT") {
             _isCBTExpanded = !_isCBTExpanded;
-            if (_isCBTExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
+            if (_isCBTExpanded) { _isPrincipalExpanded = false; _isStudentExpanded = false; _isTeacherExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "Staff") {
             _isStaffExpanded = !_isStaffExpanded;
-            if (_isStaffExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
+            if (_isStaffExpanded) { _isPrincipalExpanded = false; _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "Attendance") {
             _isAttendanceExpanded = !_isAttendanceExpanded;
-            if (_isAttendanceExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
+            if (_isAttendanceExpanded) { _isPrincipalExpanded = false; _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "School Activity") {
             _isSchoolActivityExpanded = !_isSchoolActivityExpanded;
-            if (_isSchoolActivityExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; }
+            if (_isSchoolActivityExpanded) { _isPrincipalExpanded = false; _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isELearningExpanded = false; }
           } else if (title == "Bank Mini") {
             _isBankMiniExpanded = !_isBankMiniExpanded;
-            if (_isBankMiniExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
+            if (_isBankMiniExpanded) { _isPrincipalExpanded = false; _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isELearningExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "E-Learning") {
             _isELearningExpanded = !_isELearningExpanded;
-            if (_isELearningExpanded) { _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isSchoolActivityExpanded = false; }
+            if (_isELearningExpanded) { _isPrincipalExpanded = false; _isStudentExpanded = false; _isTeacherExpanded = false; _isCBTExpanded = false; _isStaffExpanded = false; _isAttendanceExpanded = false; _isBankMiniExpanded = false; _isSchoolActivityExpanded = false; }
           } else if (title == "Home") {
             Navigator.pushAndRemoveUntil(
               context,
@@ -427,7 +450,6 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
                       ),
                     ),
                     if (isExpanded) ...[
-                      // ✅ PERBAIKAN 3: Spasi antara judul menu besar dan submenunya dikecilkan
                       const SizedBox(height: 15),
                       Expanded(
                         child: SingleChildScrollView(
@@ -435,6 +457,13 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
+                              // ✅ MAPPING SUBMENU PRINCIPAL
+                              if (title == "Principal")
+                                ..._principalSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
+                                  if (subMenu == "Task Assignment") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const TaskAssignmentPage()));
+                                  }
+                                })),
                               if (title == "Student")
                                 ..._studentSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
                                   if (subMenu == "Student Information") {
@@ -477,7 +506,12 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
                                 })),
                               if (title == "Attendance")
                                 ..._attendanceSubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
-                                  // TODO: Attendance navigation
+                                  if (subMenu == "Record Attendance") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const RecordAttendancePage()));
+                                  }
+                                  else if (subMenu == "Attendance Reports") {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const AttendanceReportPage()));
+                                  }
                                 })),
                               if (title == "School Activity")
                                 ..._schoolActivitySubMenus.map((subMenu) => _buildSubMenuItem(subMenu, () {
@@ -528,7 +562,6 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
 
   Widget _buildSubMenuItem(String title, VoidCallback onTap) {
     return Padding(
-      // ✅ PERBAIKAN 4: Spasi antar menu anak dikecilkan
       padding: const EdgeInsets.only(bottom: 10),
       child: GestureDetector(
         onTap: onTap,
@@ -538,7 +571,7 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
           textAlign: TextAlign.right,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 15, // Dikecilkan sedikit agar proporsional
+            fontSize: 15,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -559,8 +592,6 @@ class _SidebarMenuState extends State<SidebarMenu> with SingleTickerProviderStat
     }
   }
 }
-
-// ... Sisa kode Painter tidak ada yang berubah, biarkan seperti biasa ...
 
 class DrawerBackgroundPainter extends CustomPainter {
   @override

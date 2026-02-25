@@ -151,8 +151,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // MENGAMBIL DATA PENGUMUMAN DARI ANNOUNCEMENT PAGE
-    final List<Map<String, String>> activeAnnouncements = 
+    final List<Map<String, String>> activeAnnouncements =
         AnnouncementPage.announcements.where((a) => a['show'] == 'Yes').toList();
 
     return Scaffold(
@@ -184,7 +183,6 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // PROFILE SECTION
             Row(
               children: [
                 const CircleAvatar(radius: 28, backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=12')),
@@ -200,7 +198,6 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 25),
             
-            // BANNER DINAMIS
             if (activeAnnouncements.isNotEmpty) ...[
               SizedBox(
                 height: 180,

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-// ============================================================================
-// DATA DUMMY (LOGIK TIDAK DIUBAH)
-// ============================================================================
 class StudentData {
   static List<Map<String, String>> students = [
     {"id": "25049120", "name": "Abdullah Widodo", "class": "X AK 1", "image": ""},
@@ -22,9 +19,6 @@ class StudentData {
   ];
 }
 
-// ============================================================================
-// HALAMAN 1: STUDENT LIST PAGE
-// ============================================================================
 class StudentListPage extends StatefulWidget {
   const StudentListPage({super.key});
 
@@ -65,11 +59,9 @@ class _StudentListPageState extends State<StudentListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      // drawer: const SidebarMenu(), // UNCOMMENT INI BILA PERLU
-      backgroundColor: const Color(0xFFF5F7FA), // Background abu-abu muda bersih
+      backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER MELENGKUNG TEMA ORANYE ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -111,17 +103,6 @@ class _StudentListPageState extends State<StudentListPage> {
                   icon: const Icon(Icons.person_add_rounded, color: Colors.white, size: 24),
                   tooltip: "Add Student",
                   onPressed: () async {
-                    // // MUNCULKAN SAAT ANDA SUDAH PUNYA HALAMAN ADD STUDENT
-                    // final result = await Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => const AddStudentPage()),
-                    // );
-                    // if (result != null && result is Map<String, String>) {
-                    //   setState(() {
-                    //     _students.insert(0, result);
-                    //     _filteredStudents = _students;
-                    //   });
-                    // }
                   },
                 ),
               ),
@@ -129,7 +110,6 @@ class _StudentListPageState extends State<StudentListPage> {
             ],
           ),
 
-          // --- AREA PENCARIAN & INFO COUNTER ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),
@@ -137,7 +117,6 @@ class _StudentListPageState extends State<StudentListPage> {
                 children: [
                   Row(
                     children: [
-                      // Search Bar
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
@@ -163,7 +142,6 @@ class _StudentListPageState extends State<StudentListPage> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      // Clear Button
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -183,7 +161,6 @@ class _StudentListPageState extends State<StudentListPage> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  // Indikator Jumlah Siswa
                   Row(
                     children: [
                       Container(
@@ -203,7 +180,6 @@ class _StudentListPageState extends State<StudentListPage> {
             ),
           ),
 
-          // --- DAFTAR SISWA (CARD STYLE MODERN) ---
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
             sliver: _filteredStudents.isEmpty
@@ -244,7 +220,6 @@ class _StudentListPageState extends State<StudentListPage> {
     );
   }
 
-  // Desain Kartu Siswa Baru
   Widget _buildStudentCard(Map<String, String> student) {
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
@@ -262,7 +237,6 @@ class _StudentListPageState extends State<StudentListPage> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Garis Indikator Kiri Oranye
               Container(
                 width: 6,
                 decoration: BoxDecoration(
@@ -278,7 +252,6 @@ class _StudentListPageState extends State<StudentListPage> {
                   padding: const EdgeInsets.all(15),
                   child: Row(
                     children: [
-                      // Avatar Siswa
                       Container(
                         padding: const EdgeInsets.all(3),
                         decoration: BoxDecoration(
@@ -295,7 +268,6 @@ class _StudentListPageState extends State<StudentListPage> {
                       ),
                       const SizedBox(width: 15),
 
-                      // Detail Siswa
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,7 +286,6 @@ class _StudentListPageState extends State<StudentListPage> {
                             ),
                             const SizedBox(height: 10),
 
-                            // Badge Kelas & Jurusan
                             Wrap(
                               spacing: 8,
                               runSpacing: 4,
@@ -356,9 +327,6 @@ class _StudentListPageState extends State<StudentListPage> {
   }
 }
 
-// ============================================================================
-// STUDENT PROFILE PAGE
-// ============================================================================
 class StudentProfilePage extends StatefulWidget {
   final Map<String, String> studentData;
 
@@ -413,7 +381,6 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER MELENGKUNG PROFILE ---
           SliverAppBar(
             expandedHeight: 220,
             floating: false,
@@ -474,13 +441,11 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
             ),
           ),
 
-          // --- BODY KONTEN ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  // --- ACADEMIC INFO CARD ---
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -499,7 +464,6 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
                   ),
                   const SizedBox(height: 25),
 
-                  // --- PERSONAL INFORMATION FORM CARD ---
                   Container(
                     padding: const EdgeInsets.all(25),
                     decoration: BoxDecoration(
@@ -589,7 +553,6 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
     );
   }
 
-  // ✅ PERBAIKAN: Mengganti maxLines == 1 dengan !isMultiline
   Widget _buildInputField(String label, TextEditingController controller, IconData icon, {bool isMultiline = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),

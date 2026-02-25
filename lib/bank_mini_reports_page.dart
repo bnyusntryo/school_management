@@ -9,33 +9,19 @@ class BankMiniReportsPage extends StatefulWidget {
 }
 
 class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
-  // =========================================================
-  // STATE MANAGEMENT (PENGENDALI HALAMAN)
-  // 0: Menu Utama Laporan
-  // 1: Form Transaction List
-  // 2: Preview Transaction List
-  // 3: Form End Of Day
-  // 4: Preview End Of Day
-  // 5: Form Balance Per Class
-  // 6: Preview Balance Per Class
-  // =========================================================
   int _currentView = 0;
 
-  // --- CONTROLLER UNTUK TRANSACTION LIST ---
   final _transFormKey = GlobalKey<FormState>();
   final _startDateCtrl = TextEditingController();
   final _endDateCtrl = TextEditingController();
   List<String> _selectedUsers = [];
 
-  // --- CONTROLLER UNTUK END OF DAY ---
   final _eodFormKey = GlobalKey<FormState>();
   final _eodDateCtrl = TextEditingController();
 
-  // --- CONTROLLER UNTUK BALANCE PER CLASS ---
   final _balanceClassFormKey = GlobalKey<FormState>();
   List<String> _selectedClasses = [];
 
-  // Dummy Data Nasabah (Users)
   final List<Map<String, String>> _availableUsers = [
     {"id": "001", "name": "A'LIN ZAHWAH DINIYAH"},
     {"id": "002", "name": "A. RAHMAN MULYA FAZIZ"},
@@ -46,12 +32,10 @@ class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
     {"id": "007", "name": "NUREVITA SARI"},
   ];
 
-  // Dummy Data Kelas (Classes)
   final List<String> _availableClasses = [
     "X AK 1", "X BD 1", "X DKV 1", "X KUL 1", "XI RPL 1", "XII TKJ 2"
   ];
 
-  // Tema Warna Laporan (Ocean Blue)
   final Color reportBaseDark = const Color(0xFF005C97);
   final Color reportBaseLight = const Color(0xFF363795);
   final Color bankMiniAccent = const Color(0xFFF06292);
@@ -70,15 +54,11 @@ class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
     super.dispose();
   }
 
-  // Format Uang Helper
   String formatCurrency(num amount) {
     final format = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
     return format.format(amount);
   }
 
-  // =========================================================
-  // RENDERER UTAMA (Mengganti tampilan berdasarkan State)
-  // =========================================================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,9 +80,6 @@ class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
     }
   }
 
-  // =========================================================
-  // VIEW 0: MENU UTAMA LAPORAN
-  // =========================================================
   Widget _buildMainMenu() {
     final List<Map<String, dynamic>> reportsData = [
       {"title": "Transaction List Report", "desc": "Transaction List Report provides transaction records, allowing educators to monitor transaction patterns.", "icon": Icons.receipt_long_rounded, "themeColor": Colors.blue.shade600},
@@ -209,9 +186,6 @@ class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
     );
   }
 
-  // =========================================================
-  // VIEW 1 & 2: TRANSACTION LIST
-  // =========================================================
   Widget _buildTransactionFilter() {
     return CustomScrollView(
       slivers: [
@@ -313,9 +287,6 @@ class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
     );
   }
 
-  // =========================================================
-  // VIEW 3 & 4: END OF DAY
-  // =========================================================
   Widget _buildEodFilter() {
     return CustomScrollView(
       slivers: [
@@ -383,9 +354,6 @@ class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
     );
   }
 
-  // =========================================================
-  // VIEW 5 & 6: BALANCE PER CLASS
-  // =========================================================
   Widget _buildBalanceClassFilter() {
     return CustomScrollView(
       slivers: [
@@ -449,7 +417,6 @@ class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
   }
 
   Widget _buildBalanceClassPreview() {
-    // Sesuai Web (image_d5bcbc.png): Laporan menampilkan UserID, Full Name, Class, dan Balance.
     final List<Map<String, dynamic>> dummyBalances = [
       {"userId": "25049120", "name": "Abdullah Widodo", "class": _selectedClasses.first, "balance": 150000},
       {"userId": "25049121", "name": "Andika Prastyo", "class": _selectedClasses.first, "balance": 45000},
@@ -501,11 +468,6 @@ class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
     );
   }
 
-  // =========================================================
-  // SHARED UI COMPONENTS & MODALS
-  // =========================================================
-
-  // Modal Pilih User
   void _showMultiUserModal() {
     List<String> tempSelected = List.from(_selectedUsers);
     List<Map<String, String>> filteredUsers = List.from(_availableUsers);
@@ -532,7 +494,6 @@ class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
     );
   }
 
-  // Modal Pilih Kelas (Baru untuk Balance Report)
   void _showMultiClassModal() {
     List<String> tempSelected = List.from(_selectedClasses);
     List<String> filteredClasses = List.from(_availableClasses);
@@ -593,7 +554,7 @@ class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [_buildMetaRow("Report Name", reportName), const SizedBox(height: 8), _buildMetaRow("Period", period), const SizedBox(height: 8), _buildMetaRow("Reported Date", reportedDate), const SizedBox(height: 8), _buildMetaRow("Reported By", "Dummy Headmaster")]),
                 ),
                 const SizedBox(height: 25), const Text("Records", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2D3142))), const SizedBox(height: 15),
-                childRecords // Memasukkan List Record (Sesuai jenis laporan)
+                childRecords
               ],
             ),
           ),

@@ -8,7 +8,6 @@ class MonitoringExamPage extends StatefulWidget {
 }
 
 class _MonitoringExamPageState extends State<MonitoringExamPage> {
-  // Dummy Data untuk Monitoring Sesi Ujian
   final List<Map<String, dynamic>> _monitoringSessions = [
     {
       "id": "EXSES202511240001",
@@ -17,7 +16,7 @@ class _MonitoringExamPageState extends State<MonitoringExamPage> {
       "className": "X AK 1",
       "date": "03-Dec-2025",
       "time": "07:00 - 15:00",
-      "status": "Active", // Active, Scheduled, Finished
+      "status": "Active",
       "totalParticipants": 35,
       "working": 32,
       "finished": 3,
@@ -74,7 +73,6 @@ class _MonitoringExamPageState extends State<MonitoringExamPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER APP BAR (Konsisten dengan desain sebelumnya) ---
           SliverAppBar(
             expandedHeight: 140,
             floating: false,
@@ -129,7 +127,6 @@ class _MonitoringExamPageState extends State<MonitoringExamPage> {
             ),
           ),
 
-          // --- SEARCH BAR ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),
@@ -179,7 +176,6 @@ class _MonitoringExamPageState extends State<MonitoringExamPage> {
             ),
           ),
 
-          // --- LIST OF MONITORING CARDS ---
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 15, 20, 30),
             sliver: _filteredSessions.isEmpty
@@ -212,9 +208,7 @@ class _MonitoringExamPageState extends State<MonitoringExamPage> {
     );
   }
 
-  // --- WIDGET CARD MONITORING ---
   Widget _buildMonitoringCard(Map<String, dynamic> data) {
-    // Menentukan warna dan text status
     Color statusColor;
     Color statusBgColor;
     IconData statusIcon;
@@ -223,14 +217,14 @@ class _MonitoringExamPageState extends State<MonitoringExamPage> {
       case 'Active':
         statusColor = Colors.green.shade700;
         statusBgColor = Colors.green.shade50;
-        statusIcon = Icons.sensors_rounded; // Ikon live/aktif
+        statusIcon = Icons.sensors_rounded;
         break;
       case 'Finished':
         statusColor = Colors.blue.shade700;
         statusBgColor = Colors.blue.shade50;
         statusIcon = Icons.task_alt_rounded;
         break;
-      default: // Scheduled
+      default:
         statusColor = Colors.orange.shade700;
         statusBgColor = Colors.orange.shade50;
         statusIcon = Icons.schedule_rounded;
@@ -249,7 +243,6 @@ class _MonitoringExamPageState extends State<MonitoringExamPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --- CARD HEADER ---
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             decoration: BoxDecoration(
@@ -266,7 +259,6 @@ class _MonitoringExamPageState extends State<MonitoringExamPage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                // Status Badge
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
@@ -290,7 +282,6 @@ class _MonitoringExamPageState extends State<MonitoringExamPage> {
             ),
           ),
 
-          // --- CARD BODY ---
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -302,7 +293,6 @@ class _MonitoringExamPageState extends State<MonitoringExamPage> {
                 ),
                 const SizedBox(height: 12),
 
-                // Info Map
                 _buildInfoRow(Icons.menu_book_rounded, data['subject']),
                 const SizedBox(height: 6),
                 _buildInfoRow(Icons.class_rounded, data['className']),
@@ -311,7 +301,6 @@ class _MonitoringExamPageState extends State<MonitoringExamPage> {
 
                 const SizedBox(height: 20),
 
-                // --- LIVE STATS (Monitoring Indicators) ---
                 Container(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
@@ -334,7 +323,6 @@ class _MonitoringExamPageState extends State<MonitoringExamPage> {
             ),
           ),
 
-          // --- CARD FOOTER (ACTION) ---
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             decoration: BoxDecoration(
@@ -403,10 +391,6 @@ class _MonitoringExamPageState extends State<MonitoringExamPage> {
   }
 }
 
-// ============================================================================
-// HALAMAN BARU: LIST PARTICIPANT (MONITORING DETAIL)
-// ============================================================================
-
 class ListParticipantPage extends StatefulWidget {
   final Map<String, dynamic> sessionData;
 
@@ -417,7 +401,6 @@ class ListParticipantPage extends StatefulWidget {
 }
 
 class _ListParticipantPageState extends State<ListParticipantPage> {
-  // Dummy Data berdasarkan gambar referensi web
   final List<Map<String, dynamic>> _participants = [
     {
       "examParticipantId": "EXPAR202511240001",
@@ -453,7 +436,7 @@ class _ListParticipantPageState extends State<ListParticipantPage> {
       "className": "X AK 1",
       "attempt": "1 / 1",
       "startTime": "2025 Dec 03 10:12",
-      "endTime": "-" // Belum selesai
+      "endTime": "-"
     },
   ];
 
@@ -476,7 +459,6 @@ class _ListParticipantPageState extends State<ListParticipantPage> {
     });
   }
 
-  // ✅ LOGIKA FIXED: Menerima Map data peserta secara utuh untuk diubah nilainya
   void _confirmResetAttempt(Map<String, dynamic> participant) {
     showDialog(
       context: context,
@@ -510,13 +492,12 @@ class _ListParticipantPageState extends State<ListParticipantPage> {
           ),
           ElevatedButton(
             onPressed: () {
-              // ✅ TAMBAHKAN SETSTATE DI SINI UNTUK MERUBAH DATA
               setState(() {
-                participant['attempt'] = "0 / 1"; // Mereset angka attempt
-                participant['endTime'] = "-";     // Mereset waktu selesai (opsional tapi logis)
+                participant['attempt'] = "0 / 1";
+                participant['endTime'] = "-";
               });
 
-              Navigator.pop(context); // Tutup dialog setelah reset
+              Navigator.pop(context);
 
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -545,7 +526,6 @@ class _ListParticipantPageState extends State<ListParticipantPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER APP BAR ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -588,7 +568,6 @@ class _ListParticipantPageState extends State<ListParticipantPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // --- INFO SESI (Read Only) ---
                 Container(
                   margin: const EdgeInsets.all(20),
                   padding: const EdgeInsets.all(20),
@@ -622,7 +601,6 @@ class _ListParticipantPageState extends State<ListParticipantPage> {
                   ),
                 ),
 
-                // --- SEARCH BAR ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
@@ -667,7 +645,6 @@ class _ListParticipantPageState extends State<ListParticipantPage> {
                 ),
                 const SizedBox(height: 20),
 
-                // --- LIST PESERTA ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
@@ -698,7 +675,6 @@ class _ListParticipantPageState extends State<ListParticipantPage> {
                       ),
                       child: Column(
                         children: [
-                          // Header (ID & Reset Button)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                             decoration: BoxDecoration(
@@ -713,9 +689,7 @@ class _ListParticipantPageState extends State<ListParticipantPage> {
                                   participant['examParticipantId'],
                                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.indigo.shade700),
                                 ),
-                                // Tombol Action (Reset Attempt)
                                 InkWell(
-                                  // ✅ LOGIKA FIXED: Oper seluruh object participant ke fungsi konfirmasi
                                   onTap: () => _confirmResetAttempt(participant),
                                   borderRadius: BorderRadius.circular(8),
                                   child: Container(
@@ -731,7 +705,6 @@ class _ListParticipantPageState extends State<ListParticipantPage> {
                               ],
                             ),
                           ),
-                          // Body Card
                           Padding(
                             padding: const EdgeInsets.all(15),
                             child: Column(
@@ -753,7 +726,7 @@ class _ListParticipantPageState extends State<ListParticipantPage> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
-                                        "Attempt: ${participant['attempt']}", // ✅ Akan ikut berubah otomatis
+                                        "Attempt: ${participant['attempt']}",
                                         style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,
@@ -779,7 +752,6 @@ class _ListParticipantPageState extends State<ListParticipantPage> {
                                   padding: EdgeInsets.symmetric(vertical: 12),
                                   child: Divider(height: 1, color: Color(0xFFF0F0F0)),
                                 ),
-                                // Timeline Start - End
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
@@ -798,7 +770,7 @@ class _ListParticipantPageState extends State<ListParticipantPage> {
                                         Text("END TIME", style: TextStyle(fontSize: 9, color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
                                         const SizedBox(height: 4),
                                         Text(
-                                            participant['endTime'], // ✅ Akan otomatis menjadi "-" jika direset
+                                            participant['endTime'],
                                             style: TextStyle(
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w600,

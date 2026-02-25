@@ -9,7 +9,6 @@ class ExamManagementPage extends StatefulWidget {
 }
 
 class _ExamManagementPageState extends State<ExamManagementPage> {
-  // Dummy Data berdasarkan gambar referensi web
   final List<Map<String, dynamic>> _examSessions = [
     {
       "classCode": "ADPA_XI-AK-1",
@@ -340,7 +339,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER APP BAR ---
           SliverAppBar(
             expandedHeight: 140,
             floating: false,
@@ -403,7 +401,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
             ),
           ),
 
-          // --- FILTER & SEARCH SECTION ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),
@@ -411,7 +408,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
                 children: [
                   Row(
                     children: [
-                      // Search Bar
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
@@ -439,7 +435,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      // Clear Button
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -465,7 +460,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
                   ),
                   const SizedBox(height: 15),
 
-                  // Upload Session Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -491,7 +485,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
             ),
           ),
 
-          // --- LIST OF DATA CARDS ---
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
             sliver: SliverList(
@@ -508,7 +501,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
     );
   }
 
-  // WIDGET CARD
   Widget _buildExamCard(Map<String, dynamic> data, int index) {
     bool isActive = data['status'] == 'Active';
 
@@ -529,7 +521,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --- CARD HEADER ---
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             decoration: BoxDecoration(
@@ -542,7 +533,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Kode Kelas
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
@@ -559,7 +549,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
                     ),
                   ),
                 ),
-                // Status Badge
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                   decoration: BoxDecoration(
@@ -596,13 +585,11 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
             ),
           ),
 
-          // --- CARD BODY ---
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Nama Mapel
                 Text(
                   data['className'],
                   style: const TextStyle(
@@ -613,7 +600,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
                 ),
                 const SizedBox(height: 15),
 
-                // Informasi Detail
                 _buildDetailRow(Icons.person_rounded, "Teacher", data['teacher']),
                 const SizedBox(height: 8),
                 _buildDetailRow(Icons.class_rounded, "Class / Grade", "${data['class']} (Grade ${data['grade']})"),
@@ -623,7 +609,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
             ),
           ),
 
-          // --- CARD FOOTER (ACTION) ---
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
@@ -640,7 +625,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                // ✅ Tombol Edit Pindah ke Halaman EditExamManagementPage
                 InkWell(
                   onTap: () {
                     Navigator.push(
@@ -693,10 +677,6 @@ class _ExamManagementPageState extends State<ExamManagementPage> {
   }
 }
 
-// ============================================================================
-// HALAMAN BARU: EDIT EXAM MANAGEMENT (RE-DESIGNED)
-// ============================================================================
-
 class EditExamManagementPage extends StatefulWidget {
   final Map<String, dynamic> sessionData;
 
@@ -707,7 +687,6 @@ class EditExamManagementPage extends StatefulWidget {
 }
 
 class _EditExamManagementPageState extends State<EditExamManagementPage> {
-  // Dummy data untuk tabel "Session" yang ada di bawah form
   final List<Map<String, dynamic>> _sessionList = [];
 
   @override
@@ -716,7 +695,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER APP BAR (Colorful & Modern) ---
           SliverAppBar(
             expandedHeight: 180,
             floating: false,
@@ -795,7 +773,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // --- KARTU INFORMASI UTAMA (Elegan & Colorful) ---
                 Container(
                   margin: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -811,7 +788,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                   ),
                   child: Column(
                     children: [
-                      // Header Card Info
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                         decoration: BoxDecoration(
@@ -846,7 +822,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                                 ),
                               ],
                             ),
-                            // Status Badge
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
@@ -883,12 +858,10 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                         ),
                       ),
 
-                      // Isi Detail Card (Grid Layout)
                       Padding(
                         padding: const EdgeInsets.all(20),
                         child: Column(
                           children: [
-                            // Judul Utama (Nama Mapel)
                             Text(
                               widget.sessionData['className'],
                               style: const TextStyle(
@@ -910,7 +883,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                             ),
                             const SizedBox(height: 25),
 
-                            // Info Grid
                             Row(
                               children: [
                                 Expanded(
@@ -961,7 +933,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                   ),
                 ),
 
-                // --- BAGIAN TABEL SESSION ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
@@ -989,7 +960,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                         ],
                       ),
 
-                      // Tombol Add Session (Gradient)
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -1005,7 +975,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                           ],
                         ),
                         child: ElevatedButton.icon(
-                          // ✅ MENERIMA DATA DARI HALAMAN ADD SESSION DI SINI
                           onPressed: () async {
                             final newSession = await Navigator.push(
                               context,
@@ -1014,7 +983,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                               ),
                             );
 
-                            // Jika ada data yang dikembalikan, masukkan ke dalam List tabel
                             if (newSession != null) {
                               setState(() {
                                 _sessionList.add(newSession);
@@ -1039,7 +1007,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
 
                 const SizedBox(height: 20),
 
-                // Search Bar untuk Tabel Session
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
@@ -1095,7 +1062,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
 
                 const SizedBox(height: 20),
 
-                // Container untuk Tabel
                 Container(
                   margin: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
                   decoration: BoxDecoration(
@@ -1112,7 +1078,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                   ),
                   child: Column(
                     children: [
-                      // Header Tabel
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                         decoration: BoxDecoration(
@@ -1134,7 +1099,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                         ),
                       ),
 
-                      // Isi Tabel
                       _sessionList.isEmpty
                           ? Padding(
                         padding: const EdgeInsets.all(40),
@@ -1172,7 +1136,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                         itemCount: _sessionList.length,
                         itemBuilder: (context, index) {
                           final session = _sessionList[index];
-                          // ✅ DESAIN BARIS TABEL YANG SUDAH DIPERBAIKI
                           return Container(
                             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                             decoration: BoxDecoration(
@@ -1182,7 +1145,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                // Kolom 1: ID
                                 Expanded(
                                   flex: 2,
                                   child: Text(
@@ -1194,7 +1156,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                                 ),
                                 const SizedBox(width: 4),
 
-                                // Kolom 2: Session Name
                                 Expanded(
                                   flex: 3,
                                   child: Text(
@@ -1206,7 +1167,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                                 ),
                                 const SizedBox(width: 4),
 
-                                // Kolom 3: Date & Time
                                 Expanded(
                                     flex: 3,
                                     child: Column(
@@ -1230,7 +1190,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
                                 ),
                                 const SizedBox(width: 4),
 
-                                // Kolom 4: Action (Edit & Delete)
                                 Expanded(
                                   flex: 2,
                                   child: Wrap(
@@ -1277,7 +1236,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
     );
   }
 
-  // HELPER UNTUK KOTAK INFORMASI WARNA-WARNI
   Widget _buildBeautifulInfoTile(IconData icon, String label, String value, MaterialColor color) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -1320,10 +1278,6 @@ class _EditExamManagementPageState extends State<EditExamManagementPage> {
   }
 }
 
-// ============================================================================
-// HALAMAN BARU: ADD SESSION
-// ============================================================================
-
 class AddSessionPage extends StatefulWidget {
   final Map<String, dynamic> subjectData;
 
@@ -1334,7 +1288,6 @@ class AddSessionPage extends StatefulWidget {
 }
 
 class _AddSessionPageState extends State<AddSessionPage> {
-  // Controllers untuk form
   final _sessionNameCtrl = TextEditingController();
   final _questionNameCtrl = TextEditingController();
   final _examPeriodCtrl = TextEditingController();
@@ -1359,7 +1312,6 @@ class _AddSessionPageState extends State<AddSessionPage> {
     super.dispose();
   }
 
-  // --- FUNGSI UNTUK MEMUNCULKAN KALENDER (DATE PICKER) ---
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -1393,7 +1345,6 @@ class _AddSessionPageState extends State<AddSessionPage> {
     }
   }
 
-  // --- FUNGSI UNTUK MEMUNCULKAN JAM (TIME PICKER) ---
   Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -1430,7 +1381,6 @@ class _AddSessionPageState extends State<AddSessionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
-      // --- APP BAR ---
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -1458,12 +1408,10 @@ class _AddSessionPageState extends State<AddSessionPage> {
         centerTitle: true,
       ),
 
-      // --- BODY SCROLL FORM ---
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 100),
         child: Column(
           children: [
-            // 1. SECTION: SUBJECT CLASS (Read Only)
             _buildSectionCard(
               title: "Subject Class",
               icon: Icons.school_rounded,
@@ -1476,7 +1424,6 @@ class _AddSessionPageState extends State<AddSessionPage> {
             ),
             const SizedBox(height: 20),
 
-            // 2. SECTION: SESSION DETAILS
             _buildSectionCard(
               title: "Session Details",
               icon: Icons.topic_rounded,
@@ -1495,7 +1442,6 @@ class _AddSessionPageState extends State<AddSessionPage> {
             ),
             const SizedBox(height: 20),
 
-            // 3. SECTION: EXAM CONFIGURATION
             _buildSectionCard(
               title: "Exam Configuration",
               icon: Icons.settings_suggest_rounded,
@@ -1520,7 +1466,6 @@ class _AddSessionPageState extends State<AddSessionPage> {
             ),
             const SizedBox(height: 20),
 
-            // 4. SECTION: TIME & SCORING
             _buildSectionCard(
               title: "Time & Scoring",
               icon: Icons.access_time_filled_rounded,
@@ -1613,7 +1558,6 @@ class _AddSessionPageState extends State<AddSessionPage> {
         ),
       ),
 
-      // --- FLOATING ACTION BUTTON (SUBMIT & CANCEL) ---
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -1645,11 +1589,9 @@ class _AddSessionPageState extends State<AddSessionPage> {
             Expanded(
               flex: 2,
               child: ElevatedButton(
-                // ✅ LOGIKA SUBMIT DAN MENGIRIM DATA KEMBALI
                 onPressed: () {
                   if (_sessionNameCtrl.text.isNotEmpty && _startDateCtrl.text.isNotEmpty) {
 
-                    // Membungkus data yang diinput menjadi sebuah Map
                     final newSession = {
                       "id": "SES${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}",
                       "name": _sessionNameCtrl.text,
@@ -1658,14 +1600,12 @@ class _AddSessionPageState extends State<AddSessionPage> {
                       "endTime": _endTimeCtrl.text,
                     };
 
-                    // Mengirim data ini ke halaman sebelumnya (EditExamManagementPage)
                     Navigator.pop(context, newSession);
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("Session Added Successfully!", style: TextStyle(color: Colors.white)), backgroundColor: Colors.green),
                     );
                   } else {
-                    // Tampilkan error jika form kosong
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("Please fill the Session Name & Start Date!"), backgroundColor: Colors.red),
                     );
@@ -1686,7 +1626,6 @@ class _AddSessionPageState extends State<AddSessionPage> {
     );
   }
 
-  // --- WIDGET HELPERS ---
 
   Widget _buildSectionCard({required String title, required IconData icon, required Color iconColor, required List<Widget> children}) {
     return Container(

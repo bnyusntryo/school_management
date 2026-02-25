@@ -53,7 +53,7 @@ class _AddTeacherPageState extends State<AddTeacherPage> {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF0F5), // Matching Teacher theme
+            color: const Color(0xFFFFF0F5),
             borderRadius: BorderRadius.circular(25),
           ),
           child: Column(
@@ -95,7 +95,7 @@ class _AddTeacherPageState extends State<AddTeacherPage> {
                             "nip": _nipController.text,
                             "subject": _subjectController.text.isEmpty ? "Unknown" : _subjectController.text,
                             "class": _classController.text.isEmpty ? "N/A" : _classController.text,
-                            "image": "https://i.pravatar.cc/150?u=${_nipController.text}", // Dynamic dummy avatar
+                            "image": "https://i.pravatar.cc/150?u=${_nipController.text}",
                           });
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(

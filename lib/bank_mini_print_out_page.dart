@@ -9,12 +9,10 @@ class BankMiniPrintOutPage extends StatefulWidget {
 }
 
 class _BankMiniPrintOutPageState extends State<BankMiniPrintOutPage> {
-  // --- STATE PENGENDALI TAMPILAN ---
   bool _showPreview = false;
 
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers Form
   final _customerCtrl = TextEditingController();
   final _startDateCtrl = TextEditingController();
   final _endDateCtrl = TextEditingController();
@@ -23,7 +21,6 @@ class _BankMiniPrintOutPageState extends State<BankMiniPrintOutPage> {
   String? _selectedCustomerId;
   String _selectedPagePrint = 'Select Option';
 
-  // Dummy Data Nasabah
   final List<Map<String, String>> _customers = [
     {"id": "21049001", "name": "A. RAHMAN MULYA FAZIZ"},
     {"id": "21049002", "name": "ADHITYA PUTRA LIE WINATA"},
@@ -33,7 +30,6 @@ class _BankMiniPrintOutPageState extends State<BankMiniPrintOutPage> {
     {"id": "21049006", "name": "SITI AMINAH"},
   ];
 
-  // Dummy Data Transaksi (Kosong untuk simulasi "No Data Found")
   final List<Map<String, dynamic>> _dummyPrintData = [];
 
   @override
@@ -45,7 +41,6 @@ class _BankMiniPrintOutPageState extends State<BankMiniPrintOutPage> {
     super.dispose();
   }
 
-  // --- MODAL PILIH NASABAH ---
   void _showCustomerSelector() {
     List<Map<String, String>> filteredCustomers = List.from(_customers);
 
@@ -116,23 +111,18 @@ class _BankMiniPrintOutPageState extends State<BankMiniPrintOutPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Tema Warna Bank Mini Utama
     const Color bankMiniBaseDark = Color(0xFF2E3192);
     const Color bankMiniBaseLight = Color(0xFF662D91);
     const Color bankMiniAccent = Color(0xFFF06292);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF2F6FF),
-      // LOGIKA UTAMA: Tampilkan Form atau Tampilkan Preview
       body: _showPreview
           ? _buildPreviewScreen(bankMiniBaseDark)
           : _buildFilterScreen(bankMiniBaseDark, bankMiniBaseLight, bankMiniAccent),
     );
   }
 
-  // =========================================================================
-  // 1. TAMPILAN FILTER FORM (Tampilan Awal)
-  // =========================================================================
   Widget _buildFilterScreen(Color darkTheme, Color lightTheme, Color accentTheme) {
     return CustomScrollView(
       slivers: [
@@ -198,7 +188,6 @@ class _BankMiniPrintOutPageState extends State<BankMiniPrintOutPage> {
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please fill all required fields (*)"), backgroundColor: Colors.red));
                             return;
                           }
-                          // ✅ Pindah ke mode Preview
                           setState(() {
                             _showPreview = true;
                           });
@@ -218,20 +207,15 @@ class _BankMiniPrintOutPageState extends State<BankMiniPrintOutPage> {
     );
   }
 
-  // =========================================================================
-  // 2. TAMPILAN PREVIEW REPORTS (Sesuai web: Tombol biru & silang merah)
-  // =========================================================================
   Widget _buildPreviewScreen(Color darkTheme) {
     return Column(
       children: [
-        // Appbar khusus Preview
         AppBar(
-          backgroundColor: darkTheme, // Warna biru sesuai gambar
+          backgroundColor: darkTheme,
           elevation: 0,
           title: const Text("Preview Reports", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
-          automaticallyImplyLeading: false, // Matikan back button panah kiri
+          automaticallyImplyLeading: false,
           actions: [
-            // Tombol Tutup Merah (X)
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               decoration: BoxDecoration(color: Colors.red.shade600, borderRadius: BorderRadius.circular(8)),
@@ -240,7 +224,6 @@ class _BankMiniPrintOutPageState extends State<BankMiniPrintOutPage> {
                 constraints: const BoxConstraints(),
                 icon: const Icon(Icons.close_rounded, color: Colors.white, size: 18),
                 onPressed: () {
-                  // ✅ Kembali ke form filter
                   setState(() {
                     _showPreview = false;
                   });
@@ -250,11 +233,9 @@ class _BankMiniPrintOutPageState extends State<BankMiniPrintOutPage> {
           ],
         ),
 
-        // Konten Preview
         Expanded(
           child: Column(
             children: [
-              // Area Tombol Print Biru (Kiri Atas)
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(15),
@@ -270,7 +251,7 @@ class _BankMiniPrintOutPageState extends State<BankMiniPrintOutPage> {
                     icon: const Icon(Icons.print_rounded, color: Colors.white, size: 16),
                     label: const Text("Print", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue.shade600, // Tombol biru muda
+                      backgroundColor: Colors.blue.shade600,
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -279,10 +260,8 @@ class _BankMiniPrintOutPageState extends State<BankMiniPrintOutPage> {
                 ),
               ),
 
-              // Garis pemisah abu-abu
               Container(height: 1, color: Colors.grey.shade200),
 
-              // Area Data (Kosong / Ada Data)
               Expanded(
                 child: Center(
                   child: _dummyPrintData.isEmpty
@@ -296,7 +275,7 @@ class _BankMiniPrintOutPageState extends State<BankMiniPrintOutPage> {
                       Text("No transactions match your criteria.", style: TextStyle(color: Colors.grey.shade400, fontSize: 12)),
                     ],
                   )
-                      : const Text("Data will appear here..."), // Tempat jika data dummy diisi
+                      : const Text("Data will appear here..."),
                 ),
               ),
             ],
@@ -306,7 +285,6 @@ class _BankMiniPrintOutPageState extends State<BankMiniPrintOutPage> {
     );
   }
 
-  // --- Helper UI Widgets Khusus Form ---
   Widget _buildLabel(String text) => Padding(padding: const EdgeInsets.only(bottom: 8, top: 10), child: Text(text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87)));
 
   Widget _buildTextField(TextEditingController controller, IconData icon, String hint, {TextInputType keyboardType = TextInputType.text, IconData? suffixIcon}) {

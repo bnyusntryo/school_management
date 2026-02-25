@@ -10,21 +10,13 @@ class ELearningClassPage extends StatefulWidget {
 }
 
 class _ELearningClassPageState extends State<ELearningClassPage> {
-  // =========================================================
-  // STATE PENGENDALI HALAMAN (ALL-IN-ONE)
-  // 0: Daftar Kelas (Class List)
-  // 1: Daftar Mata Pelajaran (Subject List)
-  // 2: Daftar Bab/Materi (Section List)
-  // 3: Detail Materi & Tugas (Section Details)
-  // =========================================================
   int _currentView = 0;
 
-  // Data Holder
   Map<String, String>? _selectedClass;
   Map<String, String>? _selectedSubject;
   Map<String, dynamic>? _selectedSection;
 
-  int _selectedTab = 0; // 0: Material, 1: Assignment
+  int _selectedTab = 0;
 
   final TextEditingController _classSearchCtrl = TextEditingController();
   final TextEditingController _subjectSearchCtrl = TextEditingController();
@@ -51,7 +43,6 @@ class _ELearningClassPageState extends State<ELearningClassPage> {
     ],
   };
 
-  // Database Section
   final Map<String, List<Map<String, dynamic>>> _sectionDatabase = {};
 
   List<Map<String, String>> _filteredClasses = [];
@@ -105,9 +96,6 @@ class _ELearningClassPageState extends State<ELearningClassPage> {
     }
   }
 
-  // =========================================================
-  // VIEW 0: TAMPILAN CLASS LIST
-  // =========================================================
   Widget _buildClassScreen() {
     return CustomScrollView(
       slivers: [
@@ -144,9 +132,6 @@ class _ELearningClassPageState extends State<ELearningClassPage> {
     );
   }
 
-  // =========================================================
-  // VIEW 1: TAMPILAN SUBJECT LIST
-  // =========================================================
   Widget _buildSubjectScreen() {
     return CustomScrollView(
       slivers: [
@@ -183,9 +168,6 @@ class _ELearningClassPageState extends State<ELearningClassPage> {
     );
   }
 
-  // =========================================================
-  // VIEW 2: TAMPILAN SECTION LIST
-  // =========================================================
   Widget _buildSectionScreen() {
     return CustomScrollView(
       slivers: [
@@ -236,9 +218,6 @@ class _ELearningClassPageState extends State<ELearningClassPage> {
     );
   }
 
-  // =========================================================
-  // VIEW 3: TAMPILAN DETAIL MATERI & TUGAS
-  // =========================================================
   Widget _buildSectionDetailScreen() {
     return Column(
       children: [
@@ -352,7 +331,6 @@ class _ELearningClassPageState extends State<ELearningClassPage> {
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: () async {
-              // ✅ CONTOH UPLOAD ASSIGNMENT MENGGUNAKAN FILE PICKER
               try {
                 FilePickerResult? result = await FilePicker.platform.pickFiles();
                 if (result != null) {
@@ -382,9 +360,6 @@ class _ELearningClassPageState extends State<ELearningClassPage> {
     );
   }
 
-  // =========================================================
-  // CARD BUILDERS
-  // =========================================================
   Widget _buildClassCard(Map<String, String> cls, Color tintColor, Color darkTintColor) {
     return Container(
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: darkTintColor.withOpacity(0.08), blurRadius: 15, offset: const Offset(0, 8))], border: Border.all(color: tintColor, width: 1.5)),
@@ -444,9 +419,6 @@ class _ELearningClassPageState extends State<ELearningClassPage> {
     );
   }
 
-  // =========================================================
-  // MODAL: ADD SECTION FORM (DENGAN FILE PICKER ASLI)
-  // =========================================================
   void _showAddSectionModal() {
     final TextEditingController nameCtrl = TextEditingController();
     final TextEditingController remarkCtrl = TextEditingController();
@@ -455,7 +427,6 @@ class _ELearningClassPageState extends State<ELearningClassPage> {
     final TextEditingController dateCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
-    // State Lokal untuk UI File Picker
     String uploadedFileName = "";
     bool isUploading = false;
 
@@ -499,11 +470,9 @@ class _ELearningClassPageState extends State<ELearningClassPage> {
 
                                 Text("Attachment", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade700)), const SizedBox(height: 8),
 
-                                // ✅ FUNGSI FILE PICKER ASLI
                                 InkWell(
                                   onTap: () async {
                                     if (uploadedFileName.isNotEmpty) {
-                                      // Hapus file jika di-klik saat sudah ada file
                                       setModalState(() { uploadedFileName = ""; });
                                       return;
                                     }
@@ -522,7 +491,6 @@ class _ELearningClassPageState extends State<ELearningClassPage> {
                                           isUploading = false;
                                         });
                                       } else {
-                                        // User membatalkan pemilihan file
                                         setModalState(() { isUploading = false; });
                                       }
                                     } catch (e) {

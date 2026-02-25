@@ -13,7 +13,6 @@ class TransactionListPage extends StatefulWidget {
 class _TransactionListPageState extends State<TransactionListPage> {
   final TextEditingController _searchController = TextEditingController();
 
-  // Dummy Data berdasarkan gambar web
   final List<Map<String, dynamic>> _transactions = [
     {"id": "BMTR2025102000000021", "name": "Ahmad Trias Nur hakim", "type": "Debet", "date": "20 Oct 2025 13:03:30", "amount": 50000, "remark": "migrasi", "by": "Dummy Headmaster"},
     {"id": "BMTR2025102000000022", "name": "AISYAH BADARIAH", "type": "Debet", "date": "20 Oct 2025 13:03:46", "amount": 50000, "remark": "migrasi", "by": "Dummy Headmaster"},
@@ -54,7 +53,6 @@ class _TransactionListPageState extends State<TransactionListPage> {
       backgroundColor: const Color(0xFFF2F6FF),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -124,7 +122,6 @@ class _TransactionListPageState extends State<TransactionListPage> {
             ],
           ),
 
-          // --- SEARCH BAR ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),
@@ -170,7 +167,6 @@ class _TransactionListPageState extends State<TransactionListPage> {
             ),
           ),
 
-          // --- INFO TEXT ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
@@ -181,7 +177,6 @@ class _TransactionListPageState extends State<TransactionListPage> {
             ),
           ),
 
-          // --- LIST TRANSAKSI (GAYA ADMIN) ---
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             sliver: SliverList(
@@ -217,7 +212,6 @@ class _TransactionListPageState extends State<TransactionListPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Baris 1: ID Transaksi & Tanggal
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -240,7 +234,6 @@ class _TransactionListPageState extends State<TransactionListPage> {
               child: Divider(height: 1),
             ),
 
-            // Baris 2: Nama Siswa & Amount
             Row(
               children: [
                 Container(
@@ -256,7 +249,6 @@ class _TransactionListPageState extends State<TransactionListPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ✅ Tambahan pengaman maxLines untuk Nama
                       Text(
                         tx['name'],
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF2D3142)),
@@ -271,7 +263,6 @@ class _TransactionListPageState extends State<TransactionListPage> {
                             child: Text(tx['type'], style: TextStyle(fontSize: 9, color: Colors.blue.shade700, fontWeight: FontWeight.bold)),
                           ),
                           const SizedBox(width: 6),
-                          // ✅ PERBAIKAN UTAMA: Bungkus Remark dengan Expanded dan Ellipsis
                           Expanded(
                             child: Text(
                               "Remark: ${tx['remark']}",
@@ -295,7 +286,6 @@ class _TransactionListPageState extends State<TransactionListPage> {
 
             const SizedBox(height: 15),
 
-            // Baris 3: Admin Name & Action Button
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -304,7 +294,6 @@ class _TransactionListPageState extends State<TransactionListPage> {
                     children: [
                       Icon(Icons.admin_panel_settings_rounded, size: 14, color: Colors.grey.shade400),
                       const SizedBox(width: 5),
-                      // ✅ Tambahan pengaman untuk nama Admin yang panjang
                       Expanded(
                         child: Text(
                           "By: ${tx['by']}",
@@ -333,7 +322,7 @@ class _TransactionListPageState extends State<TransactionListPage> {
                     ),
                     child: Row(
                       children: const [
-                        Icon(Icons.visibility_rounded, color: Colors.white, size: 12), // Ubah ikon ke visibility (mata)
+                        Icon(Icons.visibility_rounded, color: Colors.white, size: 12),
                         SizedBox(width: 5),
                         Text("Detail", style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                       ],

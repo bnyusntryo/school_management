@@ -215,7 +215,6 @@ class _ClientIdPageState extends State<ClientIdPage> {
                 ),
 
                 const SizedBox(height: 30),
-                // Footer
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                   decoration: BoxDecoration(

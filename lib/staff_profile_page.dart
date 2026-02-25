@@ -13,7 +13,6 @@ class StaffProfilePage extends StatefulWidget {
 class _StaffProfilePageState extends State<StaffProfilePage> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers
   late TextEditingController _userIdCtrl;
   late TextEditingController _staffNameCtrl;
   late TextEditingController _bornDateCtrl;
@@ -29,14 +28,13 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
   @override
   void initState() {
     super.initState();
-    // ✅ BACA SEMUA DATA DARI widget.staffData JIKA ADA, JIKA TIDAK GUNAKAN DEFAULT
     _userIdCtrl = TextEditingController(text: widget.staffData['id']);
     _staffNameCtrl = TextEditingController(text: widget.staffData['name']);
     _positionCtrl = TextEditingController(text: widget.staffData['position']);
 
     _bornDateCtrl = TextEditingController(text: widget.staffData['born_date'] ?? '04/01/2000');
     _bornPlaceCtrl = TextEditingController(text: widget.staffData['born_place'] ?? 'Jakarta');
-    _selectedGender = widget.staffData['gender'] ?? 'Female'; // Mengambil gender tersimpan
+    _selectedGender = widget.staffData['gender'] ?? 'Female';
     _emailCtrl = TextEditingController(text: widget.staffData['email'] ?? '${widget.staffData['id']}@mail.com');
     _addressCtrl = TextEditingController(text: widget.staffData['address'] ?? 'Jakarta');
     _phoneCtrl = TextEditingController(text: widget.staffData['phone'] ?? '08123456789');
@@ -63,7 +61,6 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER MELENGKUNG ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -99,13 +96,11 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
             ),
           ),
 
-          // --- BODY KONTEN ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  // --- 1. TOP PROFILE CARD (Summary) ---
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -118,7 +113,6 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
                     ),
                     child: Row(
                       children: [
-                        // Avatar (Staff Avatar)
                         Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
@@ -132,7 +126,6 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
                           ),
                         ),
                         const SizedBox(width: 15),
-                        // Detail Singkat Kanan
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,7 +154,6 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
 
                   const SizedBox(height: 25),
 
-                  // --- 2. FORMULIR PERSONAL INFORMATION ---
                   Form(
                     key: _formKey,
                     child: Container(
@@ -241,7 +233,6 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
 
                           const SizedBox(height: 30),
 
-                          // --- TOMBOL ACTIONS (DELETE & SUBMIT) ---
                           Row(
                             children: [
                               Expanded(
@@ -266,7 +257,6 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
                                 child: ElevatedButton(
                                   onPressed: () {
                                     if (_formKey.currentState!.validate()) {
-                                      // ✅ TANGKAP SEMUA DATA FORM TERMASUK GENDER
                                       Map<String, String> updatedStaff = {
                                         "id": _userIdCtrl.text,
                                         "name": _staffNameCtrl.text,
@@ -280,7 +270,6 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
                                         "join_date": _joinDateCtrl.text,
                                       };
 
-                                      // Kirim ke halaman list
                                       Navigator.pop(context, {
                                         'action': 'update',
                                         'data': updatedStaff
@@ -311,8 +300,6 @@ class _StaffProfilePageState extends State<StaffProfilePage> {
       ),
     );
   }
-
-  // --- Helper Widgets ---
 
   Widget _buildSummaryItem(String title, String value) {
     return Column(

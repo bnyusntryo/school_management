@@ -29,10 +29,9 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: const Color(0xFFF5F7FA), // Latar belakang abu-abu sangat muda
+      backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER MELENGKUNG (TEMA TEAL/TOSCA SCHOOL ACTIVITY) ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -43,7 +42,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  // Menggunakan warna Teal/Tosca sesuai sidebar School Activity
                   colors: [Colors.teal.shade400, Colors.teal.shade800],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -70,10 +68,8 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                 onPressed: () => Navigator.pop(context),
               ),
             ),
-            // MENGHAPUS BAGIAN 'actions' DI SINI
           ),
 
-          // --- DAFTAR PENGUMUMAN (CARD STYLE) ---
           SliverPadding(
             padding: const EdgeInsets.all(20),
             sliver: AnnouncementPage.announcements.isEmpty
@@ -103,7 +99,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
         ],
       ),
 
-      // DILIPERTAHANKAN: Floating Action Button di bawah
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddEditDialog(),
         backgroundColor: Colors.teal.shade600,
@@ -112,7 +107,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
     );
   }
 
-  // --- DESAIN KARTU PENGUMUMAN ---
   Widget _buildAnnouncementCard(Map<String, String> item, int index) {
     bool isShow = item['show'] == 'Yes';
     bool isLocal = item['isLocal'] == "true";
@@ -136,7 +130,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Thumbnail Gambar
             Container(
               width: 80,
               height: 80,
@@ -155,7 +148,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
             ),
             const SizedBox(width: 15),
 
-            // Detail Teks
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,13 +164,12 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                       Icon(Icons.access_time_rounded, size: 14, color: Colors.grey.shade500),
                       const SizedBox(width: 4),
                       Text(
-                        item['id']!, // Berisi Tanggal
+                        item['id']!,
                         style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  // Badge Status Show/Hide
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
@@ -199,7 +190,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
               ),
             ),
 
-            // Tombol Edit
             IconButton(
               icon: Icon(Icons.edit_note_rounded, color: Colors.teal.shade500, size: 26),
               onPressed: () => _showAddEditDialog(existingData: item, index: index),
@@ -211,7 +201,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
     );
   }
 
-  // --- MODAL DIALOG ADD / EDIT ---
   void _showAddEditDialog({Map<String, String>? existingData, int? index}) {
     final titleCtrl = TextEditingController(text: existingData?['title']);
     final descCtrl = TextEditingController(text: existingData?['description']);
@@ -237,7 +226,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Modal Header
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -253,13 +241,11 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Inputs
                   _buildModalInputField("Announcement Title", titleCtrl, Icons.title_rounded, maxLines: 1),
                   const SizedBox(height: 15),
                   _buildModalInputField("Description", descCtrl, Icons.description_rounded, maxLines: 3),
                   const SizedBox(height: 15),
 
-                  // Dropdown Show
                   Text("Show Announcement", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
@@ -280,7 +266,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                   Text("Thumbnail Image", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
                   const SizedBox(height: 8),
 
-                  // Image Picker Box
                   GestureDetector(
                     onTap: () async {
                       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -322,7 +307,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                   ),
                   const SizedBox(height: 30),
 
-                  // Save Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -337,7 +321,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                             "isLocal": isImageLocal.toString(),
                           };
                           if (index == null) {
-                            AnnouncementPage.announcements.insert(0, newData); // Tambah di urutan atas
+                            AnnouncementPage.announcements.insert(0, newData);
                           } else {
                             AnnouncementPage.announcements[index] = newData;
                           }
@@ -372,7 +356,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
     );
   }
 
-  // Desain Input Field untuk Modal
   Widget _buildModalInputField(String label, TextEditingController controller, IconData icon, {int maxLines = 1}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

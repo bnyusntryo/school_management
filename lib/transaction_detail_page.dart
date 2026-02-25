@@ -30,11 +30,9 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
     _transactedByCtrl = TextEditingController(text: tx['by']);
     _dateCtrl = TextEditingController(text: tx['date']);
 
-    // Otomatis ubah angka jadi terbilang
     _spelledAmountCtrl = TextEditingController(text: "${_terbilang(tx['amount'])} Rupiah");
   }
 
-  // Fungsi Terbilang
   String _terbilang(int number) {
     List<String> angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
     if (number < 12) return angka[number];
@@ -69,7 +67,6 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
       backgroundColor: const Color(0xFFF2F6FF),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -102,7 +99,6 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             ),
           ),
 
-          // --- FORM DETAIL (READ ONLY) ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -148,7 +144,6 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
 
                     const SizedBox(height: 25),
 
-                    // --- TOMBOL CANCEL (KEMBALI) ---
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -172,7 +167,6 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
     );
   }
 
-  // Helper Widget
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, top: 10),
@@ -185,13 +179,13 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
       margin: const EdgeInsets.only(bottom: 10),
       child: TextFormField(
         controller: controller,
-        readOnly: true, // DIKUNCI SEMUA (READ-ONLY)
+        readOnly: true,
         maxLines: maxLines,
         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade800),
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: Colors.grey.shade500, size: 20),
           filled: true,
-          fillColor: Colors.grey.shade200, // Warna latar abu-abu untuk read-only
+          fillColor: Colors.grey.shade200,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
           focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
         ),

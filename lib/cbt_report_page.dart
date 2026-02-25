@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-// ============================================================================
-// HALAMAN 1: CBT REPORTS DASHBOARD
-// ============================================================================
-
 class CBTReportsPage extends StatelessWidget {
   const CBTReportsPage({super.key});
 
@@ -13,7 +9,6 @@ class CBTReportsPage extends StatelessWidget {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER APP BAR (KONSISTEN DENGAN DESAIN SEBELUMNYA) ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -52,7 +47,6 @@ class CBTReportsPage extends StatelessWidget {
             ),
           ),
 
-          // --- BODY: DAFTAR REPORT ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -69,7 +63,6 @@ class CBTReportsPage extends StatelessWidget {
                       );
                     },
                   ),
-                  // Jika ada report lain (misal: Absensi, Analisis Soal), bisa ditambahkan di sini
                 ],
               ),
             ),
@@ -128,7 +121,7 @@ class CBTReportsPage extends StatelessWidget {
             child: ElevatedButton(
               onPressed: onTap,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4285F4), // Warna biru sesuai gambar web
+                backgroundColor: const Color(0xFF4285F4),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 elevation: 0,
@@ -142,10 +135,6 @@ class CBTReportsPage extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// HALAMAN 2: EXAM RESULT REPORT (FORM SELEKSI)
-// ============================================================================
-
 class ExamResultReportPage extends StatefulWidget {
   const ExamResultReportPage({super.key});
 
@@ -154,7 +143,6 @@ class ExamResultReportPage extends StatefulWidget {
 }
 
 class _ExamResultReportPageState extends State<ExamResultReportPage> {
-  // Dummy Data Sesuai Gambar Web
   final List<String> _examPeriods = [
     "Exam Period 08 Feb 2024",
     "EXAM 11 Feb",
@@ -169,7 +157,6 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
     "MATEMATIKA X AK 1",
   ];
 
-  // Set untuk menyimpan item yang dipilih (Logika Fix)
   final Set<String> _selectedPeriods = {};
   final Set<String> _selectedSessions = {};
 
@@ -204,7 +191,6 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER APP BAR ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -249,7 +235,6 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- BAGIAN 1: SELECT EXAM PERIOD ---
                   _buildSelectionSection(
                     title: "Select Exam Period",
                     items: _examPeriods,
@@ -270,7 +255,6 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
 
                   const SizedBox(height: 30),
 
-                  // --- BAGIAN 2: SELECT SESSION ---
                   _buildSelectionSection(
                     title: "Select Session",
                     items: _sessions,
@@ -289,14 +273,13 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
                     },
                   ),
 
-                  const SizedBox(height: 100), // Spasi untuk tombol submit di bawah
+                  const SizedBox(height: 100),
                 ],
               ),
             ),
           ),
         ],
       ),
-      // --- TOMBOL SUBMIT BAWAH ---
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -307,12 +290,11 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
         ),
         child: ElevatedButton(
           onPressed: (_selectedPeriods.isEmpty || _selectedSessions.isEmpty) ? null : () {
-            // ✅ NAVIGASI MEMBAWA DATA SESI YANG DIPILIH
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => PreviewReportPage(
-                  selectedSessions: _selectedSessions.toList(), // Kirim data filter
+                  selectedSessions: _selectedSessions.toList(),
                 ),
               ),
             );
@@ -330,7 +312,6 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
     );
   }
 
-  // --- HELPER UNTUK MEMBUAT KOTAK SELEKSI (PENGGANTI TRANSFER LIST) ---
   Widget _buildSelectionSection({
     required String title,
     required List<String> items,
@@ -342,7 +323,6 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Title Label
         RichText(
           text: TextSpan(
             text: title,
@@ -353,8 +333,6 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
           ),
         ),
         const SizedBox(height: 10),
-
-        // Kontainer Utama Form Seleksi
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -363,7 +341,6 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
           ),
           child: Column(
             children: [
-              // Header: Select All & Counter
               Padding(
                 padding: const EdgeInsets.only(left: 8, right: 15, top: 5, bottom: 5),
                 child: Row(
@@ -396,7 +373,6 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
               ),
               Divider(height: 1, color: Colors.grey.shade200),
 
-              // Search Bar Internal
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: Container(
@@ -417,9 +393,8 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
                 ),
               ),
 
-              // Daftar Item (Scrollable Box)
               Container(
-                height: 200, // Membatasi tinggi agar layout tidak hancur
+                height: 200,
                 decoration: BoxDecoration(
                   border: Border(top: BorderSide(color: Colors.grey.shade200)),
                 ),
@@ -462,14 +437,13 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
                 ),
               ),
 
-              // Tombol Load More (Visual sesuai web)
               InkWell(
                 onTap: (){},
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF8C9EFF), // Biru muda sesuai web
+                    color: const Color(0xFF8C9EFF),
                     borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(14), bottomRight: Radius.circular(14)),
                   ),
                   child: const Center(
@@ -484,9 +458,6 @@ class _ExamResultReportPageState extends State<ExamResultReportPage> {
     );
   }
 }
-// ============================================================================
-// HALAMAN 3: PREVIEW REPORT DATA (TABLE)
-// ============================================================================
 
 class PreviewReportPage extends StatefulWidget {
   final List<String> selectedSessions;
@@ -498,7 +469,6 @@ class PreviewReportPage extends StatefulWidget {
 }
 
 class _PreviewReportPageState extends State<PreviewReportPage> {
-  // Dummy Data Laporan (Biasanya ini hasil dari pemanggilan API backend)
   List<Map<String, dynamic>> reportData = [];
 
   @override
@@ -507,12 +477,9 @@ class _PreviewReportPageState extends State<PreviewReportPage> {
     _generateDummyReportData();
   }
 
-  // Fungsi mensimulasikan Backend memfilter data berdasarkan Sesi yang dipilih
   void _generateDummyReportData() {
-    // Jika tidak ada sesi yang dilempar, biarkan kosong
     if (widget.selectedSessions.isEmpty) return;
 
-    // Kita buat 2 data murid dummy untuk SETIAP sesi yang dipilih user
     for (String session in widget.selectedSessions) {
       reportData.add({
         "className": "X AK 1",
@@ -543,14 +510,13 @@ class _PreviewReportPageState extends State<PreviewReportPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Format tanggal saat ini untuk header (Seperti di web: 2/23/2026...)
     final now = DateTime.now();
     final String reportedDate = "${now.month}/${now.day}/${now.year}, ${now.hour}:${now.minute.toString().padLeft(2, '0')} AM";
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1976D2), // Biru Header Web
+        backgroundColor: const Color(0xFF1976D2),
         title: const Text("Preview Reports", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
@@ -565,7 +531,6 @@ class _PreviewReportPageState extends State<PreviewReportPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- META INFO HEADER ---
             Container(
               width: double.infinity,
               color: Colors.white,
@@ -583,11 +548,10 @@ class _PreviewReportPageState extends State<PreviewReportPage> {
             ),
             const SizedBox(height: 15),
 
-            // --- ACTION BUTTONS (DOWNLOAD EXCEL & PDF) ---
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end, // Rata kanan sesuai web
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton.icon(
                     onPressed: () {
@@ -596,7 +560,7 @@ class _PreviewReportPageState extends State<PreviewReportPage> {
                     icon: const Icon(Icons.description_rounded, size: 16, color: Colors.white),
                     label: const Text("Download Excel", style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF4CAF50), // Hijau Excel
+                      backgroundColor: const Color(0xFF4CAF50),
                       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       elevation: 0,
                     ),
@@ -609,7 +573,7 @@ class _PreviewReportPageState extends State<PreviewReportPage> {
                     icon: const Icon(Icons.picture_as_pdf_rounded, size: 16, color: Colors.white),
                     label: const Text("Download PDF", style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF44336), // Merah PDF
+                      backgroundColor: const Color(0xFFF44336),
                       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       elevation: 0,
                     ),
@@ -619,7 +583,6 @@ class _PreviewReportPageState extends State<PreviewReportPage> {
             ),
             const SizedBox(height: 15),
 
-            // --- DATA TABLE SCROLLABLE ---
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
@@ -629,14 +592,13 @@ class _PreviewReportPageState extends State<PreviewReportPage> {
                   BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 5, offset: const Offset(0, 3)),
                 ],
               ),
-              // Komponen ajaib untuk membuat tabel bisa digeser ke kanan-kiri
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
-                  headingRowColor: WidgetStateProperty.resolveWith((states) => const Color(0xFF283593)), // Biru gelap header tabel
+                  headingRowColor: WidgetStateProperty.resolveWith((states) => const Color(0xFF283593)),
                   headingTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
                   dataTextStyle: const TextStyle(color: Colors.black87, fontSize: 12),
-                  columnSpacing: 25, // Jarak antar kolom
+                  columnSpacing: 25,
                   columns: const [
                     DataColumn(label: Text("#")),
                     DataColumn(label: Text("Class Name")),
@@ -650,12 +612,10 @@ class _PreviewReportPageState extends State<PreviewReportPage> {
                     DataColumn(label: Text("End Time")),
                     DataColumn(label: Text("Score")),
                   ],
-                  // Looping data dummy kita untuk dijadikan baris (row)
                   rows: List.generate(reportData.length, (index) {
                     final data = reportData[index];
                     return DataRow(
                       color: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
-                        // Belang-belang warna baris (Zebra Striping)
                         if (index.isEven) return Colors.grey.withOpacity(0.05);
                         return null;
                       }),
@@ -677,14 +637,13 @@ class _PreviewReportPageState extends State<PreviewReportPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 40), // Padding bawah
+            const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
 
-  // Helper text meta info
   Widget _buildMetaText(String label, String value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,

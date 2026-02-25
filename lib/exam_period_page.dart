@@ -8,7 +8,6 @@ class ExamPeriodPage extends StatefulWidget {
 }
 
 class _ExamPeriodPageState extends State<ExamPeriodPage> {
-  // Dummy Data berdasarkan gambar referensi web
   final List<Map<String, dynamic>> _examPeriods = [
     {
       "id": "EXPER2025111900000002",
@@ -73,7 +72,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER APP BAR ---
           SliverAppBar(
             expandedHeight: 140,
             floating: false,
@@ -84,7 +82,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  // Menggunakan warna ungu & pink agar berbeda dari Exam Management
                   colors: [
                     Colors.purple.shade500,
                     Colors.deepPurple.shade700,
@@ -136,7 +133,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
             ),
           ),
 
-          // --- FILTER, SEARCH & ADD BUTTON ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),
@@ -144,7 +140,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
                 children: [
                   Row(
                     children: [
-                      // Search Bar
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
@@ -172,7 +167,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      // Clear Button
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -198,7 +192,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
                   ),
                   const SizedBox(height: 15),
 
-                  // Add Exam Period Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -237,7 +230,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
             ),
           ),
 
-          // --- LIST OF PERIOD CARDS ---
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
             sliver: _filteredPeriods.isEmpty
@@ -270,7 +262,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
     );
   }
 
-  // --- WIDGET CARD EXAM PERIOD ---
   Widget _buildPeriodCard(Map<String, dynamic> data) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -289,7 +280,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --- CARD HEADER ---
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             decoration: BoxDecoration(
@@ -302,7 +292,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // ID Badge
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -323,7 +312,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                // Year Code Badge
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
@@ -351,13 +339,11 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
             ),
           ),
 
-          // --- CARD BODY ---
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Period Name
                 Text(
                   data['name'],
                   style: const TextStyle(
@@ -368,7 +354,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
                 ),
                 const SizedBox(height: 20),
 
-                // Info Tanggal (Start & End)
                 Container(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
@@ -378,7 +363,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
                   ),
                   child: Row(
                     children: [
-                      // Start Date
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -404,12 +388,10 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
                           ],
                         ),
                       ),
-                      // Arrow Icon di tengah
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Icon(Icons.arrow_forward_rounded, color: Colors.grey.shade400, size: 20),
                       ),
-                      // End Date
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -442,7 +424,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
             ),
           ),
 
-          // --- CARD FOOTER (ACTION) ---
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
@@ -459,7 +440,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                // Tombol Edit
                 InkWell(
                   onTap: () {
                     Navigator.push(
@@ -488,10 +468,6 @@ class _ExamPeriodPageState extends State<ExamPeriodPage> {
   }
 }
 
-// ============================================================================
-// HALAMAN BARU: ADD EXAM PERIOD
-// ============================================================================
-
 class AddExamPeriodPage extends StatefulWidget {
   const AddExamPeriodPage({super.key});
 
@@ -500,7 +476,6 @@ class AddExamPeriodPage extends StatefulWidget {
 }
 
 class _AddExamPeriodPageState extends State<AddExamPeriodPage> {
-  // Controllers untuk input form
   final _periodNameCtrl = TextEditingController();
   final _startDateCtrl = TextEditingController();
   final _endDateCtrl = TextEditingController();
@@ -515,7 +490,6 @@ class _AddExamPeriodPageState extends State<AddExamPeriodPage> {
     super.dispose();
   }
 
-  // --- FUNGSI UNTUK MEMUNCULKAN KALENDER (DATE PICKER) ---
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -523,11 +497,10 @@ class _AddExamPeriodPageState extends State<AddExamPeriodPage> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
       builder: (context, child) {
-        // Tema kalender disesuaikan dengan warna halaman Exam Period (Ungu)
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: Colors.deepPurple.shade600, // Warna Header Kalender
+              primary: Colors.deepPurple.shade600,
               onPrimary: Colors.white,
               onSurface: Colors.black87,
             ),
@@ -544,7 +517,6 @@ class _AddExamPeriodPageState extends State<AddExamPeriodPage> {
 
     if (pickedDate != null) {
       setState(() {
-        // Format tanggal: DD-Bulan-YYYY (Sesuai dengan referensi dummy data)
         const List<String> monthNames = [
           "January", "February", "March", "April", "May", "June",
           "July", "August", "September", "October", "November", "December"
@@ -559,7 +531,6 @@ class _AddExamPeriodPageState extends State<AddExamPeriodPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
-      // --- APP BAR ---
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -587,18 +558,16 @@ class _AddExamPeriodPageState extends State<AddExamPeriodPage> {
         centerTitle: true,
       ),
 
-      // --- BODY SCROLL FORM ---
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 100), // padding bawah untuk tombol floating
+        padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 100),
         child: Column(
           children: [
-            // 1. SECTION: PERIOD DETAILS
             _buildSectionCard(
               title: "Period Details",
               icon: Icons.info_outline_rounded,
               iconColor: Colors.purple,
               children: [
-                _buildReadOnlyField("Exam Period ID", "EXPER[YYYYMMDDXXXXXX]"), // Auto generated
+                _buildReadOnlyField("Exam Period ID", "EXPER[YYYYMMDDXXXXXX]"),
                 const SizedBox(height: 15),
                 _buildInputField(
                   label: "Exam Period Name",
@@ -620,13 +589,11 @@ class _AddExamPeriodPageState extends State<AddExamPeriodPage> {
             ),
             const SizedBox(height: 20),
 
-            // 2. SECTION: TIMELINE CONFIGURATION
             _buildSectionCard(
               title: "Timeline Configuration",
               icon: Icons.calendar_month_rounded,
               iconColor: Colors.orange,
               children: [
-                // Start Date & End Date dibuat bersebelahan agar rapi
                 Row(
                   children: [
                     Expanded(
@@ -660,7 +627,6 @@ class _AddExamPeriodPageState extends State<AddExamPeriodPage> {
         ),
       ),
 
-      // --- FLOATING ACTION BUTTON (SUBMIT & CANCEL) ---
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -693,10 +659,8 @@ class _AddExamPeriodPageState extends State<AddExamPeriodPage> {
               flex: 2,
               child: ElevatedButton(
                 onPressed: () {
-                  // Validasi Form
                   if (_periodNameCtrl.text.isNotEmpty && _startDateCtrl.text.isNotEmpty && _endDateCtrl.text.isNotEmpty && _periodYearCtrl.text.isNotEmpty) {
 
-                    // Bungkus data baru
                     final newPeriod = {
                       "id": "EXPER${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}",
                       "name": _periodNameCtrl.text,
@@ -705,7 +669,6 @@ class _AddExamPeriodPageState extends State<AddExamPeriodPage> {
                       "yearCode": _periodYearCtrl.text,
                     };
 
-                    // Kirim data kembali ke halaman utama Exam Period
                     Navigator.pop(context, newPeriod);
 
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -731,8 +694,6 @@ class _AddExamPeriodPageState extends State<AddExamPeriodPage> {
       ),
     );
   }
-
-  // --- WIDGET HELPERS ---
 
   Widget _buildSectionCard({required String title, required IconData icon, required Color iconColor, required List<Widget> children}) {
     return Container(
@@ -866,10 +827,6 @@ class _AddExamPeriodPageState extends State<AddExamPeriodPage> {
   }
 }
 
-// ============================================================================
-// HALAMAN BARU: EDIT EXAM PERIOD & SESSION LIST
-// ============================================================================
-
 class EditExamPeriodPage extends StatefulWidget {
   final Map<String, dynamic> periodData;
 
@@ -880,13 +837,11 @@ class EditExamPeriodPage extends StatefulWidget {
 }
 
 class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
-  // Controllers untuk input form
   late TextEditingController _periodNameCtrl;
   late TextEditingController _startDateCtrl;
   late TextEditingController _endDateCtrl;
   late TextEditingController _periodYearCtrl;
 
-  // ✅ LOGIC FIXED: Data Master disimpan di State agar persisten
   final List<Map<String, dynamic>> _sessionList = [
     {
       "id": "EXSES2025112400000001",
@@ -899,7 +854,7 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
       "endDate": "10-Dec-2025",
       "startTime": "07:00",
       "endTime": "15:00",
-      "participants": ["25049120", "25049121", "25049122"] // ✅ List of String (IDs)
+      "participants": ["25049120", "25049121", "25049122"]
     },
     {
       "id": "EXSES2025112900000001",
@@ -932,7 +887,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
   @override
   void initState() {
     super.initState();
-    // Mengisi form dengan data yang dilempar dari halaman sebelumnya
     _periodNameCtrl = TextEditingController(text: widget.periodData['name']);
     _startDateCtrl = TextEditingController(text: widget.periodData['startDate']);
     _endDateCtrl = TextEditingController(text: widget.periodData['endDate']);
@@ -982,7 +936,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
     }
   }
 
-  // ✅ FUNGSI BARU: Konfirmasi Delete Session
   void _confirmDeleteSession(int index, String sessionName) {
     showDialog(
       context: context,
@@ -1012,18 +965,16 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context), // Tutup dialog
+              onPressed: () => Navigator.pop(context),
               child: const Text("Cancel", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
             ),
             ElevatedButton(
               onPressed: () {
-                // Hapus data dari List
                 setState(() {
                   _sessionList.removeAt(index);
                 });
-                Navigator.pop(context); // Tutup dialog
+                Navigator.pop(context);
 
-                // Tampilkan snackbar sukses
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: const Text("Session deleted successfully!"),
@@ -1052,7 +1003,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER APP BAR ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -1095,16 +1045,12 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ==========================================
-                // BAGIAN 1: FORM EDIT EXAM PERIOD (UI MATCHED)
-                // ==========================================
                 Container(
                   margin: const EdgeInsets.all(20),
                   padding: const EdgeInsets.all(25),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    // Tidak ada shadow sesuai permintaan
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1152,7 +1098,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
                       ),
 
                       const SizedBox(height: 25),
-                      // TOMBOL AKSI FORM
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -1164,7 +1109,7 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
                           ElevatedButton(
                             onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFE57373), // Merah soft
+                              backgroundColor: const Color(0xFFE57373),
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               elevation: 0,
@@ -1175,7 +1120,7 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
                           ElevatedButton(
                             onPressed: () => Navigator.pop(context),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF5E35B1), // Ungu tua
+                              backgroundColor: const Color(0xFF5E35B1),
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               elevation: 0,
@@ -1194,11 +1139,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
                 ),
                 const SizedBox(height: 10),
 
-                // ==========================================
-                // BAGIAN 2: EXAM SESSION LIST (TABEL)
-                // ==========================================
-
-                // --- TOKENS BUTTONS ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
@@ -1249,7 +1189,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
                 ),
                 const SizedBox(height: 15),
 
-                // --- SEARCH BAR ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Container(
@@ -1271,8 +1210,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
                 ),
                 const SizedBox(height: 20),
 
-                // --- LIST OF SESSION CARDS ---
-                // ✅ UPDATE: Tambahkan argumen index di fungsi itemBuilder
                 ListView.builder(
                   padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
                   shrinkWrap: true,
@@ -1280,7 +1217,7 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
                   itemCount: _sessionList.length,
                   itemBuilder: (context, index) {
                     final session = _sessionList[index];
-                    return _buildSessionListCard(session, index); // Meneruskan index ke helper
+                    return _buildSessionListCard(session, index);
                   },
                 ),
               ],
@@ -1291,7 +1228,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
     );
   }
 
-  // --- HELPER UNTUK WIDGET FORM (UI DESIGN MATCH) ---
   Widget _buildDesignReadOnlyField(String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1302,7 +1238,7 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
           decoration: BoxDecoration(
-            color: const Color(0xFFF5F5F5), // Abu-abu pucat
+            color: const Color(0xFFF5F5F5),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.grey.shade300),
           ),
@@ -1342,8 +1278,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
     );
   }
 
-  // --- HELPER UNTUK KARTU TABEL SESSION ---
-  // ✅ UPDATE: Menambahkan parameter index
   Widget _buildSessionListCard(Map<String, dynamic> session, int index) {
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
@@ -1357,7 +1291,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
       ),
       child: Column(
         children: [
-          // Header Card (ID & Action Buttons)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
             decoration: BoxDecoration(
@@ -1376,7 +1309,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
                   children: [
                     InkWell(
                       onTap: () {
-                        // ✅ NAVIGASI KE HALAMAN VIEW SESSION DETAIL
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -1398,7 +1330,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
                     const SizedBox(width: 6),
                     InkWell(
                       onTap: () async {
-                        // ✅ LOGIC FIXED: Tunggu hasil dari halaman Participant
                         final List<String>? result = await Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -1423,10 +1354,8 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
                       ),
                     ),
                     const SizedBox(width: 6),
-                    // ✅ UPDATE: Tambahkan Aksi Hapus (Delete)
                     InkWell(
                       onTap: () {
-                        // Panggil fungsi konfirmasi hapus
                         _confirmDeleteSession(index, session['sessionName']);
                       },
                       borderRadius: BorderRadius.circular(8),
@@ -1446,7 +1375,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
             ),
           ),
 
-          // Body Card (Informasi Sesi)
           Padding(
             padding: const EdgeInsets.all(15),
             child: Column(
@@ -1458,7 +1386,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
                 ),
                 const SizedBox(height: 12),
 
-                // Info Grid
                 Row(
                   children: [
                     Expanded(child: _buildInfoText(Icons.menu_book_rounded, session['subject'])),
@@ -1469,7 +1396,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
                 Row(
                   children: [
                     Expanded(child: _buildInfoText(Icons.class_rounded, "Class: ${session['className']} (Gr. ${session['grade']})")),
-                    // ✅ Tampilkan jumlah peserta secara dinamis
                     Expanded(child: _buildInfoText(Icons.people_alt_rounded, "${session['participants']?.length ?? 0} Students")),
                   ],
                 ),
@@ -1479,7 +1405,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
                   child: Divider(height: 1, color: Color(0xFFF0F0F0)),
                 ),
 
-                // Jadwal
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -1529,10 +1454,6 @@ class _EditExamPeriodPageState extends State<EditExamPeriodPage> {
   }
 }
 
-// ============================================================================
-// HALAMAN BARU: VIEW EXAM TOKEN LIST
-// ============================================================================
-
 class ViewTokenPage extends StatefulWidget {
   final Map<String, dynamic> periodData;
 
@@ -1543,7 +1464,6 @@ class ViewTokenPage extends StatefulWidget {
 }
 
 class _ViewTokenPageState extends State<ViewTokenPage> {
-  // Dummy Data Token Murid (Berdasarkan gambar referensi web)
   final List<Map<String, dynamic>> _studentTokens = [
     {"userId": "25049120", "name": "Abdullah Widodo", "className": "X AK 1", "token": "HUYXMR"},
     {"userId": "25049121", "name": "Andika Prastyo", "className": "X AK 1", "token": "WMNEUY"},
@@ -1580,7 +1500,6 @@ class _ViewTokenPageState extends State<ViewTokenPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER APP BAR ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -1623,7 +1542,6 @@ class _ViewTokenPageState extends State<ViewTokenPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // --- KARTU INFO PERIODE (Ringkasan dari halaman sebelumnya) ---
                 Container(
                   margin: const EdgeInsets.all(20),
                   padding: const EdgeInsets.all(20),
@@ -1661,7 +1579,6 @@ class _ViewTokenPageState extends State<ViewTokenPage> {
                   ),
                 ),
 
-                // --- TOMBOL EXPORT & SEARCH BAR ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
@@ -1690,7 +1607,6 @@ class _ViewTokenPageState extends State<ViewTokenPage> {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      // Tombol Export Excel (Sesuai Web)
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -1717,7 +1633,6 @@ class _ViewTokenPageState extends State<ViewTokenPage> {
 
                 const SizedBox(height: 20),
 
-                // --- LIST OF STUDENT TOKENS ---
                 Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
                   child: Text(
@@ -1757,7 +1672,6 @@ class _ViewTokenPageState extends State<ViewTokenPage> {
     );
   }
 
-  // Helper Card untuk Detail Periode
   Widget _buildSummaryRow(String label, String value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1774,9 +1688,7 @@ class _ViewTokenPageState extends State<ViewTokenPage> {
     );
   }
 
-  // Helper Card untuk Murid & Token
   Widget _buildTokenCard(Map<String, dynamic> student, int index) {
-    // Mengambil inisial nama (misal: "Abdullah Widodo" jadi "AW")
     List<String> nameParts = student['name'].split(" ");
     String initials = nameParts[0][0];
     if (nameParts.length > 1) initials += nameParts[1][0];
@@ -1794,7 +1706,6 @@ class _ViewTokenPageState extends State<ViewTokenPage> {
       ),
       child: Row(
         children: [
-          // Nomor Urut & Avatar
           Container(
             width: 40,
             height: 40,
@@ -1810,7 +1721,7 @@ class _ViewTokenPageState extends State<ViewTokenPage> {
           ),
           const SizedBox(width: 15),
 
-          // Data Murid
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1844,7 +1755,6 @@ class _ViewTokenPageState extends State<ViewTokenPage> {
           ),
           const SizedBox(width: 10),
 
-          // Token Box
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
@@ -1861,7 +1771,7 @@ class _ViewTokenPageState extends State<ViewTokenPage> {
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 2.0, // Memberi jarak agar token mudah dibaca
+                letterSpacing: 2.0,
                 color: Colors.white,
               ),
             ),
@@ -1871,10 +1781,6 @@ class _ViewTokenPageState extends State<ViewTokenPage> {
     );
   }
 }
-
-// ============================================================================
-// HALAMAN BARU: GENERATE TOKEN (MOBILE ADAPTATION)
-// ============================================================================
 
 class GenerateTokenPage extends StatefulWidget {
   final Map<String, dynamic> periodData;
@@ -1886,7 +1792,6 @@ class GenerateTokenPage extends StatefulWidget {
 }
 
 class _GenerateTokenPageState extends State<GenerateTokenPage> {
-  // Dummy Data Murid yang bisa di-generate tokennya
   final List<Map<String, dynamic>> _students = [
     {"id": "S001", "name": "A'LIN ZAHWAH DINIYAH", "className": "XII TKJ 2"},
     {"id": "S002", "name": "ABDUL BARKAH AR RASYID", "className": "XI DKV 2"},
@@ -1897,14 +1802,12 @@ class _GenerateTokenPageState extends State<GenerateTokenPage> {
     {"id": "S007", "name": "CHELSEA ISLAN", "className": "XII DKV 1"},
   ];
 
-  // Set untuk menyimpan ID murid yang dicentang
   Set<String> _selectedStudentIds = {};
   bool _selectAll = false;
 
   @override
   void initState() {
     super.initState();
-    // Default: Semua murid langsung tercentang saat halaman dibuka (Sesuai kebiasaan)
     _selectAllStudents(true);
   }
 
@@ -1926,7 +1829,6 @@ class _GenerateTokenPageState extends State<GenerateTokenPage> {
       } else {
         _selectedStudentIds.remove(id);
       }
-      // Update status "Select All" checkbox
       _selectAll = _selectedStudentIds.length == _students.length;
     });
   }
@@ -1937,7 +1839,6 @@ class _GenerateTokenPageState extends State<GenerateTokenPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER APP BAR ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -1980,7 +1881,6 @@ class _GenerateTokenPageState extends State<GenerateTokenPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // --- 1. INFO EXAM PERIOD (Read-Only) ---
                 Container(
                   margin: const EdgeInsets.all(20),
                   padding: const EdgeInsets.all(20),
@@ -2013,7 +1913,6 @@ class _GenerateTokenPageState extends State<GenerateTokenPage> {
                   ),
                 ),
 
-                // --- 2. HEADER PESERTA (PARTICIPANT) ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
@@ -2034,7 +1933,6 @@ class _GenerateTokenPageState extends State<GenerateTokenPage> {
                         ],
                       ),
 
-                      // Tombol Select All
                       InkWell(
                         onTap: () => _selectAllStudents(!_selectAll),
                         borderRadius: BorderRadius.circular(10),
@@ -2070,9 +1968,8 @@ class _GenerateTokenPageState extends State<GenerateTokenPage> {
                 ),
                 const SizedBox(height: 15),
 
-                // --- 3. LIST PESERTA ---
                 ListView.builder(
-                  padding: const EdgeInsets.only(left: 20, right: 20, bottom: 100), // Padding bawah untuk area FAB
+                  padding: const EdgeInsets.only(left: 20, right: 20, bottom: 100),
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: _students.length,
@@ -2139,7 +2036,6 @@ class _GenerateTokenPageState extends State<GenerateTokenPage> {
         ],
       ),
 
-      // --- FLOATING ACTION BUTTON (SUBMIT & CANCEL) ---
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -2168,7 +2064,6 @@ class _GenerateTokenPageState extends State<GenerateTokenPage> {
               flex: 2,
               child: ElevatedButton.icon(
                 onPressed: _selectedStudentIds.isEmpty ? null : () async {
-                  // Simulasi proses generate token (API)
                   showDialog(
                     context: context,
                     barrierDismissible: false,
@@ -2189,7 +2084,7 @@ class _GenerateTokenPageState extends State<GenerateTokenPage> {
                   );
 
                   await Future.delayed(const Duration(seconds: 2));
-                  if (mounted) Navigator.pop(context); // Tutup loading
+                  if (mounted) Navigator.pop(context);
 
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -2206,7 +2101,7 @@ class _GenerateTokenPageState extends State<GenerateTokenPage> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                       ),
                     );
-                    Navigator.pop(context); // Kembali ke halaman sebelumnya
+                    Navigator.pop(context);
                   }
                 },
                 icon: const Icon(Icons.generating_tokens_rounded, color: Colors.white, size: 20),
@@ -2246,9 +2141,6 @@ class _GenerateTokenPageState extends State<GenerateTokenPage> {
     );
   }
 }
-// ============================================================================
-// HALAMAN BARU: VIEW SESSION DETAIL
-// ============================================================================
 
 class ViewSessionDetailPage extends StatelessWidget {
   final Map<String, dynamic> sessionData;
@@ -2257,12 +2149,10 @@ class ViewSessionDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Data dummy tambahan jika di data utama belum ada (untuk Max Attempt)
     final String maxAttempt = sessionData['maxAttempt'] ?? "1";
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
-      // --- HEADER APP BAR ---
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -2290,12 +2180,10 @@ class ViewSessionDetailPage extends StatelessWidget {
         centerTitle: true,
       ),
 
-      // --- BODY CONTENT ---
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // --- KARTU 1: INFO UTAMA ---
             _buildDetailSectionCard(
               title: "Basic Information",
               icon: Icons.info_outline_rounded,
@@ -2307,7 +2195,6 @@ class ViewSessionDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // --- KARTU 2: AKADEMIK & PENGAJAR ---
             _buildDetailSectionCard(
               title: "Academic & Teacher",
               icon: Icons.school_rounded,
@@ -2327,7 +2214,6 @@ class ViewSessionDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // --- KARTU 3: JADWAL & ATURAN ---
             _buildDetailSectionCard(
               title: "Schedule & Rules",
               icon: Icons.calendar_month_rounded,
@@ -2341,7 +2227,6 @@ class ViewSessionDetailPage extends StatelessWidget {
             ),
 
             const SizedBox(height: 30),
-            // Tombol Close di bawah
             SizedBox(
               width: double.infinity,
               child: TextButton(
@@ -2361,9 +2246,6 @@ class ViewSessionDetailPage extends StatelessWidget {
     );
   }
 
-  // --- WIDGET HELPERS ---
-
-  // Helper untuk membuat Kartu Section
   Widget _buildDetailSectionCard({required String title, required IconData icon, required List<Widget> children}) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -2394,7 +2276,6 @@ class ViewSessionDetailPage extends StatelessWidget {
     );
   }
 
-  // Helper untuk menampilkan baris data (Label & Value)
   Widget _buildDetailRow(String label, String value, IconData icon, {Color? valueColor}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2423,7 +2304,6 @@ class ViewSessionDetailPage extends StatelessWidget {
     );
   }
 
-  // Helper Garis Pembatas
   Widget _buildDivider() {
     return Padding(
       padding: const EdgeInsets.only(left: 35, top: 12, bottom: 12),
@@ -2431,10 +2311,6 @@ class ViewSessionDetailPage extends StatelessWidget {
     );
   }
 }
-
-// ============================================================================
-// HALAMAN BARU: EXAM PARTICIPANT SELECTION (MOBILE ADAPTATION)
-// ============================================================================
 
 class ExamParticipantPage extends StatefulWidget {
   final Map<String, dynamic> sessionData;
@@ -2446,7 +2322,6 @@ class ExamParticipantPage extends StatefulWidget {
 }
 
 class _ExamParticipantPageState extends State<ExamParticipantPage> {
-  // Dummy Data Murid yang tersedia di kelas tersebut
   final List<Map<String, dynamic>> _availableStudents = [
     {"id": "25049120", "name": "Abdullah Widodo", "className": "X AK 1"},
     {"id": "25049121", "name": "Andika Prastyo", "className": "X AK 1"},
@@ -2457,14 +2332,11 @@ class _ExamParticipantPageState extends State<ExamParticipantPage> {
     {"id": "25049126", "name": "DEZIYAH THOYIB", "className": "X AK 1"},
   ];
 
-  // Set untuk menampung ID murid yang dipilih (Selected)
   final Set<String> _selectedIds = {};
 
   @override
   void initState() {
     super.initState();
-    // ✅ PERBAIKAN LOGIKA:
-    // Ambil data ID murid dari sessionData agar centang lama tidak hilang
     if (widget.sessionData['participants'] != null) {
       _selectedIds.addAll(List<String>.from(widget.sessionData['participants']));
     }
@@ -2476,7 +2348,6 @@ class _ExamParticipantPageState extends State<ExamParticipantPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER APP BAR ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -2519,7 +2390,6 @@ class _ExamParticipantPageState extends State<ExamParticipantPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // --- KARTU INFO SESI (Read-Only) ---
                 Container(
                   margin: const EdgeInsets.all(20),
                   padding: const EdgeInsets.all(20),
@@ -2542,7 +2412,6 @@ class _ExamParticipantPageState extends State<ExamParticipantPage> {
                   ),
                 ),
 
-                // --- TAB HEADER (Available vs Selected Count) ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
@@ -2568,7 +2437,6 @@ class _ExamParticipantPageState extends State<ExamParticipantPage> {
                 ),
                 const SizedBox(height: 15),
 
-                // --- SEARCH BAR ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Container(
@@ -2590,7 +2458,6 @@ class _ExamParticipantPageState extends State<ExamParticipantPage> {
                 ),
                 const SizedBox(height: 20),
 
-                // --- LIST PESERTA DENGAN CHECKBOX ---
                 ListView.builder(
                   padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
                   shrinkWrap: true,
@@ -2626,7 +2493,6 @@ class _ExamParticipantPageState extends State<ExamParticipantPage> {
                         ),
                         child: Row(
                           children: [
-                            // Status Checkbox Visual
                             Container(
                               width: 24,
                               height: 24,
@@ -2643,7 +2509,6 @@ class _ExamParticipantPageState extends State<ExamParticipantPage> {
                                   : null,
                             ),
                             const SizedBox(width: 15),
-                            // Data Murid
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -2664,7 +2529,6 @@ class _ExamParticipantPageState extends State<ExamParticipantPage> {
                                 ],
                               ),
                             ),
-                            // Badge Status (Available/Selected)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
@@ -2691,7 +2555,6 @@ class _ExamParticipantPageState extends State<ExamParticipantPage> {
           ),
         ],
       ),
-      // --- TOMBOL SIMPAN ---
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -2699,7 +2562,6 @@ class _ExamParticipantPageState extends State<ExamParticipantPage> {
           boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))],
         ),
         child: ElevatedButton(
-          // ✅ PERBAIKAN LOGIKA: Kirim kembali list ID yang dipilih ke halaman sebelumnya
           onPressed: () {
             Navigator.pop(context, _selectedIds.toList());
           },

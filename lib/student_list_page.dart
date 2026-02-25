@@ -44,10 +44,9 @@ class _StudentListPageState extends State<StudentListPage> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: const SidebarMenu(),
-      backgroundColor: const Color(0xFFF5F7FA), // Background abu-abu muda bersih
+      backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER MELENGKUNG (TEMA WARM ORANGE) ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -58,7 +57,7 @@ class _StudentListPageState extends State<StudentListPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Colors.orange.shade400, Colors.deepOrange.shade600], // Sesuai warna sidebar
+                  colors: [Colors.orange.shade400, Colors.deepOrange.shade600],
                 ),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(30),
@@ -112,7 +111,6 @@ class _StudentListPageState extends State<StudentListPage> {
             ],
           ),
 
-          // --- AREA PENCARIAN & INFO COUNTER ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),
@@ -120,7 +118,6 @@ class _StudentListPageState extends State<StudentListPage> {
                 children: [
                   Row(
                     children: [
-                      // Search Bar
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
@@ -149,7 +146,6 @@ class _StudentListPageState extends State<StudentListPage> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      // Clear Button
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -169,7 +165,6 @@ class _StudentListPageState extends State<StudentListPage> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  // Teks Indikator Jumlah Siswa
                   Row(
                     children: [
                       Container(
@@ -189,7 +184,6 @@ class _StudentListPageState extends State<StudentListPage> {
             ),
           ),
 
-          // --- DAFTAR SISWA (CARD STYLE MODERN) ---
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
             sliver: _filteredStudents.isEmpty
@@ -230,7 +224,6 @@ class _StudentListPageState extends State<StudentListPage> {
     );
   }
 
-  // --- WIDGET KARTU SISWA MODERN ---
   Widget _buildStudentCard(Map<String, String> student) {
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
@@ -252,7 +245,6 @@ class _StudentListPageState extends State<StudentListPage> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Garis Indikator Oranye di Kiri
               Container(
                 width: 6,
                 decoration: BoxDecoration(
@@ -268,7 +260,6 @@ class _StudentListPageState extends State<StudentListPage> {
                   padding: const EdgeInsets.all(15),
                   child: Row(
                     children: [
-                      // Avatar Siswa dengan Border Oranye
                       Container(
                         padding: const EdgeInsets.all(3),
                         decoration: BoxDecoration(
@@ -285,7 +276,6 @@ class _StudentListPageState extends State<StudentListPage> {
                       ),
                       const SizedBox(width: 15),
 
-                      // Detail Siswa
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,7 +294,6 @@ class _StudentListPageState extends State<StudentListPage> {
                             ),
                             const SizedBox(height: 10),
 
-                            // Badge Kelas & Jurusan
                             Wrap(
                               spacing: 8,
                               runSpacing: 4,
@@ -328,7 +317,6 @@ class _StudentListPageState extends State<StudentListPage> {
     );
   }
 
-  // --- WIDGET BADGE INFO KECIL ---
   Widget _buildInfoBadge(IconData icon, String label, MaterialColor color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

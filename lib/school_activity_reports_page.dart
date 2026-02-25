@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'class_activity_page.dart';
 
-// ============================================================================
-// HALAMAN 1: DASHBOARD LAPORAN (SCHOOL ACTIVITY REPORTS)
-// ============================================================================
-
 class SchoolActivityReportsPage extends StatelessWidget {
   const SchoolActivityReportsPage({super.key});
 
@@ -15,7 +11,6 @@ class SchoolActivityReportsPage extends StatelessWidget {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER MELENGKUNG (TEMA EMERALD/HIJAU) ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -26,7 +21,6 @@ class SchoolActivityReportsPage extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  // Warna hijau Emerald/Teal yang berbeda dari halaman sebelumnya
                   colors: [Colors.teal.shade500, Colors.green.shade700],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -49,7 +43,6 @@ class SchoolActivityReportsPage extends StatelessWidget {
             ),
           ),
 
-          // --- BODY: DAFTAR LAPORAN ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -117,10 +110,6 @@ class SchoolActivityReportsPage extends StatelessWidget {
     );
   }
 }
-
-// ============================================================================
-// HALAMAN 2: FILTER LAPORAN
-// ============================================================================
 
 class ClassActivityFilterPage extends StatefulWidget {
   const ClassActivityFilterPage({super.key});
@@ -285,17 +274,12 @@ class _ClassActivityFilterPageState extends State<ClassActivityFilterPage> {
   );
 }
 
-// ============================================================================
-// HALAMAN 3: HASIL LAPORAN (REPORT RESULT)
-// ============================================================================
-
 class ClassActivityReportResultPage extends StatelessWidget {
   final List<String> selectedClasses;
   final String dateRange;
 
   const ClassActivityReportResultPage({super.key, required this.selectedClasses, required this.dateRange});
 
-  // Fungsi Simulasi Export PDF (Tidak diubah)
   void _exportPdf(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -316,7 +300,6 @@ class ClassActivityReportResultPage extends StatelessWidget {
     });
   }
 
-  // Fungsi Simulasi Share (Dipercantik sedikit tampilannya)
   void _shareReport(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -460,7 +443,6 @@ class ClassActivityReportResultPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Pita Header Kartu
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                             decoration: BoxDecoration(
@@ -521,11 +503,9 @@ class ClassActivityReportResultPage extends StatelessWidget {
     );
   }
 
-  // Fungsi Tampil Absen Modal (Tampilan Dipercantik)
   void _showAttendanceDetail(BuildContext context, Map<String, dynamic> activity) {
     final List attendance = activity['attendance'] as List;
 
-    // Hitung statistik
     int presentCount = attendance.where((s) => s['present'] == true).length;
     int absentCount = attendance.length - presentCount;
 
@@ -547,7 +527,6 @@ class ClassActivityReportResultPage extends StatelessWidget {
             Text(activity['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18), textAlign: TextAlign.center),
             const SizedBox(height: 15),
 
-            // Statistik Singkat
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -558,7 +537,6 @@ class ClassActivityReportResultPage extends StatelessWidget {
             ),
             const Padding(padding: EdgeInsets.symmetric(vertical: 15), child: Divider()),
 
-            // Daftar Absensi
             Expanded(
               child: ListView.builder(
                 itemCount: attendance.length,

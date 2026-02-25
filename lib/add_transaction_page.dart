@@ -11,7 +11,6 @@ class AddTransactionPage extends StatefulWidget {
 class _AddTransactionPageState extends State<AddTransactionPage> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers
   final _customerCtrl = TextEditingController();
   final _amountCtrl = TextEditingController();
   final _spelledAmountCtrl = TextEditingController();
@@ -20,7 +19,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   String? _selectedCustomerId;
   String _selectedTransactionType = 'Select Option';
 
-  // Dummy Data Nasabah (Bank Customers)
   final List<Map<String, String>> _customers = [
     {"id": "21049001", "name": "A. RAHMAN MULYA FAZIZ"},
     {"id": "21049002", "name": "ADHITYA PUTRA LIE WINATA"},
@@ -30,14 +28,12 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     {"id": "21049006", "name": "SITI AMINAH"},
   ];
 
-  // --- LOGIKA TERBILANG (SPELLED AMOUNT) OTOMATIS ---
   void _updateSpelledAmount(String value) {
     if (value.isEmpty) {
       _spelledAmountCtrl.text = "";
       return;
     }
 
-    // Hilangkan karakter non-angka jika ada
     String cleanValue = value.replaceAll(RegExp(r'[^0-9]'), '');
     if (cleanValue.isEmpty) return;
 
@@ -47,7 +43,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     });
   }
 
-  // Fungsi Helper untuk mengubah angka ke kata (Bahasa Indonesia)
   String _terbilang(int number) {
     List<String> angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
     if (number < 12) return angka[number];
@@ -61,7 +56,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     return "Nominal terlalu besar";
   }
 
-  // --- MODAL BOTTOM SHEET UNTUK PILIH NASABAH ---
   void _showCustomerSelector() {
     List<Map<String, String>> filteredCustomers = List.from(_customers);
 
@@ -87,7 +81,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                     const Text("Select Bank Customer", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF2E3192))),
                     const SizedBox(height: 15),
 
-                    // Kolom Pencarian Nasabah
                     TextField(
                       decoration: InputDecoration(
                         hintText: "Search name or ID...",
@@ -107,7 +100,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                     ),
                     const SizedBox(height: 15),
 
-                    // Daftar Nasabah
                     Expanded(
                       child: ListView.builder(
                         itemCount: filteredCustomers.length,
@@ -125,7 +117,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                                 _selectedCustomerId = customer['id'];
                                 _customerCtrl.text = "[${customer['id']}] ${customer['name']}";
                               });
-                              Navigator.pop(context); // Tutup modal setelah milih
+                              Navigator.pop(context);
                             },
                           );
                         },
@@ -142,7 +134,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Tema Warna Bank Mini
     const Color bankMiniBaseDark = Color(0xFF2E3192);
     const Color bankMiniBaseLight = Color(0xFF662D91);
 
@@ -150,7 +141,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       backgroundColor: const Color(0xFFF2F6FF),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER MELENGKUNG ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -186,7 +176,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
             ),
           ),
 
-          // --- FORM KONTEN ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -204,7 +193,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Judul Form
                       Row(
                         children: const [
                           Icon(Icons.receipt_long_rounded, color: bankMiniBaseDark),
@@ -217,26 +205,23 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                       ),
                       const Padding(padding: EdgeInsets.symmetric(vertical: 15), child: Divider()),
 
-                      // 1. Bank Customer (Dengan fungsi klik memunculkan Modal)
                       _buildLabel("Bank Customer *"),
                       InkWell(
                         onTap: _showCustomerSelector,
-                        child: IgnorePointer( // Mematikan input keyboard
+                        child: IgnorePointer(
                           child: _buildTextField(_customerCtrl, Icons.person_search_rounded, "Select Customer", suffixIcon: Icons.keyboard_arrow_down_rounded),
                         ),
                       ),
 
-                      // 2. Transaction Type (Dropdown biasa)
                       _buildLabel("Transaction Type *"),
                       _buildTypeDropdown(),
 
-                      // 3. Amount (Memicu fungsi terbilang)
                       _buildLabel("Amount *"),
                       TextFormField(
                         controller: _amountCtrl,
                         keyboardType: TextInputType.number,
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                        onChanged: _updateSpelledAmount, // Panggil fungsi saat diketik
+                        onChanged: _updateSpelledAmount,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.attach_money_rounded, color: bankMiniBaseLight, size: 22),
                           hintText: "0",
@@ -247,17 +232,14 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                         ),
                       ),
 
-                      // 4. Spelled Amount (Otomatis & ReadOnly, persis spt Web)
                       _buildLabel("Spelled Amount *"),
                       _buildTextField(_spelledAmountCtrl, Icons.spellcheck_rounded, "Auto generated amount in words", isReadOnly: true, maxLines: 2),
 
-                      // 5. Remark
                       _buildLabel("Remark *"),
                       _buildTextField(_remarkCtrl, Icons.notes_rounded, "Enter transaction remark...", maxLines: 3),
 
                       const SizedBox(height: 30),
 
-                      // --- TOMBOL ACTIONS ---
                       Row(
                         children: [
                           Expanded(
@@ -280,10 +262,9 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                                   return;
                                 }
 
-                                // Simulasikan pengiriman data balik ke list
                                 Map<String, dynamic> newTx = {
                                   "id": "BMTR${DateTime.now().millisecondsSinceEpoch}",
-                                  "name": _customerCtrl.text.split('] ')[1], // Ambil nama saja
+                                  "name": _customerCtrl.text.split('] ')[1],
                                   "type": _selectedTransactionType,
                                   "date": DateFormat('dd MMM yyyy HH:mm:ss').format(DateTime.now()),
                                   "amount": int.parse(_amountCtrl.text),
@@ -317,7 +298,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     );
   }
 
-  // --- Helper UI Widgets ---
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, top: 10),

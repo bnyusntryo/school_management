@@ -104,13 +104,12 @@ class _AddStudentPageState extends State<AddStudentPage> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        // Create a new student object and pop back
                         if (_nameController.text.isNotEmpty && _nisController.text.isNotEmpty) {
                           Navigator.pop(context, {
                             "name": _nameController.text,
                             "nis": _nisController.text,
-                            "kelas": "XII", // Default for now
-                            "jurusan": "Teknik Komputer Jaringan", // Default for now
+                            "kelas": "XII",
+                            "jurusan": "Teknik Komputer Jaringan",
                           });
                         }
                       },

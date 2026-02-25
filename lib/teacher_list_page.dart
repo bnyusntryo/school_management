@@ -47,7 +47,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
 
   List<Map<String, String>> _filteredTeachers = [];
 
-  // Array warna untuk indikator kartu agar lebih colorfull
   final List<Color> _cardColors = [
     Colors.pink.shade400,
     Colors.purple.shade400,
@@ -75,10 +74,9 @@ class _TeacherListPageState extends State<TeacherListPage> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: const SidebarMenu(),
-      backgroundColor: const Color(0xFFF5F7FA), // Latar abu-abu bersih
+      backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER MELENGKUNG TEMA MAGENTA/PINK (SESUAI SIDEBAR) ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -89,7 +87,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  // Warna Magenta/Pink Hangat untuk Guru
                   colors: [Colors.pink.shade400, Colors.pink.shade700],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -121,13 +118,11 @@ class _TeacherListPageState extends State<TeacherListPage> {
                   icon: const Icon(Icons.person_add_rounded, color: Colors.white, size: 24),
                   tooltip: "Add Teacher",
                   onPressed: () async {
-                    // ✅ LOGIKA ADD TEACHER DIAKTIFKAN KEMBALI
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const AddTeacherPage()),
                     );
 
-                    // Jika ada data baru yang dikirim balik
                     if (result != null && result is Map<String, String>) {
                       setState(() {
                         _teachers.insert(0, result);
@@ -141,7 +136,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
             ],
           ),
 
-          // --- AREA PENCARIAN & INFO COUNTER ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),
@@ -149,7 +143,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
                 children: [
                   Row(
                     children: [
-                      // Search Bar
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
@@ -175,7 +168,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      // Clear Button
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -195,7 +187,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  // Indikator Jumlah Guru
                   Row(
                     children: [
                       Container(
@@ -215,7 +206,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
             ),
           ),
 
-          // --- DAFTAR GURU (CARD STYLE MODERN) ---
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
             sliver: _filteredTeachers.isEmpty
@@ -238,7 +228,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
                     (context, index) {
                   return InkWell(
                     onTap: () {
-                      // ✅ LOGIKA NAVIGASI PROFIL DIAKTIFKAN KEMBALI
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -259,9 +248,7 @@ class _TeacherListPageState extends State<TeacherListPage> {
     );
   }
 
-  // Desain Kartu Guru Baru yang Lebih Ceria
   Widget _buildTeacherCard(Map<String, String> teacher, int index) {
-    // Memberikan warna tepi yang berbeda-beda untuk tiap kartu agar "colorful"
     final cardColor = _cardColors[index % _cardColors.length];
 
     return Container(
@@ -284,7 +271,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Garis Indikator Kiri Colorful
               Container(
                 width: 6,
                 color: cardColor,
@@ -294,7 +280,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
                   padding: const EdgeInsets.all(15),
                   child: Row(
                     children: [
-                      // Avatar Guru dengan Border Dinamis
                       Container(
                         padding: const EdgeInsets.all(3),
                         decoration: BoxDecoration(
@@ -311,7 +296,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
                       ),
                       const SizedBox(width: 15),
 
-                      // Detail Guru
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,7 +314,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
                             ),
                             const SizedBox(height: 10),
 
-                            // Badge Subject & Kelas
                             Wrap(
                               spacing: 8,
                               runSpacing: 4,

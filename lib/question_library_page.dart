@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // <-- TAMBAHKAN INI UNTUK FORMATTER
+import 'package:flutter/services.dart';
 import 'class_activity_page.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -228,7 +228,6 @@ class _QuestionLibraryPageState extends State<QuestionLibraryPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // MODERN APP BAR
           SliverAppBar(
             expandedHeight: 180,
             floating: false,
@@ -305,7 +304,6 @@ class _QuestionLibraryPageState extends State<QuestionLibraryPage> {
             ],
           ),
 
-          // SEARCH BAR
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
@@ -341,7 +339,6 @@ class _QuestionLibraryPageState extends State<QuestionLibraryPage> {
             ),
           ),
 
-          // LIST
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
             sliver: SliverList(
@@ -359,7 +356,6 @@ class _QuestionLibraryPageState extends State<QuestionLibraryPage> {
   Widget _buildQuestionCard(Map<String, dynamic> item, int index) {
     bool isActive = item['status'] == 'Active';
 
-    // Color palette for each card
     List<List<Color>> colorPalettes = [
       [Colors.purple.shade400, Colors.deepPurple.shade600],
       [Colors.blue.shade400, Colors.indigo.shade600],
@@ -644,8 +640,6 @@ class _QuestionLibraryPageState extends State<QuestionLibraryPage> {
       );
 }
 
-// ==================== EDIT PAGE ====================
-
 class EditQuestionLibraryPage extends StatefulWidget {
   final Map<String, dynamic> headerData;
   const EditQuestionLibraryPage({super.key, required this.headerData});
@@ -729,7 +723,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
     );
   }
 
-  // ✅ FUNGSI UPLOAD YANG SUDAH DIBUAT DINAMIS (BANYAK FORMAT)
   void _showUploadOptions() {
     final List<Map<String, dynamic>> uploadFormats = [
       {'name': 'Excel', 'ext': ['xlsx', 'xls'], 'icon': Icons.table_view_rounded},
@@ -785,7 +778,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // --- HEADER ---
                     Row(
                       children: [
                         Container(
@@ -818,7 +810,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                     ),
                     const SizedBox(height: 30),
 
-                    // --- INFO CARD & INPUT FORM ---
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
@@ -835,7 +826,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                       ),
                       child: Column(
                         children: [
-                          // ID - Read Only
                           _buildInfoRow(Icons.fingerprint_rounded, "Header ID", displayId, Colors.purple),
 
                           const Padding(
@@ -843,7 +833,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                             child: Divider(height: 1, thickness: 1, color: Color(0xFFF0F0F0)),
                           ),
 
-                          // NAME - Editable TextField
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -907,7 +896,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                     ),
                     const SizedBox(height: 25),
 
-                    // --- DROPDOWN FORMAT LMS ---
                     Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: Row(
@@ -997,7 +985,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                     ),
                     const SizedBox(height: 35),
 
-                    // --- ACTION BUTTONS ---
                     Row(
                       children: [
                         Expanded(
@@ -1226,7 +1213,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // COLORFUL APP BAR
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -1275,7 +1261,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
           SliverToBoxAdapter(
             child: Column(
               children: [
-                // HEADER SECTION - GLASSMORPHISM
                 Container(
                   margin: const EdgeInsets.all(20),
                   padding: const EdgeInsets.all(25),
@@ -1400,7 +1385,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                   ),
                 ),
 
-                // ITEMS LIBRARY
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -1435,7 +1419,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                       ),
                       const SizedBox(height: 20),
 
-                      // ACTION BUTTONS
                       Row(
                         children: [
                           _buildActionBtn(
@@ -1477,7 +1460,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                       ),
                       const SizedBox(height: 25),
 
-                      // TABLE
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -1492,7 +1474,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                         ),
                         child: Column(
                           children: [
-                            // TABLE HEADER
                             Container(
                               padding: const EdgeInsets.all(18),
                               decoration: BoxDecoration(
@@ -1559,7 +1540,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                               ),
                             ),
 
-                            // LIST
                             questions.isEmpty
                                 ? Padding(
                               padding: const EdgeInsets.all(40),
@@ -1894,8 +1874,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
       );
 }
 
-// ==================== ADD QUESTION PAGE ====================
-
 class AddQuestionPage extends StatefulWidget {
   final Map<String, dynamic> headerData;
   final Map<String, dynamic>? existingQuestion;
@@ -1938,7 +1916,6 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // COLORFUL APP BAR
           SliverAppBar(
             expandedHeight: 120,
             floating: false,

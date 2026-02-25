@@ -24,11 +24,9 @@ class SchedulePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- DATE SELECTOR ---
             _buildDateSelector(),
             const SizedBox(height: 30),
 
-            // --- GROUP TASK ---
             _buildSectionHeader('Group Task'),
             const SizedBox(height: 15),
             SizedBox(
@@ -41,7 +39,6 @@ class SchedulePage extends StatelessWidget {
             ),
             const SizedBox(height: 30),
 
-            // --- ALL TASKS ---
             _buildSectionHeader('All tasks'),
             const SizedBox(height: 15),
             _buildAllTaskItem('Create prototype', 'Projects', Colors.orange),
@@ -53,7 +50,6 @@ class SchedulePage extends StatelessWidget {
     );
   }
 
-  // Header for sections like "Group Task" and "All tasks"
   Widget _buildSectionHeader(String title) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -70,7 +66,6 @@ class SchedulePage extends StatelessWidget {
     );
   }
 
-  // Horizontal scrolling date selector
   Widget _buildDateSelector() {
     final List<Map<String, String>> dates = [
       {'day': 'Fri', 'date': '11'},
@@ -120,7 +115,6 @@ class SchedulePage extends StatelessWidget {
     );
   }
 
-  // Card for the "Group Task" section
   Widget _buildGroupTaskCard() {
     return Container(
       width: 180,
@@ -151,7 +145,6 @@ class SchedulePage extends StatelessWidget {
             children: [
               const Text('Members', style: TextStyle(color: Colors.grey, fontSize: 12)),
               const Spacer(),
-              // Dummy avatars
               SizedBox(
                 width: 70,
                 child: Stack(
@@ -168,7 +161,6 @@ class SchedulePage extends StatelessWidget {
     );
   }
 
-  // List item for the "All tasks" section
   Widget _buildAllTaskItem(String title, String subtitle, Color color) {
     return Container(
       margin: const EdgeInsets.only(bottom: 15),

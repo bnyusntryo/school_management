@@ -11,7 +11,6 @@ class AddStaffPage extends StatefulWidget {
 class _AddStaffPageState extends State<AddStaffPage> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers sesuai field di gambar web
   final _userIdCtrl = TextEditingController();
   final _staffNameCtrl = TextEditingController();
   final _bornDateCtrl = TextEditingController();
@@ -30,7 +29,6 @@ class _AddStaffPageState extends State<AddStaffPage> {
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
         slivers: [
-          // --- HEADER MELENGKUNG (KONSISTEN DENGAN STAFF LIST) ---
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -66,7 +64,6 @@ class _AddStaffPageState extends State<AddStaffPage> {
             ),
           ),
 
-          // --- FORMULIR PENDAFTARAN ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -149,10 +146,8 @@ class _AddStaffPageState extends State<AddStaffPage> {
 
                       const SizedBox(height: 30),
 
-                      // --- TOMBOL ACTIONS ---
                       Row(
                         children: [
-                          // ... di dalam widget build AddStaffPage
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
@@ -205,7 +200,6 @@ class _AddStaffPageState extends State<AddStaffPage> {
     );
   }
 
-  // Helper untuk Label
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, top: 10),
@@ -216,7 +210,6 @@ class _AddStaffPageState extends State<AddStaffPage> {
     );
   }
 
-  // Helper untuk TextField Modern
   Widget _buildTextField(TextEditingController controller, IconData icon, String hint, {int maxLines = 1, TextInputType keyboardType = TextInputType.text}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -237,7 +230,6 @@ class _AddStaffPageState extends State<AddStaffPage> {
     );
   }
 
-  // Helper untuk Date Picker
   Widget _buildDateField(BuildContext context, TextEditingController controller, String hint) {
     return InkWell(
       onTap: () async {
@@ -263,7 +255,6 @@ class _AddStaffPageState extends State<AddStaffPage> {
     );
   }
 
-  // Helper untuk Dropdown Gender
   Widget _buildGenderDropdown() {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
