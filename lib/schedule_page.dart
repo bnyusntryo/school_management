@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'user_session.dart'; // ✅ WAJIB IMPORT INI UNTUK LOGIKA ROLE
+import 'user_session.dart';
+import 'class_activity_page.dart'; // ✅ WAJIB IMPORT INI UNTUK NAVIGASI KE CLASS ACTIVITY
 
 // ==========================================
 // WARNA TEMA PREMIUM GLOBAL
@@ -20,16 +21,18 @@ class _SchedulePageState extends State<SchedulePage> {
   int _selectedDateIndex = 2; // Default ke hari ini (Index 2: Sun 14)
 
   // =========================================================
-  // 1. DATA JADWAL UNTUK SISWA
+  // 1. DATA JADWAL UNTUK SISWA (Ditambah data activityCount)
   // =========================================================
   final List<Map<String, dynamic>> _studentSchedules = [
     {
       "subject": "Matematika",
-      "person": "Bpk. Yoga Pratama", // Siswa melihat nama GURU
+      "person": "Bpk. Yoga Pratama",
       "room": "Ruang Kelas XII-A",
       "time": "08:00 - 09:30",
       "status": "Sedang Berlangsung",
-      "color": const Color(0xFF10B981), // Hijau (Ongoing)
+      "color": const Color(0xFF10B981),
+      "activityCount": 2, // Ada 2 aktivitas baru
+      "avatars": 3 // Dummy jumlah teman/guru
     },
     {
       "subject": "Bahasa Inggris",
@@ -37,7 +40,9 @@ class _SchedulePageState extends State<SchedulePage> {
       "room": "Ruang Kelas XII-A",
       "time": "10:00 - 11:30",
       "status": "Akan Datang",
-      "color": const Color(0xFFF59E0B), // Oranye (Upcoming)
+      "color": const Color(0xFFF59E0B),
+      "activityCount": 0,
+      "avatars": 0
     },
     {
       "subject": "Pendidikan Agama",
@@ -46,6 +51,8 @@ class _SchedulePageState extends State<SchedulePage> {
       "time": "13:00 - 14:30",
       "status": "Akan Datang",
       "color": const Color(0xFFF59E0B),
+      "activityCount": 1,
+      "avatars": 2
     },
   ];
 
@@ -55,11 +62,13 @@ class _SchedulePageState extends State<SchedulePage> {
   final List<Map<String, dynamic>> _teacherSchedules = [
     {
       "subject": "Matematika",
-      "person": "Kelas XII TKJ B", // Guru melihat nama KELAS
+      "person": "Kelas XII TKJ B",
       "room": "Lab Komputer 1",
       "time": "08:00 - 09:30",
       "status": "Sedang Berlangsung",
       "color": const Color(0xFF10B981),
+      "activityCount": 5, // Tugas yang perlu diperiksa
+      "avatars": 4
     },
     {
       "subject": "Matematika",
@@ -68,15 +77,14 @@ class _SchedulePageState extends State<SchedulePage> {
       "time": "10:00 - 11:30",
       "status": "Akan Datang",
       "color": const Color(0xFFF59E0B),
+      "activityCount": 0,
+      "avatars": 0
     },
   ];
 
   @override
   Widget build(BuildContext context) {
-    // 🚦 KONDISI WIDGET: Cek siapa yang sedang login
     bool isStudent = UserSession.currentRole == 'Student';
-
-    // Pilih data yang mau ditampilkan berdasarkan Role
     List<Map<String, dynamic>> currentSchedules = isStudent ? _studentSchedules : _teacherSchedules;
 
     return Scaffold(
@@ -119,7 +127,7 @@ class _SchedulePageState extends State<SchedulePage> {
             ),
             const SizedBox(height: 20),
 
-            // --- DATE SELECTOR (Premium Version) ---
+            // --- DATE SELECTOR ---
             _buildDateSelector(),
             const SizedBox(height: 35),
 
@@ -157,9 +165,6 @@ class _SchedulePageState extends State<SchedulePage> {
     );
   }
 
-  // =========================================================
-  // WIDGET: DATE SELECTOR (Desain Lebih Mulus)
-  // =========================================================
   Widget _buildDateSelector() {
     final List<Map<String, dynamic>> dates = [
       {'day': 'Fri', 'date': '11'},
@@ -188,7 +193,7 @@ class _SchedulePageState extends State<SchedulePage> {
                 gradient: isActive
                     ? const LinearGradient(colors: [primaryBlue, Color(0xFF60A5FA)], begin: Alignment.topLeft, end: Alignment.bottomRight)
                     : const LinearGradient(colors: [Colors.white, Colors.white]),
-                borderRadius: BorderRadius.circular(20), // Sudut kapsul premium
+                borderRadius: BorderRadius.circular(20),
                 boxShadow: isActive
                     ? [BoxShadow(color: primaryBlue.withOpacity(0.4), blurRadius: 10, offset: const Offset(0, 5))]
                     : [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 5, offset: const Offset(0, 2))],
@@ -199,20 +204,12 @@ class _SchedulePageState extends State<SchedulePage> {
                 children: [
                   Text(
                       dates[index]['day']!,
-                      style: TextStyle(
-                        color: isActive ? Colors.white.withOpacity(0.9) : textMuted,
-                        fontSize: 13,
-                        fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                      )
+                      style: TextStyle(color: isActive ? Colors.white.withOpacity(0.9) : textMuted, fontSize: 13, fontWeight: isActive ? FontWeight.w600 : FontWeight.w500)
                   ),
                   const SizedBox(height: 5),
                   Text(
                       dates[index]['date']!,
-                      style: TextStyle(
-                        color: isActive ? Colors.white : textDark,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 18,
-                      )
+                      style: TextStyle(color: isActive ? Colors.white : textDark, fontWeight: FontWeight.w900, fontSize: 18)
                   ),
                 ],
               ),
@@ -223,35 +220,27 @@ class _SchedulePageState extends State<SchedulePage> {
     );
   }
 
-  // =========================================================
-  // WIDGET: SCHEDULE CARD (PREMIUM & DINAMIS)
-  // =========================================================
   Widget _buildPremiumScheduleCard({required Map<String, dynamic> data, required bool isStudent}) {
     Color statusColor = data['color'];
     bool isOngoing = data['status'] == "Sedang Berlangsung";
+    int activityCount = data['activityCount'] ?? 0;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24), // Melengkung ala iOS
-        boxShadow: [
-          BoxShadow(color: const Color(0xFF94A3B8).withOpacity(0.12), blurRadius: 24, offset: const Offset(0, 8))
-        ],
-        border: isOngoing ? Border.all(color: statusColor.withOpacity(0.3), width: 1.5) : null, // Highlight border jika sedang kelas
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [BoxShadow(color: const Color(0xFF94A3B8).withOpacity(0.12), blurRadius: 24, offset: const Offset(0, 8))],
+        border: isOngoing ? Border.all(color: statusColor.withOpacity(0.3), width: 1.5) : null,
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Garis Indikator Kiri
           Container(
-              width: 4,
-              height: 60,
-              decoration: BoxDecoration(
-                  color: statusColor,
-                  borderRadius: BorderRadius.circular(5)
-              )
+              width: 4, height: 70,
+              decoration: BoxDecoration(color: statusColor, borderRadius: BorderRadius.circular(5))
           ),
           const SizedBox(width: 15),
 
@@ -260,37 +249,31 @@ class _SchedulePageState extends State<SchedulePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Waktu & Status Badge
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                        data['time'],
-                        style: const TextStyle(color: primaryBlue, fontWeight: FontWeight.w900, fontSize: 13)
-                    ),
+                    Text(data['time'], style: const TextStyle(color: primaryBlue, fontWeight: FontWeight.w900, fontSize: 13)),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                          data['status'],
-                          style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold)
-                      ),
+                      decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                      child: Text(data['status'], style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold)),
                     )
                   ],
                 ),
                 const SizedBox(height: 10),
 
-                // Mata Pelajaran
-                Text(
-                    data['subject'],
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: textDark, letterSpacing: -0.3)
+                // Subject & Avatar Stack
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(data['subject'], style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: textDark, letterSpacing: -0.3), overflow: TextOverflow.ellipsis),
+                    ),
+                    const SizedBox(width: 8),
+                    if (data['avatars'] > 0) _buildStackedAvatars(data['avatars']),
+                  ],
                 ),
                 const SizedBox(height: 8),
 
-                // 🚦 TEKS DINAMIS BERDASARKAN ROLE
                 Row(
                   children: [
                     Icon(isStudent ? Icons.person_rounded : Icons.meeting_room_rounded, size: 14, color: textMuted),
@@ -303,21 +286,83 @@ class _SchedulePageState extends State<SchedulePage> {
                 ),
                 const SizedBox(height: 4),
 
-                // Ruangan
                 Row(
                   children: [
                     const Icon(Icons.location_on_rounded, size: 14, color: textMuted),
                     const SizedBox(width: 6),
-                    Text(
-                        "Ruang : ${data['room']}",
-                        style: const TextStyle(color: textMuted, fontSize: 12, fontWeight: FontWeight.w500)
-                    ),
+                    Text("Ruang : ${data['room']}", style: const TextStyle(color: textMuted, fontSize: 12, fontWeight: FontWeight.w500)),
                   ],
                 ),
               ],
             ),
           ),
+
+          const SizedBox(width: 10),
+
+          // ========================================================
+          // 🚀 TOMBOL SHORTCUT CLASS ACTIVITY (Sesuai Catatan Figma)
+          // ========================================================
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  // Arahkan langsung ke halaman Class Activity Page
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const ClassActivityPage()));
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: activityCount > 0 ? primaryBlue.withOpacity(0.1) : Colors.grey.shade50,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: activityCount > 0 ? primaryBlue.withOpacity(0.3) : Colors.grey.shade200),
+                  ),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Icon(Icons.assignment_rounded, color: activityCount > 0 ? primaryBlue : Colors.grey.shade400, size: 24),
+                      // Badge Notifikasi Angka (Misal: "2" Aktivitas)
+                      if (activityCount > 0)
+                        Positioned(
+                          top: -6, right: -6,
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: const BoxDecoration(color: Color(0xFFEF4444), shape: BoxShape.circle),
+                            child: Text(
+                              activityCount.toString(),
+                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, height: 1),
+                            ),
+                          ),
+                        )
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                  "Activity",
+                  style: TextStyle(color: activityCount > 0 ? primaryBlue : Colors.grey.shade500, fontSize: 10, fontWeight: FontWeight.bold)
+              )
+            ],
+          )
         ],
+      ),
+    );
+  }
+
+  // Widget Helper untuk Avatar menumpuk (seperti di desain awal)
+  Widget _buildStackedAvatars(int count) {
+    return SizedBox(
+      width: 24.0 + (count - 1) * 12.0,
+      height: 24,
+      child: Stack(
+        children: List.generate(count, (i) => Positioned(
+          left: i * 12.0,
+          child: Container(
+            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2)),
+            child: CircleAvatar(radius: 10, backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=${i + 15}')),
+          ),
+        )),
       ),
     );
   }
