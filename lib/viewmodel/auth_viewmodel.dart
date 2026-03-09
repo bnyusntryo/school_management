@@ -13,10 +13,6 @@ import '../config/pref.dart';
 class AuthViewmodel {
 
   Future<Resp> clients({String? clientId}) async {
-    String? token = await Session().getUserToken();
-    var header = <String, dynamic>{};
-    header[HttpHeaders.authorizationHeader] = 'Bearer $token';
-
     FormData formData = FormData.fromMap({
       'client_id': clientId,
     });

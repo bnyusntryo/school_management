@@ -9,6 +9,7 @@ class Session {
   final String userToken = "user_token";
   final String isWelcome = "is_welcome";
   final String fcmToken = "fcmToken";
+  final String clientIdKey = "client_id";
 
 
   Future<void> setUserToken(dynamic value) async {
@@ -41,11 +42,22 @@ class Session {
     return prefs.getBool(isWelcome);
   }
 
+  Future<void> setClientId(String value) async {
+    final SharedPreferences prefs = await _prefs;
+    await prefs.setString(clientIdKey, value);
+  }
+
+  Future<String?> getClientId() async {
+    final SharedPreferences prefs = await _prefs;
+    return prefs.getString(clientIdKey);
+  }
+
   Future<void> logout() async {
     // await AuthViewModel().logout();
 
     final SharedPreferences prefs = await _prefs;
     await prefs.remove(userToken);
     await prefs.remove(fcmToken);
+    await prefs.remove(clientIdKey);
   }
 }
