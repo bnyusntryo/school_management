@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'client_id_page.dart';
+import 'view/client_id_page.dart';
 
 void main() {
   runApp(const MyApp());
