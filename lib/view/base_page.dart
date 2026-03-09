@@ -12,15 +12,37 @@ class BasePage extends StatefulWidget {
 }
 
 class _BasePageState extends State<BasePage> {
+
+  late Future<String?> _tokenFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _tokenFuture = Session().getUserToken();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(future: Session().getUserToken(), builder: (context, snapshot) {
-      String? token = snapshot.data;
-      if (token == null) {
-        return const ClientIdPage();
-      } else {
+    return FutureBuilder<String?>(
+      future: _tokenFuture,
+      builder: (context, snapshot) {
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        final token = snapshot.data;
+
+        if (token == null || token.isEmpty) {
+          return const ClientIdPage();
+        }
+
         return const HomePage();
-      }
-    },);
+      },
+    );
   }
 }

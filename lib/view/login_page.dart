@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../config/pref.dart';
+import '../viewmodel/auth_viewmodel.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -10,6 +12,71 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isObscure = true;
+
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  final AuthViewmodel _viewmodel = AuthViewmodel();
+
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  Future<void> _login() async {
+
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text;
+
+    if (username.isEmpty || password.isEmpty) {
+      setState(() {
+        _errorMessage = "Username dan password wajib diisi";
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final resp = await _viewmodel.login(
+      username: username,
+      password: password,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (resp.code == 200 && resp.data != null) {
+
+      await Session().setUserToken(resp.data['token']);
+
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const HomePage(),
+        ),
+      );
+
+    } else {
+
+      setState(() {
+        _errorMessage = resp.message?.toString() ?? "Login gagal";
+      });
+
+    }
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 8),
                 TextField(
+                  controller: _usernameController,
                   decoration: InputDecoration(
                     hintText: "Enter your username",
                     filled: true,
@@ -73,6 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 8),
                 TextField(
+                  controller: _passwordController,
                   obscureText: _isObscure,
                   decoration: InputDecoration(
                     hintText: "Enter your password",
@@ -89,6 +158,15 @@ class _LoginPageState extends State<LoginPage> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
                 ),
+
+                if (_errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Text(
+                      _errorMessage!,
+                      style: const TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  ),
 
                 const SizedBox(height: 15),
 
@@ -126,21 +204,25 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(width: 15),
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const HomePage()),
-                        );
-                      },
+                      onPressed: _isLoading ? null : _login,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2962FF),
                         foregroundColor: Colors.white,
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 12),
                       ),
-                      child: const Text("Login", style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
+                      child: _isLoading
+                          ? const SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                          : const Text(
+                        "Login",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    )
                   ],
                 ),
               ],
