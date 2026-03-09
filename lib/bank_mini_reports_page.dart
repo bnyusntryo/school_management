@@ -132,8 +132,9 @@ class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
                     title: r['title'], desc: r['desc'], icon: r['icon'], themeColor: r['themeColor'],
                     onTap: () {
                       setState(() {
-                        if (r['title'] == "Transaction List Report") _currentView = 1;
-                        else if (r['title'] == "End Of Day Report") _currentView = 3;
+                        if (r['title'] == "Transaction List Report") {
+                          _currentView = 1;
+                        } else if (r['title'] == "End Of Day Report") _currentView = 3;
                         else if (r['title'] == "Balance Per Class Report") _currentView = 5;
                       });
                     }
@@ -484,7 +485,11 @@ class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Select Users", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF005C97))), TextButton(onPressed: () => setModalState(() { tempSelected.length == _availableUsers.length ? tempSelected.clear() : tempSelected = _availableUsers.map((e) => e['id']!).toList(); }), child: Text(tempSelected.length == _availableUsers.length ? "Deselect All" : "Select All", style: const TextStyle(fontWeight: FontWeight.bold)))]),
                 TextField(decoration: InputDecoration(hintText: "Search name...", prefixIcon: const Icon(Icons.search, color: Colors.grey), filled: true, fillColor: Colors.grey.shade100, border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none), contentPadding: const EdgeInsets.symmetric(vertical: 0)), onChanged: (query) => setModalState(() { filteredUsers = _availableUsers.where((user) => user['name']!.toLowerCase().contains(query.toLowerCase())).toList(); })),
                 const SizedBox(height: 10), Text("${tempSelected.length} users selected", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)), const Padding(padding: EdgeInsets.symmetric(vertical: 5), child: Divider()),
-                Expanded(child: ListView.builder(itemCount: filteredUsers.length, itemBuilder: (context, index) { final user = filteredUsers[index]; final isChecked = tempSelected.contains(user['id']); return CheckboxListTile(contentPadding: EdgeInsets.zero, activeColor: const Color(0xFF005C97), title: Text(user['name']!, style: TextStyle(fontWeight: isChecked ? FontWeight.bold : FontWeight.normal, fontSize: 14)), value: isChecked, onChanged: (bool? value) { setModalState(() { if (value == true) tempSelected.add(user['id']!); else tempSelected.remove(user['id']); }); }); })),
+                Expanded(child: ListView.builder(itemCount: filteredUsers.length, itemBuilder: (context, index) { final user = filteredUsers[index]; final isChecked = tempSelected.contains(user['id']); return CheckboxListTile(contentPadding: EdgeInsets.zero, activeColor: const Color(0xFF005C97), title: Text(user['name']!, style: TextStyle(fontWeight: isChecked ? FontWeight.bold : FontWeight.normal, fontSize: 14)), value: isChecked, onChanged: (bool? value) { setModalState(() { if (value == true) {
+                  tempSelected.add(user['id']!);
+                } else {
+                  tempSelected.remove(user['id']);
+                } }); }); })),
                 SizedBox(width: double.infinity, child: ElevatedButton(onPressed: () { setState(() => _selectedUsers = tempSelected); Navigator.pop(context); }, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF005C97), padding: const EdgeInsets.symmetric(vertical: 15), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: const Text("Apply Selection", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))))
               ],
             ),
@@ -510,7 +515,11 @@ class _BankMiniReportsPageState extends State<BankMiniReportsPage> {
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Select Classes", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF005C97))), TextButton(onPressed: () => setModalState(() { tempSelected.length == _availableClasses.length ? tempSelected.clear() : tempSelected = List.from(_availableClasses); }), child: Text(tempSelected.length == _availableClasses.length ? "Deselect All" : "Select All", style: const TextStyle(fontWeight: FontWeight.bold)))]),
                 TextField(decoration: InputDecoration(hintText: "Search class name...", prefixIcon: const Icon(Icons.search, color: Colors.grey), filled: true, fillColor: Colors.grey.shade100, border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none), contentPadding: const EdgeInsets.symmetric(vertical: 0)), onChanged: (query) => setModalState(() { filteredClasses = _availableClasses.where((c) => c.toLowerCase().contains(query.toLowerCase())).toList(); })),
                 const SizedBox(height: 10), Text("${tempSelected.length} classes selected", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)), const Padding(padding: EdgeInsets.symmetric(vertical: 5), child: Divider()),
-                Expanded(child: ListView.builder(itemCount: filteredClasses.length, itemBuilder: (context, index) { final c = filteredClasses[index]; final isChecked = tempSelected.contains(c); return CheckboxListTile(contentPadding: EdgeInsets.zero, activeColor: const Color(0xFF005C97), title: Text(c, style: TextStyle(fontWeight: isChecked ? FontWeight.bold : FontWeight.normal, fontSize: 14)), value: isChecked, onChanged: (bool? value) { setModalState(() { if (value == true) tempSelected.add(c); else tempSelected.remove(c); }); }); })),
+                Expanded(child: ListView.builder(itemCount: filteredClasses.length, itemBuilder: (context, index) { final c = filteredClasses[index]; final isChecked = tempSelected.contains(c); return CheckboxListTile(contentPadding: EdgeInsets.zero, activeColor: const Color(0xFF005C97), title: Text(c, style: TextStyle(fontWeight: isChecked ? FontWeight.bold : FontWeight.normal, fontSize: 14)), value: isChecked, onChanged: (bool? value) { setModalState(() { if (value == true) {
+                  tempSelected.add(c);
+                } else {
+                  tempSelected.remove(c);
+                } }); }); })),
                 SizedBox(width: double.infinity, child: ElevatedButton(onPressed: () { setState(() => _selectedClasses = tempSelected); Navigator.pop(context); }, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF005C97), padding: const EdgeInsets.symmetric(vertical: 15), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: const Text("Apply Selection", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))))
               ],
             ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'class_activity_page.dart';
 import 'package:file_picker/file_picker.dart';
 
 class QuestionLibraryPage extends StatefulWidget {
@@ -37,6 +36,17 @@ class _QuestionLibraryPageState extends State<QuestionLibraryPage> {
   List<Map<String, dynamic>> _filteredHeaders = [];
   final _searchController = TextEditingController();
 
+  final List<String> _availableSubjects = [
+    "Bahasa Indonesia",
+    "Bahasa Inggris",
+    "Biologi",
+    "Fisika",
+    "Kimia",
+    "Matematika",
+    "Pemrograman Dasar",
+    "Sejarah"
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -58,10 +68,6 @@ class _QuestionLibraryPageState extends State<QuestionLibraryPage> {
     String status = 'Active';
     String randomize = 'Yes';
     String? subject;
-
-    List<String> dynamicSubjects = ClassActivityData.classSubjectsData.values
-        .expand((list) => list).map((s) => s['name']!).toSet().toList();
-    dynamicSubjects.sort();
 
     showModalBottomSheet(
       context: context,
@@ -158,7 +164,7 @@ class _QuestionLibraryPageState extends State<QuestionLibraryPage> {
               DropdownButtonFormField<String>(
                 isExpanded: true,
                 decoration: _inputDeco("Select Subject", Icons.school),
-                items: dynamicSubjects.map((e) => DropdownMenuItem(
+                items: _availableSubjects.map((e) => DropdownMenuItem(
                     value: e,
                     child: Text(e, style: const TextStyle(fontSize: 14))
                 )).toList(),
@@ -366,6 +372,9 @@ class _QuestionLibraryPageState extends State<QuestionLibraryPage> {
 
     List<Color> cardColors = colorPalettes[index % colorPalettes.length];
 
+    String rawId = item['id'].toString();
+    String displayId = rawId.length > 8 ? rawId.substring(rawId.length - 8) : rawId;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -437,7 +446,7 @@ class _QuestionLibraryPageState extends State<QuestionLibraryPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          "ID: ${item['id'].toString().substring(item['id'].toString().length - 8)}",
+                          "ID: $displayId",
                           style: const TextStyle(fontSize: 10, color: Colors.grey),
                         ),
                       ),
@@ -640,6 +649,9 @@ class _QuestionLibraryPageState extends State<QuestionLibraryPage> {
       );
 }
 
+// ==============================================================================
+// HALAMAN KEDUA (MANAGE CONTENT)
+// ==============================================================================
 class EditQuestionLibraryPage extends StatefulWidget {
   final Map<String, dynamic> headerData;
   const EditQuestionLibraryPage({super.key, required this.headerData});
@@ -656,6 +668,10 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
   bool _isSelectionMode = false;
   final List<String> _selectedIds = [];
 
+  final List<String> _availableSubjects = [
+    "Bahasa Indonesia", "Bahasa Inggris", "Biologi", "Fisika", "Kimia", "Matematika", "Pemrograman Dasar", "Sejarah"
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -663,6 +679,10 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
     _status = widget.headerData['status'];
     _randomize = widget.headerData['randomize'];
     _subject = widget.headerData['subject'];
+
+    if (!_availableSubjects.contains(_subject)) {
+      _availableSubjects.add(_subject);
+    }
   }
 
   void _handleDelete() {
@@ -1044,9 +1064,9 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
+                                children: const [
                                   Icon(Icons.drive_folder_upload_rounded, color: Colors.white, size: 22),
                                   SizedBox(width: 8),
                                   Text(
@@ -1202,12 +1222,6 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
   @override
   Widget build(BuildContext context) {
     final List questions = widget.headerData['questions'];
-    List<String> dynamicSubjects = ClassActivityData.classSubjectsData.values
-        .expand((list) => list)
-        .map((s) => s['name']!)
-        .toSet()
-        .toList();
-    if (!dynamicSubjects.contains(_subject)) dynamicSubjects.add(_subject);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
@@ -1234,9 +1248,9 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                   bottomRight: Radius.circular(30),
                 ),
               ),
-              child: const FlexibleSpaceBar(
-                titlePadding: EdgeInsets.only(left: 60, bottom: 20),
-                title: Text(
+              child: FlexibleSpaceBar(
+                titlePadding: const EdgeInsets.only(left: 60, bottom: 20),
+                title: const Text(
                   "Manage Content",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -1314,7 +1328,7 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                       _buildHeaderDropdown(
                         "Subject",
                         _subject,
-                        dynamicSubjects,
+                        _availableSubjects,
                             (v) => setState(() => _subject = v!),
                         Icons.school,
                       ),
@@ -1368,9 +1382,9 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                                   borderRadius: BorderRadius.circular(15),
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
-                                children: [
+                                children: const [
                                   Icon(Icons.save_rounded, size: 18),
                                   SizedBox(width: 8),
                                   Text("Save Changes",
@@ -1491,49 +1505,21 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                               child: Row(
                                 children: [
                                   if (_isSelectionMode) const SizedBox(width: 35),
-                                  const Expanded(
+                                  Expanded(
                                     flex: 2,
-                                    child: Text(
-                                      "ID",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 11,
-                                      ),
-                                    ),
+                                    child: const Text("ID", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
                                   ),
-                                  const Expanded(
+                                  Expanded(
                                     flex: 3,
-                                    child: Text(
-                                      "TYPE",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 11,
-                                      ),
-                                    ),
+                                    child: const Text("TYPE", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
                                   ),
-                                  const Expanded(
+                                  Expanded(
                                     flex: 4,
-                                    child: Text(
-                                      "DETAIL",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 11,
-                                      ),
-                                    ),
+                                    child: const Text("DETAIL", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
                                   ),
-                                  const Expanded(
+                                  Expanded(
                                     flex: 2,
-                                    child: Text(
-                                      "WEIGHT",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 11,
-                                      ),
-                                    ),
+                                    child: const Text("WEIGHT", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
                                   ),
                                   const SizedBox(width: 30),
                                 ],
@@ -1545,19 +1531,9 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                               padding: const EdgeInsets.all(40),
                               child: Column(
                                 children: [
-                                  Icon(
-                                    Icons.inbox_rounded,
-                                    size: 60,
-                                    color: Colors.grey.shade300,
-                                  ),
+                                  Icon(Icons.inbox_rounded, size: 60, color: Colors.grey.shade300),
                                   const SizedBox(height: 12),
-                                  Text(
-                                    "No questions yet",
-                                    style: TextStyle(
-                                      color: Colors.grey.shade400,
-                                      fontSize: 14,
-                                    ),
-                                  ),
+                                  Text("No questions yet", style: TextStyle(color: Colors.grey.shade400, fontSize: 14)),
                                 ],
                               ),
                             )
@@ -1570,21 +1546,14 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                                 final q = questions[index];
                                 final isSelected = _selectedIds.contains(q['id']);
 
+                                String qRawId = q['id'].toString();
+                                String qDisplayId = qRawId.length > 5 ? qRawId.substring(qRawId.length - 5) : qRawId;
+
                                 return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 15,
-                                    vertical: 15,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                                   decoration: BoxDecoration(
-                                    color: index % 2 == 0
-                                        ? Colors.grey.shade50
-                                        : Colors.white,
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Colors.grey.shade200,
-                                        width: 1,
-                                      ),
-                                    ),
+                                    color: index % 2 == 0 ? Colors.grey.shade50 : Colors.white,
+                                    border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 1)),
                                   ),
                                   child: Row(
                                     children: [
@@ -1592,9 +1561,7 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                                         Checkbox(
                                           value: isSelected,
                                           activeColor: Colors.deepPurple,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(5),
-                                          ),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
                                           onChanged: (v) {
                                             setState(() {
                                               if (v!) {
@@ -1608,47 +1575,21 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                                       Expanded(
                                         flex: 2,
                                         child: Text(
-                                          q['id'].toString().length > 5
-                                              ? q['id'].toString().substring(
-                                            q['id'].toString().length - 5,
-                                          )
-                                              : q['id'],
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF2D3142),
-                                          ),
+                                          qDisplayId,
+                                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
                                         ),
                                       ),
                                       Expanded(
                                         flex: 3,
                                         child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.blue.shade50,
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: Text(
-                                            q['type'],
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: Colors.blue.shade700,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8)),
+                                          child: Text(q['type'], style: TextStyle(fontSize: 11, color: Colors.blue.shade700, fontWeight: FontWeight.w600)),
                                         ),
                                       ),
                                       Expanded(
                                         flex: 4,
-                                        child: Text(
-                                          q['detail'],
-                                          style: const TextStyle(fontSize: 12),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                        child: Text(q['detail'], style: const TextStyle(fontSize: 12), maxLines: 2, overflow: TextOverflow.ellipsis),
                                       ),
                                       Expanded(
                                         flex: 2,
@@ -1656,31 +1597,15 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
                                           child: Container(
                                             padding: const EdgeInsets.all(8),
                                             decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  Colors.purple.shade300,
-                                                  Colors.deepPurple.shade400,
-                                                ],
-                                              ),
+                                              gradient: LinearGradient(colors: [Colors.purple.shade300, Colors.deepPurple.shade400]),
                                               shape: BoxShape.circle,
                                             ),
-                                            child: Text(
-                                              q['weight'].toString(),
-                                              style: const TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
+                                            child: Text(q['weight'].toString(), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
                                           ),
                                         ),
                                       ),
                                       IconButton(
-                                        icon: Icon(
-                                          Icons.edit_rounded,
-                                          color: Colors.orange.shade600,
-                                          size: 22,
-                                        ),
+                                        icon: Icon(Icons.edit_rounded, color: Colors.orange.shade600, size: 22),
                                         onPressed: () async {
                                           final res = await Navigator.push(
                                             context,
@@ -1716,8 +1641,7 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
     );
   }
 
-  Widget _buildActionBtn(
-      IconData icon, String label, List<Color> colors, VoidCallback onTap) =>
+  Widget _buildActionBtn(IconData icon, String label, List<Color> colors, VoidCallback onTap) =>
       Expanded(
         child: InkWell(
           onTap: onTap,
@@ -1725,46 +1649,22 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: colors,
-              ),
+              gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: colors),
               borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  color: colors[0].withOpacity(0.4),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+              boxShadow: [BoxShadow(color: colors[0].withOpacity(0.4), blurRadius: 12, offset: const Offset(0, 6))],
             ),
             child: Column(
               children: [
                 Icon(icon, color: Colors.white, size: 24),
                 const SizedBox(height: 6),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                Text(label, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
               ],
             ),
           ),
         ),
       );
 
-  Widget _buildHeaderField(
-      String label,
-      String? value, {
-        bool isReadOnly = false,
-        TextEditingController? controller,
-        required IconData icon,
-      }) =>
+  Widget _buildHeaderField(String label, String? value, {bool isReadOnly = false, TextEditingController? controller, required IconData icon}) =>
       Padding(
         padding: const EdgeInsets.only(bottom: 18),
         child: Column(
@@ -1774,14 +1674,7 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
               children: [
                 Icon(icon, size: 16, color: Colors.deepPurple),
                 const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A237E),
-                  ),
-                ),
+                Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1A237E))),
               ],
             ),
             const SizedBox(height: 8),
@@ -1791,34 +1684,17 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: isReadOnly ? Colors.grey.shade100 : Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide:
-                  BorderSide(color: Colors.deepPurple.shade300, width: 2),
-                ),
-                contentPadding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.deepPurple.shade300, width: 2)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               ),
             ),
           ],
         ),
       );
 
-  Widget _buildHeaderDropdown(
-      String label,
-      String value,
-      List<String> items,
-      Function(String?) onChanged,
-      IconData icon,
-      ) =>
+  Widget _buildHeaderDropdown(String label, String value, List<String> items, Function(String?) onChanged, IconData icon) =>
       Padding(
         padding: const EdgeInsets.only(bottom: 18),
         child: Column(
@@ -1828,14 +1704,7 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
               children: [
                 Icon(icon, size: 16, color: Colors.deepPurple),
                 const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A237E),
-                  ),
-                ),
+                Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1A237E))),
               ],
             ),
             const SizedBox(height: 8),
@@ -1845,28 +1714,12 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide:
-                  BorderSide(color: Colors.deepPurple.shade300, width: 2),
-                ),
-                contentPadding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.deepPurple.shade300, width: 2)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               ),
-              items: items
-                  .map((e) => DropdownMenuItem(
-                value: e,
-                child: Text(e, style: const TextStyle(fontSize: 14)),
-              ))
-                  .toList(),
+              items: items.map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 14)))).toList(),
               onChanged: onChanged,
             ),
           ],
@@ -1874,6 +1727,9 @@ class _EditQuestionLibraryPageState extends State<EditQuestionLibraryPage> {
       );
 }
 
+// ==============================================================================
+// HALAMAN KETIGA (ADD QUESTION)
+// ==============================================================================
 class AddQuestionPage extends StatefulWidget {
   final Map<String, dynamic> headerData;
   final Map<String, dynamic>? existingQuestion;
@@ -2095,7 +1951,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                                   groupValue: _correctIndex,
                                   onChanged: (v) => setState(() => _correctIndex = v!),
                                   activeColor: Colors.white,
-                                  fillColor: WidgetStateProperty.all(Colors.white),
+                                  fillColor: MaterialStateProperty.all(Colors.white),
                                 ),
                               ),
                               const SizedBox(width: 12),

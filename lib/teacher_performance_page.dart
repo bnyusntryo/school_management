@@ -810,7 +810,7 @@ class _SubEvaluationFormPageState extends State<SubEvaluationFormPage> {
                                 SizedBox(
                                   width: 100,
                                   child: DropdownButtonFormField<String>(
-                                    value: currentAssessment,
+                                    initialValue: currentAssessment,
                                     decoration: InputDecoration(
                                       labelText: "Score",
                                       labelStyle: const TextStyle(fontSize: 12),

@@ -38,7 +38,7 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
   List<String> _availableUsers = [];
   List<String> _selectedUsers = [];
 
-  List<Map<String, String>> _generatedReportData = [];
+  final List<Map<String, String>> _generatedReportData = [];
 
   Future<void> _selectDate(BuildContext context, bool isStart) async {
     final DateTime? picked = await showDatePicker(
@@ -740,7 +740,7 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    value: _selectedUserType,
+                    initialValue: _selectedUserType,
                     hint: Text(
                       "Select Option",
                       style: TextStyle(

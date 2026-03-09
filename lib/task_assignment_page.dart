@@ -648,7 +648,7 @@ class _TaskAssignmentPageState extends State<TaskAssignmentPage> {
                 children: [
                   _buildFormLabel("User Type", isRequired: true),
                   DropdownButtonFormField<String>(
-                    value: _formUserType,
+                    initialValue: _formUserType,
                     hint: Text(
                       "Select Option",
                       style: TextStyle(
@@ -1052,7 +1052,7 @@ class _TaskAssignmentPageState extends State<TaskAssignmentPage> {
 
                   _buildFormLabel("Status", isRequired: true),
                   DropdownButtonFormField<String>(
-                    value: _editStatus,
+                    initialValue: _editStatus,
                     icon: const Icon(Icons.keyboard_arrow_down_rounded,
                         color: Colors.grey),
                     decoration: _getInputDecoration(

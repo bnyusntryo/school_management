@@ -588,7 +588,7 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
           Text("Gender", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
-            value: _selectedGender,
+            initialValue: _selectedGender,
             icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.orange.shade400),
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.wc_rounded, color: Colors.orange.shade300, size: 20),

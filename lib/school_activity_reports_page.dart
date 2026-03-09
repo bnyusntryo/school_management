@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'class_activity_page.dart';
 
 class SchoolActivityReportsPage extends StatelessWidget {
   const SchoolActivityReportsPage({super.key});
@@ -121,13 +120,11 @@ class ClassActivityFilterPage extends StatefulWidget {
 class _ClassActivityFilterPageState extends State<ClassActivityFilterPage> {
   final _dateRangeCtrl = TextEditingController();
   final List<String> _selectedClasses = [];
-  late List<String> _availableClasses;
 
-  @override
-  void initState() {
-    super.initState();
-    _availableClasses = ClassActivityData.classes.map((c) => c['name']!).toList();
-  }
+  // ✅ PERBAIKAN: Menambahkan Data Kelas Mandiri
+  final List<String> _availableClasses = [
+    "X TKJ B", "X MIPA A", "X IPS C", "IX B", "VIII A"
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -338,13 +335,52 @@ class ClassActivityReportResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ PERBAIKAN: Menambahkan Data Laporan Mandiri
+    final Map<String, List<Map<String, dynamic>>> allActivities = {
+      "X TKJ B": [
+        {
+          "name": "Pertemuan 1 - Pengenalan Jaringan",
+          "description": "Membahas topologi dasar dan kabel UTP.",
+          "date": "10 Oct 2023",
+          "time": "08:00 - 09:30",
+          "attendance": [
+            {"fullName": "Banyu Bintang", "userId": "STU001", "present": true},
+            {"fullName": "Savannah Nguyen", "userId": "STU002", "present": true},
+            {"fullName": "Jerome Bell", "userId": "STU003", "present": false},
+          ]
+        },
+        {
+          "name": "Pertemuan 2 - Praktik Crimping",
+          "description": "Siswa melakukan praktik pembuatan kabel straight dan cross.",
+          "date": "17 Oct 2023",
+          "time": "08:00 - 09:30",
+          "attendance": [
+            {"fullName": "Banyu Bintang", "userId": "STU001", "present": true},
+            {"fullName": "Savannah Nguyen", "userId": "STU002", "present": false},
+            {"fullName": "Jerome Bell", "userId": "STU003", "present": true},
+          ]
+        }
+      ],
+      "X MIPA A": [
+        {
+          "name": "Pertemuan 1 - Aljabar Linear",
+          "description": "Membahas konsep dasar matriks dan vektor.",
+          "date": "12 Oct 2023",
+          "time": "10:00 - 11:30",
+          "attendance": [
+            {"fullName": "Eleanor Pena", "userId": "STU004", "present": true},
+            {"fullName": "Albert Flores", "userId": "STU005", "present": true},
+          ]
+        }
+      ]
+    };
+
     List<Map<String, dynamic>> filteredActivities = [];
 
-    ClassActivityData.allActivities.forEach((key, list) {
-      for (var className in selectedClasses) {
-        if (key.startsWith(className)) {
-          filteredActivities.addAll(list);
-        }
+    // Logika Filtering
+    allActivities.forEach((key, list) {
+      if (selectedClasses.contains(key)) {
+        filteredActivities.addAll(list);
       }
     });
 
