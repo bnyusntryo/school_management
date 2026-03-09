@@ -1,7 +1,7 @@
 class UserSession {
-  static String currentRole = 'Principal';
+  static String currentRole = 'Teacher';
 
-  static String currentUserName = 'Kristo William';
+  static String currentUserName = 'Bpk. Alexander';
 
   static void switchUser(String role) {
     currentRole = role;
