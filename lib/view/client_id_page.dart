@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import '../config/pref.dart';
+import '../model/client_model.dart';
+import '../viewmodel/auth_viewmodel.dart';
 import 'login_page.dart';
 
 class ClientIdPage extends StatefulWidget {
@@ -12,41 +17,68 @@ class _ClientIdPageState extends State<ClientIdPage> {
   final TextEditingController _controller = TextEditingController();
   String? _errorMessage;
 
-  final List<Map<String, String>> _schoolsData = [
-    {'id': 'smkislamiyah', 'name': 'SMK Islamiyah Ciputat'},
-    {'id': 'smkn1', 'name': 'SMK Negeri 1 Jakarta'},
-    {'id': 'sma3', 'name': 'SMA Negeri 3 Bandung'},
-    {'id': 'tjipta', 'name': 'Tjipta Foundation School'},
-  ];
+  final AuthViewmodel _viewmodel = AuthViewmodel();
 
-  List<Map<String, String>> _filteredSchools = [];
+  bool _isLoading = false;
 
-  void _onSearchChanged(String query) {
+  List<ClientModel> _clients = [];
+
+  Timer? _debounce;
+
+  Future<void> _searchClient(String query) async {
+
     setState(() {
       _errorMessage = null;
-      if (query.isEmpty) {
-        _filteredSchools = [];
-      } else {
-        _filteredSchools = _schoolsData
-            .where((school) =>
-        school['id']!.toLowerCase().contains(query.toLowerCase()) ||
-            school['name']!.toLowerCase().contains(query.toLowerCase()))
+    });
+
+    if (query.isEmpty) {
+      setState(() {
+        _clients = [];
+      });
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    final resp = await _viewmodel.clients(clientId: query);
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+
+      if (resp.data != null) {
+        _clients = (resp.data as List)
+            .map((e) => ClientModel.fromJson(e))
             .toList();
+      } else {
+        _clients = [];
+        _errorMessage = resp.message?.toString();
       }
     });
   }
 
-  void _validateAndSubmit() {
-    if (_controller.text.isEmpty) {
-      setState(() {
-        _errorMessage = "Client Code tidak boleh kosong!";
-      });
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
-    }
+  void _selectClient(dynamic client) async {
+
+    final clientId = client['client_id'];
+
+    await Session().setClientId(clientId);
+
+    if (!mounted) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const LoginPage(),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _debounce?.cancel();
+    super.dispose();
   }
 
   @override
@@ -131,7 +163,22 @@ class _ClientIdPageState extends State<ClientIdPage> {
                         children: [
                           TextField(
                             controller: _controller,
-                            onChanged: _onSearchChanged,
+                            onChanged: (value) {
+
+                              final cleaned = value
+                                  .toLowerCase()
+                                  .trim()
+                                  .replaceAll(RegExp(r'\s+'), '');
+
+                              if (_debounce?.isActive ?? false) {
+                                _debounce!.cancel();
+                              }
+
+                              _debounce = Timer(
+                                const Duration(milliseconds: 400),
+                                    () => _searchClient(cleaned),
+                              );
+                            },
                             decoration: InputDecoration(
                               hintText: "Input Client ID...",
                               errorText: _errorMessage,
@@ -154,7 +201,13 @@ class _ClientIdPageState extends State<ClientIdPage> {
                             ),
                           ),
 
-                          if (_filteredSchools.isNotEmpty)
+                          if (_isLoading)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 10),
+                              child: CircularProgressIndicator(),
+                            ),
+
+                          if (_clients.isNotEmpty)
                             Container(
                               margin: const EdgeInsets.only(top: 5),
                               decoration: BoxDecoration(
@@ -170,23 +223,14 @@ class _ClientIdPageState extends State<ClientIdPage> {
                               ),
                               constraints: const BoxConstraints(maxHeight: 150),
                               child: ListView.builder(
-                                shrinkWrap: true,
-                                padding: EdgeInsets.zero,
-                                itemCount: _filteredSchools.length,
+                                itemCount: _clients.length,
                                 itemBuilder: (context, index) {
-                                  final school = _filteredSchools[index];
+
+                                  final client = _clients[index];
+
                                   return ListTile(
-                                    title: Text(
-                                      school['name']!,
-                                      style: const TextStyle(fontSize: 14),
-                                    ),
-                                    onTap: () {
-                                      setState(() {
-                                        _controller.text = school['name']!;
-                                        _filteredSchools = [];
-                                        FocusScope.of(context).unfocus();
-                                      });
-                                    },
+                                    title: Text(client.clientName),
+                                    onTap: () => _selectClient(client),
                                   );
                                 },
                               ),
@@ -195,21 +239,6 @@ class _ClientIdPageState extends State<ClientIdPage> {
                       ),
 
                       const SizedBox(height: 24),
-
-                      ElevatedButton(
-                        onPressed: _validateAndSubmit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2962FF),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        child: const Text(
-                          "Continue",
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                      ),
                     ],
                   ),
                 ),
