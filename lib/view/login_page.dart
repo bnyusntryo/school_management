@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_management/view/base_page.dart';
 import '../config/pref.dart';
 import '../viewmodel/auth_viewmodel.dart';
 import 'home_page.dart';
@@ -58,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => const HomePage(),
+          builder: (_) => const BasePage(),
         ),
       );
 
