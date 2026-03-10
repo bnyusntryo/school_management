@@ -26,7 +26,6 @@ class _ClientIdPageState extends State<ClientIdPage> {
   Timer? _debounce;
 
   Future<void> _searchClient(String query) async {
-
     setState(() {
       _errorMessage = null;
     });
@@ -34,33 +33,52 @@ class _ClientIdPageState extends State<ClientIdPage> {
     if (query.isEmpty) {
       setState(() {
         _clients = [];
+        _isLoading = false;
       });
       return;
     }
 
     setState(() => _isLoading = true);
 
-    final resp = await _viewmodel.clients(clientId: query);
+    try {
+      final resp = await _viewmodel.clients(clientId: query);
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() {
-      _isLoading = false;
+      setState(() {
+        _isLoading = false;
 
-      if (resp.data != null) {
-        _clients = (resp.data as List)
-            .map((e) => ClientModel.fromJson(e))
-            .toList();
-      } else {
+        if (resp.data != null) {
+
+          if (resp.data is List) {
+            _clients = (resp.data as List)
+                .map((e) => ClientModel.fromJson(e as Map<String, dynamic>))
+                .toList();
+          } else if (resp.data is Map) {
+            _clients = [ClientModel.fromJson(resp.data as Map<String, dynamic>)];
+          } else {
+            _clients = [];
+            _errorMessage = "Format data tidak dikenali";
+          }
+
+        } else {
+          _clients = [];
+          _errorMessage = resp.message?.toString() ?? "Client tidak ditemukan";
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
         _clients = [];
-        _errorMessage = resp.message?.toString();
-      }
-    });
+        _errorMessage = "Terjadi kesalahan internal. Cek console.";
+      });
+      debugPrint("Error Fetching Client: $e");
+    }
   }
 
-  void _selectClient(dynamic client) async {
-
-    final clientId = client['client_id'];
+  void _selectClient(ClientModel client) async {
+    final String clientId = client.clientId;
 
     await Session().setClientId(clientId);
 
@@ -207,15 +225,16 @@ class _ClientIdPageState extends State<ClientIdPage> {
                               child: CircularProgressIndicator(),
                             ),
 
-                          if (_clients.isNotEmpty)
+                          if (_clients.isNotEmpty && !_isLoading)
                             Container(
                               margin: const EdgeInsets.only(top: 5),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.grey.shade200),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
+                                    color: Colors.black.withOpacity(0.05),
                                     blurRadius: 5,
                                     offset: const Offset(0, 2),
                                   )
@@ -223,13 +242,15 @@ class _ClientIdPageState extends State<ClientIdPage> {
                               ),
                               constraints: const BoxConstraints(maxHeight: 150),
                               child: ListView.builder(
+                                shrinkWrap: true,
                                 itemCount: _clients.length,
                                 itemBuilder: (context, index) {
-
                                   final client = _clients[index];
 
                                   return ListTile(
-                                    title: Text(client.clientName),
+                                    title: Text(client.clientName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    subtitle: Text("ID: ${client.clientId}", style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                                    trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
                                     onTap: () => _selectClient(client),
                                   );
                                 },

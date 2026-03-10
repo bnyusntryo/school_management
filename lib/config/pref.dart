@@ -1,7 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-// import '../viewmodel/auth_viewmodel.dart';
-
 class Session {
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
@@ -11,6 +9,8 @@ class Session {
   final String fcmToken = "fcmToken";
   final String clientIdKey = "client_id";
 
+  final String userRoleKey = "user_role";
+  final String userNameKey = "user_name";
 
   Future<void> setUserToken(dynamic value) async {
     final SharedPreferences prefs = await _prefs;
@@ -52,12 +52,34 @@ class Session {
     return prefs.getString(clientIdKey);
   }
 
+  Future<void> setUserRole(String value) async {
+    final SharedPreferences prefs = await _prefs;
+    await prefs.setString(userRoleKey, value);
+  }
+
+  Future<String?> getUserRole() async {
+    final SharedPreferences prefs = await _prefs;
+    return prefs.getString(userRoleKey);
+  }
+
+  Future<void> setUserName(String value) async {
+    final SharedPreferences prefs = await _prefs;
+    await prefs.setString(userNameKey, value);
+  }
+
+  Future<String?> getUserName() async {
+    final SharedPreferences prefs = await _prefs;
+    return prefs.getString(userNameKey);
+  }
+
   Future<void> logout() async {
-    // await AuthViewModel().logout();
 
     final SharedPreferences prefs = await _prefs;
     await prefs.remove(userToken);
     await prefs.remove(fcmToken);
     await prefs.remove(clientIdKey);
+
+    await prefs.remove(userRoleKey);
+    await prefs.remove(userNameKey);
   }
 }

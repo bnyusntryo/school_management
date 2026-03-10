@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:io';
+import 'package:provider/provider.dart'; // 💡 TAMBAHAN: Import Provider
 import 'sidebar_menu.dart';
 import 'schedule_page.dart';
 import 'announcement_page.dart';
 import 'feed_detail_page.dart';
-import 'user_session.dart';
-import 'class_activity_page.dart'; // ✅ TAMBAHKAN IMPORT INI UNTUK KEPSEK
+import 'auth_provider.dart';
+import 'class_activity_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -79,10 +80,13 @@ class _HomePageState extends State<HomePage> {
 
   void _addNewPost() {
     if (_postController.text.isNotEmpty) {
+      // 💡 PERBAIKAN: Tarik data dari Provider saat membuat postingan baru
+      final authData = Provider.of<AuthProvider>(context, listen: false);
+
       setState(() {
         _feeds.insert(0, {
-          "name": UserSession.currentUserName,
-          "role": UserSession.currentRole,
+          "name": authData.userName, // Menggunakan data Provider
+          "role": authData.role,     // Menggunakan data Provider
           "time": "Just Now",
           "content": _postController.text,
           "likes": 0,
@@ -118,10 +122,13 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // 💡 SUNTIKAN PROVIDER: Tarik data untuk merender UI
+    final authData = Provider.of<AuthProvider>(context);
+
     final List<Map<String, String>> activeAnnouncements = AnnouncementPage.announcements.where((a) => a['show'] == 'Yes').toList();
 
-    // 🚦 SAKLAR PINTAR ROLE
-    String currentRole = UserSession.currentRole;
+    // 🚦 SAKLAR PINTAR ROLE (Menggunakan Provider)
+    String currentRole = authData.role;
     bool isStudent = currentRole == 'Student';
     bool isPrincipal = currentRole == 'Principal';
 
@@ -169,7 +176,8 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text("Hello $currentRole", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
                     const SizedBox(height: 2),
-                    Text(UserSession.currentUserName, style: const TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w600)),
+                    // 💡 PERBAIKAN: Menggunakan nama dari Provider
+                    Text(authData.userName, style: const TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ],
@@ -259,7 +267,7 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                   flex: 1,
                   child: InkWell(
-                    // ✅ PERBAIKAN: LOGIKA NAVIGASI KEPSEK
+                    // ✅ LOGIKA NAVIGASI KEPSEK
                     onTap: () {
                       if (!isPrincipal) {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const SchedulePage()));

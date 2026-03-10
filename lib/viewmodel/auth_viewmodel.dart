@@ -38,6 +38,16 @@ class AuthViewmodel {
         header
     );
 
+    if (resp != null && resp['token'] != null) {
+      var wrappedResp = {
+        'code': 200,
+        'message': 'Login Berhasil',
+        'data': resp
+      };
+
+      return Resp.fromJson(wrappedResp);
+    }
+
     return Resp.fromJson(resp);
   }
 }

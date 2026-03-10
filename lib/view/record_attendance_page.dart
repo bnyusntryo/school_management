@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
-import 'user_session.dart';
+import 'package:provider/provider.dart';
+import 'auth_provider.dart';
 
 class RecordAttendancePage extends StatelessWidget {
   const RecordAttendancePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    String currentRole = UserSession.currentRole;
+    final authData = Provider.of<AuthProvider>(context);
+    String currentRole = authData.role;
 
     if (currentRole == 'Student') {
       return const StudentAttendanceView();
@@ -18,9 +20,6 @@ class RecordAttendancePage extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// 1. TAMPILAN ADMIN (KEPALA SEKOLAH / GURU)
-// ============================================================================
 class AdminAttendanceView extends StatefulWidget {
   const AdminAttendanceView({super.key});
 
@@ -67,6 +66,8 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView> {
 
   @override
   Widget build(BuildContext context) {
+    final authData = Provider.of<AuthProvider>(context);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
       appBar: AppBar(
@@ -96,7 +97,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView> {
             ),
             const SizedBox(height: 10),
             Text(
-              "Hello, ${UserSession.currentRole} ${UserSession.currentUserName.split(' ').first}",
+              "Hello, ${authData.role} ${authData.userName.split(' ').first}",
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF1E293B)),
             ),
             const SizedBox(height: 25),
@@ -243,9 +244,6 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView> {
   }
 }
 
-// ============================================================================
-// 2. TAMPILAN MURID (STUDENT) - DESAIN BARU FIGMA + KARTU GRADIEN
-// ============================================================================
 class StudentAttendanceView extends StatefulWidget {
   const StudentAttendanceView({super.key});
 
@@ -300,6 +298,8 @@ class _StudentAttendanceViewState extends State<StudentAttendanceView> with Sing
   }
 
   void _recordAttendanceNow() {
+    final authData = Provider.of<AuthProvider>(context, listen: false);
+
     String today = DateFormat('dd MMMM yyyy').format(DateTime.now());
     String timeNow = DateFormat('HH:mm:ss').format(DateTime.now());
 
@@ -308,14 +308,15 @@ class _StudentAttendanceViewState extends State<StudentAttendanceView> with Sing
     setState(() {
       if (existingIndex == -1) {
         _allAttendances.insert(0, {
-          "name": UserSession.currentUserName, "date": today, "schIn": "08:00:00", "schOut": "17:00:00",
+          "name": authData.userName,
+          "date": today, "schIn": "08:00:00", "schOut": "17:00:00",
           "actIn": timeNow, "actOut": "--:--:--", "status": "On Time"
         });
       } else {
         _allAttendances[existingIndex]['actOut'] = timeNow;
       }
       _filterData(_searchCtrl.text);
-      _currentView = 0; // Kembali ke layar utama
+      _currentView = 0;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -356,8 +357,9 @@ class _StudentAttendanceViewState extends State<StudentAttendanceView> with Sing
     }
   }
 
-  // LAYAR UTAMA MURID (Sesuai Desain Figma)
   Widget _buildMainScreen() {
+    final authData = Provider.of<AuthProvider>(context);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
       appBar: AppBar(
@@ -375,7 +377,6 @@ class _StudentAttendanceViewState extends State<StudentAttendanceView> with Sing
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- HEADER & LIVE UPDATES ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -395,12 +396,11 @@ class _StudentAttendanceViewState extends State<StudentAttendanceView> with Sing
             ),
             const SizedBox(height: 10),
             Text(
-              "Hello, ${UserSession.currentRole} ${UserSession.currentUserName.split(' ').first}",
+              "Hello, ${authData.role} ${authData.userName.split(' ').first}",
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF1E293B)),
             ),
             const SizedBox(height: 25),
 
-            // --- SUMMARY CARD (Sama dengan Admin, dengan Angka Murid) ---
             Container(
               padding: const EdgeInsets.all(25),
               decoration: BoxDecoration(
@@ -473,7 +473,6 @@ class _StudentAttendanceViewState extends State<StudentAttendanceView> with Sing
             ),
             const SizedBox(height: 25),
 
-            // --- TOMBOL TAP IN & TAP OUT ---
             Row(
               children: [
                 Expanded(
@@ -481,7 +480,7 @@ class _StudentAttendanceViewState extends State<StudentAttendanceView> with Sing
                       colors: [const Color(0xFFFF8A65), const Color(0xFFF4511E)],
                       title: "Tap In", time: "07:00", buttonText: "Check In",
                       imagePath: 'assets/images/tap_in_illustration.png',
-                      onTap: () => setState(() => _currentView = 1) // ✅ Pindah ke Layar Map Validation
+                      onTap: () => setState(() => _currentView = 1)
                   ),
                 ),
                 const SizedBox(width: 15),
@@ -490,14 +489,13 @@ class _StudentAttendanceViewState extends State<StudentAttendanceView> with Sing
                       colors: [const Color(0xFF9FA8DA), const Color(0xFF5E35B1)],
                       title: "Tap Out", time: "16:00", buttonText: "Check In",
                       imagePath: 'assets/images/tap_out_illustration.png',
-                      onTap: () => setState(() => _currentView = 1) // ✅ Pindah ke Layar Map Validation
+                      onTap: () => setState(() => _currentView = 1)
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 25),
 
-            // --- SEARCH BAR & HISTORY ---
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))], border: Border.all(color: Colors.grey.shade200)),
@@ -518,7 +516,6 @@ class _StudentAttendanceViewState extends State<StudentAttendanceView> with Sing
     );
   }
 
-  // Komponen Reusable untuk Kartu Tap In / Tap Out
   Widget _buildActionCard({required List<Color> colors, required String title, required String time, required String buttonText, required String imagePath, VoidCallback? onTap}) {
     return Container(
       height: 105,
@@ -608,7 +605,6 @@ class _StudentAttendanceViewState extends State<StudentAttendanceView> with Sing
     );
   }
 
-  // --- MAP VALIDATION & FACE SCAN (Sama dengan sebelumnya) ---
   Widget _buildMapValidationScreen() {
     return Stack(
       children: [

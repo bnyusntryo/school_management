@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'user_session.dart';
-import 'class_activity_page.dart'; // ✅ WAJIB IMPORT INI UNTUK NAVIGASI KE CLASS ACTIVITY
+import 'package:provider/provider.dart';
+import 'auth_provider.dart';
+import 'class_activity_page.dart';
 
-// ==========================================
-// WARNA TEMA PREMIUM GLOBAL
-// ==========================================
 const Color bgPremium = Color(0xFFF4F7FB);
 const Color textDark = Color(0xFF0F172A);
 const Color textMuted = Color(0xFF64748B);
@@ -18,11 +16,8 @@ class SchedulePage extends StatefulWidget {
 }
 
 class _SchedulePageState extends State<SchedulePage> {
-  int _selectedDateIndex = 2; // Default ke hari ini (Index 2: Sun 14)
+  int _selectedDateIndex = 2;
 
-  // =========================================================
-  // 1. DATA JADWAL UNTUK SISWA (Ditambah data activityCount)
-  // =========================================================
   final List<Map<String, dynamic>> _studentSchedules = [
     {
       "subject": "Matematika",
@@ -31,8 +26,8 @@ class _SchedulePageState extends State<SchedulePage> {
       "time": "08:00 - 09:30",
       "status": "Sedang Berlangsung",
       "color": const Color(0xFF10B981),
-      "activityCount": 2, // Ada 2 aktivitas baru
-      "avatars": 3 // Dummy jumlah teman/guru
+      "activityCount": 2,
+      "avatars": 3
     },
     {
       "subject": "Bahasa Inggris",
@@ -56,9 +51,6 @@ class _SchedulePageState extends State<SchedulePage> {
     },
   ];
 
-  // =========================================================
-  // 2. DATA JADWAL UNTUK GURU / KEPSEK
-  // =========================================================
   final List<Map<String, dynamic>> _teacherSchedules = [
     {
       "subject": "Matematika",
@@ -67,7 +59,7 @@ class _SchedulePageState extends State<SchedulePage> {
       "time": "08:00 - 09:30",
       "status": "Sedang Berlangsung",
       "color": const Color(0xFF10B981),
-      "activityCount": 5, // Tugas yang perlu diperiksa
+      "activityCount": 5,
       "avatars": 4
     },
     {
@@ -84,7 +76,9 @@ class _SchedulePageState extends State<SchedulePage> {
 
   @override
   Widget build(BuildContext context) {
-    bool isStudent = UserSession.currentRole == 'Student';
+    final authData = Provider.of<AuthProvider>(context);
+    bool isStudent = authData.role == 'Student';
+
     List<Map<String, dynamic>> currentSchedules = isStudent ? _studentSchedules : _teacherSchedules;
 
     return Scaffold(
@@ -107,7 +101,6 @@ class _SchedulePageState extends State<SchedulePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- HEADER BULAN ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -127,11 +120,9 @@ class _SchedulePageState extends State<SchedulePage> {
             ),
             const SizedBox(height: 20),
 
-            // --- DATE SELECTOR ---
             _buildDateSelector(),
             const SizedBox(height: 35),
 
-            // --- SECTION HEADER ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -147,7 +138,6 @@ class _SchedulePageState extends State<SchedulePage> {
             ),
             const SizedBox(height: 20),
 
-            // --- LIST JADWAL DINAMIS ---
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -237,14 +227,12 @@ class _SchedulePageState extends State<SchedulePage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Garis Indikator Kiri
           Container(
               width: 4, height: 70,
               decoration: BoxDecoration(color: statusColor, borderRadius: BorderRadius.circular(5))
           ),
           const SizedBox(width: 15),
 
-          // Konten Tengah
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,15 +287,11 @@ class _SchedulePageState extends State<SchedulePage> {
 
           const SizedBox(width: 10),
 
-          // ========================================================
-          // 🚀 TOMBOL SHORTCUT CLASS ACTIVITY (Sesuai Catatan Figma)
-          // ========================================================
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               GestureDetector(
                 onTap: () {
-                  // Arahkan langsung ke halaman Class Activity Page
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const ClassActivityPage()));
                 },
                 child: Container(
@@ -321,7 +305,6 @@ class _SchedulePageState extends State<SchedulePage> {
                     clipBehavior: Clip.none,
                     children: [
                       Icon(Icons.assignment_rounded, color: activityCount > 0 ? primaryBlue : Colors.grey.shade400, size: 24),
-                      // Badge Notifikasi Angka (Misal: "2" Aktivitas)
                       if (activityCount > 0)
                         Positioned(
                           top: -6, right: -6,
@@ -350,7 +333,6 @@ class _SchedulePageState extends State<SchedulePage> {
     );
   }
 
-  // Widget Helper untuk Avatar menumpuk (seperti di desain awal)
   Widget _buildStackedAvatars(int count) {
     return SizedBox(
       width: 24.0 + (count - 1) * 12.0,

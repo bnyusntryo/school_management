@@ -3,6 +3,8 @@ import 'package:school_management/view/base_page.dart';
 import '../config/pref.dart';
 import '../viewmodel/auth_viewmodel.dart';
 import 'home_page.dart';
+import 'package:provider/provider.dart';
+import 'auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -52,9 +54,28 @@ class _LoginPageState extends State<LoginPage> {
 
     if (resp.code == 200 && resp.data != null) {
 
+      String apiStatus = resp.data['user_status'] ?? '';
+      String apiName = resp.data['full_name'] ?? 'User';
+
+      String finalRole = 'Teacher';
+      if (apiStatus == 'HEADMASTER') {
+        finalRole = 'Principal';
+      } else if (apiStatus == 'STUDENT') {
+        finalRole = 'Student';
+      }
+
+      // 1. Simpan ke Brankas HP (SharedPreferences)
       await Session().setUserToken(resp.data['token']);
+      await Session().setUserRole(finalRole);
+      await Session().setUserName(apiName);
 
       if (!mounted) return;
+
+      // 2. ⚡ SUNTIKKAN KE PROVIDER (Pengganti UserSession)
+      Provider.of<AuthProvider>(context, listen: false).setUserData(
+        role: finalRole,
+        userName: apiName,
+      );
 
       Navigator.pushReplacement(
         context,

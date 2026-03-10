@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'user_session.dart';
+import 'package:provider/provider.dart';
+import 'auth_provider.dart';
 
-// ==========================================
-// WARNA TEMA PREMIUM GLOBAL (Modern Tech Vibe)
-// ==========================================
 const Color bgPremium = Color(0xFFF4F7FB);
 const Color textDark = Color(0xFF0F172A);
 const Color textMuted = Color(0xFF64748B);
@@ -11,9 +9,6 @@ const Color primaryBlue = Color(0xFF3B82F6);
 const Color primaryPink = Color(0xFFEC4899);
 final Color attGradientEnd = const Color(0xFFF06292);
 
-// ============================================================================
-// HALAMAN 1: CLASS ACTIVITY LIST (HALAMAN DEPAN)
-// ============================================================================
 class ClassActivityPage extends StatefulWidget {
   const ClassActivityPage({super.key});
 
@@ -51,7 +46,9 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
 
   @override
   Widget build(BuildContext context) {
-    bool isStudent = UserSession.currentRole == 'Student';
+    final authData = Provider.of<AuthProvider>(context);
+    bool isStudent = authData.role == 'Student';
+    bool isTeacher = authData.role == 'Teacher' || authData.role == 'Principal';
 
     return Scaffold(
       backgroundColor: bgPremium,
@@ -82,7 +79,6 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --- HEADER & SEARCH (Super Bersih Tanpa Tombol Add) ---
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 15),
             child: Row(
@@ -344,9 +340,6 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
   }
 }
 
-// ============================================================================
-// HALAMAN 2: CLASS ACTIVITY LIST SUBJECT
-// ============================================================================
 class ClassActivitySubjectListPage extends StatelessWidget {
   final Map<String, String> classData;
 
@@ -552,9 +545,6 @@ class ClassActivitySubjectListPage extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// HALAMAN 3: CLASS ACTIVITY SUBJECT DETAIL LIST (ADA TOMBOL ADD KHUSUS GURU)
-// ============================================================================
 class ClassActivitySubjectDetailListPage extends StatefulWidget {
   final Map<String, String> subjectData;
 
@@ -608,8 +598,8 @@ class _ClassActivitySubjectDetailListPageState extends State<ClassActivitySubjec
 
   @override
   Widget build(BuildContext context) {
-    // 🚦 KONDISI WIDGET: Cek apakah yang login adalah Guru
-    bool isTeacher = UserSession.currentRole == 'Teacher';
+    final authData = Provider.of<AuthProvider>(context);
+    bool isTeacher = authData.role == 'Teacher' || authData.role == 'Principal';
 
     return Scaffold(
       backgroundColor: bgPremium,
@@ -668,7 +658,6 @@ class _ClassActivitySubjectDetailListPageState extends State<ClassActivitySubjec
             ),
             const SizedBox(height: 25),
 
-            // ✅ PERBAIKAN: Tombol Add dipindahkan ke sini dan dilindungi kondisi Role
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -770,7 +759,6 @@ class _ClassActivitySubjectDetailListPageState extends State<ClassActivitySubjec
     );
   }
 
-  // Widget Helper Tombol Aksi
   Widget _buildPremiumActionBtn(IconData icon, String label, Color bgColor, Color textColor, VoidCallback onTap) {
     return Container(
       decoration: BoxDecoration(
@@ -827,9 +815,6 @@ class _ClassActivitySubjectDetailListPageState extends State<ClassActivitySubjec
   }
 }
 
-// ============================================================================
-// HALAMAN 4: MEETING DETAIL PAGE
-// ============================================================================
 class ClassActivityMeetingDetailPage extends StatelessWidget {
   final Map<String, dynamic> meetingData;
 
@@ -1006,9 +991,6 @@ class ClassActivityMeetingDetailPage extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// HALAMAN 5: ADD CLASS ACTIVITY (FORM PREMIUM)
-// ============================================================================
 class AddClassActivityPage extends StatefulWidget {
   const AddClassActivityPage({super.key});
 
