@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+
+// Sesuaikan path import ini jika berbeda
+import '../config/pref.dart';
+import 'auth_provider.dart';
 
 class AnnouncementPage extends StatefulWidget {
   const AnnouncementPage({super.key});
-
-  static List<Map<String, String>> announcements = [
-    {
-      "id": "20-Jan-2025 10:00",
-      "title": "Testing Announcement",
-      "show": "Yes",
-      "description": "This is a detailed description.",
-      "image": "https://img.freepik.com/free-vector/hand-drawn-phone-social-media-concept_23-2149118557.jpg",
-      "isLocal": "false"
-    },
-  ];
 
   @override
   State<AnnouncementPage> createState() => _AnnouncementPageState();
@@ -25,8 +21,56 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ImagePicker _picker = ImagePicker();
 
+  // 💡 VARIABEL API
+  List<dynamic> _announcementsList = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAnnouncements(); // Tarik data saat halaman dibuka
+  }
+
+  // =======================================================
+  // 🚀 FUNGSI FETCHING API ANNOUNCEMENT LIST
+  // =======================================================
+  Future<void> _fetchAnnouncements() async {
+    try {
+      String? token = await Session().getUserToken();
+
+      final response = await http.post(
+        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/home/announcement'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({}),
+      );
+
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+        if (mounted) {
+          setState(() {
+            _announcementsList = result['data'] ?? [];
+            _isLoading = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      print("Error fetching list: $e");
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // 🚦 SAKLAR PINTAR ROLE (Menggunakan Provider)
+    final authData = Provider.of<AuthProvider>(context);
+    bool isPrincipal = authData.role == 'Principal';
+
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF5F7FA),
@@ -72,7 +116,16 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
 
           SliverPadding(
             padding: const EdgeInsets.all(20),
-            sliver: AnnouncementPage.announcements.isEmpty
+            sliver: _isLoading
+                ? const SliverToBoxAdapter(
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 50.0),
+                  child: CircularProgressIndicator(color: Colors.teal),
+                ),
+              ),
+            )
+                : _announcementsList.isEmpty
                 ? SliverToBoxAdapter(
               child: Center(
                 child: Column(
@@ -89,28 +142,38 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                 : SliverList(
               delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                  final item = AnnouncementPage.announcements[index];
-                  return _buildAnnouncementCard(item, index);
+                  final item = _announcementsList[index];
+                  return _buildAnnouncementCard(item, index, isPrincipal);
                 },
-                childCount: AnnouncementPage.announcements.length,
+                childCount: _announcementsList.length,
               ),
             ),
           ),
         ],
       ),
 
-      floatingActionButton: FloatingActionButton(
+      // 💡 HANYA MUNCUL JIKA KEPALA SEKOLAH
+      floatingActionButton: isPrincipal
+          ? FloatingActionButton(
         onPressed: () => _showAddEditDialog(),
         backgroundColor: Colors.teal.shade600,
         child: const Icon(Icons.add_rounded, color: Colors.white, size: 30),
-      ),
+      )
+          : null,
     );
   }
 
-  Widget _buildAnnouncementCard(Map<String, String> item, int index) {
-    bool isShow = item['show'] == 'Yes';
-    bool isLocal = item['isLocal'] == "true";
-    String imagePath = item['image'] ?? "";
+  Widget _buildAnnouncementCard(Map<String, dynamic> item, int index, bool isPrincipal) {
+    // 💡 TRANSLATE DATA API KE UI ANDA
+    String title = item['announcement_title'] ?? 'No Title';
+    String idStr = item['announcement_id'] ?? 'Unknown ID';
+    bool isShow = item['show_announcement'] == 'Y';
+    List images = item['announcement_img'] ?? [];
+
+    // Trik gambar dummy Premium dari API sebelumnya
+    String imagePath = images.isNotEmpty
+        ? 'https://fastly.picsum.photos/id/517/1600/900.jpg?hmac=CdnOMbQEo4LItWYoyDHPpmPs3HPyGBFBnOFiel377XI'
+        : 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=2000&auto=format&fit=crop';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
@@ -139,11 +202,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                child: imagePath.isEmpty
-                    ? Icon(Icons.image_not_supported_rounded, color: Colors.grey.shade400, size: 30)
-                    : (isLocal
-                    ? Image.file(File(imagePath), fit: BoxFit.cover)
-                    : Image.network(imagePath, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image_rounded, color: Colors.grey.shade400))),
+                child: Image.network(imagePath, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image_rounded, color: Colors.grey.shade400)),
               ),
             ),
             const SizedBox(width: 15),
@@ -153,7 +212,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item['title']!,
+                    title,
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -161,11 +220,11 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.access_time_rounded, size: 14, color: Colors.grey.shade500),
+                      Icon(Icons.tag_rounded, size: 14, color: Colors.grey.shade500),
                       const SizedBox(width: 4),
                       Text(
-                        item['id']!,
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                        idStr,
+                        style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -178,7 +237,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                       border: Border.all(color: isShow ? Colors.green.shade200 : Colors.red.shade200),
                     ),
                     child: Text(
-                      isShow ? "Visible" : "Hidden",
+                      isShow ? "Visible (Y)" : "Hidden (N)",
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -190,23 +249,25 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
               ),
             ),
 
-            IconButton(
-              icon: Icon(Icons.edit_note_rounded, color: Colors.teal.shade500, size: 26),
-              onPressed: () => _showAddEditDialog(existingData: item, index: index),
-              tooltip: "Edit",
-            ),
+            // 💡 TOMBOL EDIT HANYA UNTUK KEPSEK
+            if (isPrincipal)
+              IconButton(
+                icon: Icon(Icons.edit_note_rounded, color: Colors.teal.shade500, size: 26),
+                onPressed: () => _showAddEditDialog(existingData: item, index: index),
+                tooltip: "Edit",
+              ),
           ],
         ),
       ),
     );
   }
 
-  void _showAddEditDialog({Map<String, String>? existingData, int? index}) {
-    final titleCtrl = TextEditingController(text: existingData?['title']);
-    final descCtrl = TextEditingController(text: existingData?['description']);
-    String showValue = existingData?['show'] ?? 'Yes';
-    String? currentImagePath = existingData?['image'];
-    bool isImageLocal = existingData?['isLocal'] == "true";
+  // NOTE: Fungsi Dialog Tetap Sama, tapi aksi Save-nya belum nyambung ke API POST/Create Reonaldi
+  void _showAddEditDialog({Map<String, dynamic>? existingData, int? index}) {
+    final titleCtrl = TextEditingController(text: existingData?['announcement_title']);
+    String showValue = (existingData?['show_announcement'] == 'Y') ? 'Yes' : 'No';
+    String? currentImagePath;
+    bool isImageLocal = false;
 
     showModalBottomSheet(
       context: context,
@@ -243,13 +304,11 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
 
                   _buildModalInputField("Announcement Title", titleCtrl, Icons.title_rounded, maxLines: 1),
                   const SizedBox(height: 15),
-                  _buildModalInputField("Description", descCtrl, Icons.description_rounded, maxLines: 3),
-                  const SizedBox(height: 15),
 
                   Text("Show Announcement", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    initialValue: showValue,
+                    value: showValue,
                     icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.teal.shade400),
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.visibility_rounded, color: Colors.teal.shade400, size: 20),
@@ -259,51 +318,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                     ),
                     items: ['Yes', 'No'].map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontWeight: FontWeight.w500)))).toList(),
-                    onChanged: (v) => showValue = v!,
-                  ),
-
-                  const SizedBox(height: 20),
-                  Text("Thumbnail Image", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
-                  const SizedBox(height: 8),
-
-                  GestureDetector(
-                    onTap: () async {
-                      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-                      if (image != null) {
-                        setModalState(() {
-                          currentImagePath = image.path;
-                          isImageLocal = true;
-                        });
-                      }
-                    },
-                    child: Container(
-                      height: 160,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.teal.shade50.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.teal.shade200, width: 2, style: BorderStyle.solid),
-                      ),
-                      child: currentImagePath == null || currentImagePath!.isEmpty
-                          ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(color: Colors.teal.shade100, shape: BoxShape.circle),
-                            child: Icon(Icons.add_photo_alternate_rounded, size: 30, color: Colors.teal.shade700),
-                          ),
-                          const SizedBox(height: 10),
-                          Text("Tap to upload image", style: TextStyle(color: Colors.teal.shade700, fontWeight: FontWeight.bold)),
-                        ],
-                      )
-                          : ClipRRect(
-                        borderRadius: BorderRadius.circular(18),
-                        child: isImageLocal
-                            ? Image.file(File(currentImagePath!), fit: BoxFit.cover, width: double.infinity)
-                            : Image.network(currentImagePath!, fit: BoxFit.cover, width: double.infinity),
-                      ),
-                    ),
+                    onChanged: (v) => setModalState(() => showValue = v!),
                   ),
                   const SizedBox(height: 30),
 
@@ -311,28 +326,12 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        setState(() {
-                          final newData = {
-                            "id": existingData?['id'] ?? DateFormat('dd-MMM-yyyy HH:mm').format(DateTime.now()),
-                            "title": titleCtrl.text,
-                            "show": showValue,
-                            "description": descCtrl.text,
-                            "image": currentImagePath ?? "",
-                            "isLocal": isImageLocal.toString(),
-                          };
-                          if (index == null) {
-                            AnnouncementPage.announcements.insert(0, newData);
-                          } else {
-                            AnnouncementPage.announcements[index] = newData;
-                          }
-                        });
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: const Text("Announcement saved successfully!"),
-                              backgroundColor: Colors.teal.shade600,
+                              content: const Text("Fitur API Create/Edit belum disambungkan!"),
+                              backgroundColor: Colors.orange.shade600,
                               behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             )
                         );
                       },
@@ -340,8 +339,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                         backgroundColor: Colors.teal.shade600,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                        elevation: 4,
-                        shadowColor: Colors.teal.withOpacity(0.4),
                       ),
                       child: const Text("Save Announcement", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                     ),
@@ -372,7 +369,6 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
             fillColor: Colors.grey.shade50,
             contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.teal.shade300, width: 1.5)),
           ),
         ),
       ],
