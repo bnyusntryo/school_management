@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import '../config/pref.dart';
 import 'auth_provider.dart';
 import 'class_activity_page.dart';
 
@@ -18,69 +22,70 @@ class SchedulePage extends StatefulWidget {
 class _SchedulePageState extends State<SchedulePage> {
   int _selectedDateIndex = 2;
 
-  // 💡 PERBAIKAN: List sekarang tidak final agar bisa kita hapus isinya
-  List<Map<String, dynamic>> _studentSchedules = [
-    {
-      "subject": "Matematika",
-      "person": "Bpk. Yoga Pratama",
-      "room": "Ruang Kelas XII-A",
-      "time": "08:00 - 09:30",
-      "status": "Sedang Berlangsung",
-      "color": const Color(0xFF10B981),
-      "activityCount": 2,
-      "avatars": 3
-    },
-    {
-      "subject": "Bahasa Inggris",
-      "person": "Ibu Siti Aminah",
-      "room": "Ruang Kelas XII-A",
-      "time": "10:00 - 11:30",
-      "status": "Akan Datang",
-      "color": const Color(0xFFF59E0B),
-      "activityCount": 0,
-      "avatars": 0
-    },
-    {
-      "subject": "Pendidikan Agama",
-      "person": "Bpk. Ahmad Fauzi",
-      "room": "Ruang Kelas XII-A",
-      "time": "13:00 - 14:30",
-      "status": "Akan Datang",
-      "color": const Color(0xFFF59E0B),
-      "activityCount": 1,
-      "avatars": 2
-    },
-  ];
+  List<dynamic> _apiSchedules = [];
+  bool _isLoading = true;
 
-  List<Map<String, dynamic>> _teacherSchedules = [
-    {
-      "subject": "Matematika",
-      "person": "Kelas XII TKJ B",
-      "room": "Lab Komputer 1",
-      "time": "08:00 - 09:30",
-      "status": "Sedang Berlangsung",
-      "color": const Color(0xFF10B981),
-      "activityCount": 5,
-      "avatars": 4
-    },
-    {
-      "subject": "Matematika",
-      "person": "Kelas XI MIPA A",
-      "room": "Ruang Kelas XI-A",
-      "time": "10:00 - 11:30",
-      "status": "Akan Datang",
-      "color": const Color(0xFFF59E0B),
-      "activityCount": 0,
-      "avatars": 0
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchSchedule();
+  }
+
+  Future<void> _fetchSchedule() async {
+    try {
+      String? token = await Session().getUserToken();
+      final response = await http.post(
+        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/home/mytodayclass'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({}),
+      );
+
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+        final dataNode = result['data'];
+        List classList = dataNode is List ? dataNode : (dataNode?['data'] ?? []);
+
+        if (mounted) {
+          setState(() {
+            _apiSchedules = classList;
+            _isLoading = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      print("🚨 Error fetch schedule: $e");
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  bool _isNowInSchedule(String? start, String? end) {
+    if (start == null || end == null) return false;
+    try {
+      final now = DateTime.now();
+      final startParts = start.split(':');
+      final endParts = end.split(':');
+
+      final startTime = DateTime(now.year, now.month, now.day, int.parse(startParts[0]), int.parse(startParts[1]));
+      final endTime = DateTime(now.year, now.month, now.day, int.parse(endParts[0]), int.parse(endParts[1]));
+
+      return now.isAfter(startTime) && now.isBefore(endTime);
+    } catch (e) {
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final authData = Provider.of<AuthProvider>(context);
     bool isStudent = authData.role == 'Student';
 
-    List<Map<String, dynamic>> currentSchedules = isStudent ? _studentSchedules : _teacherSchedules;
+    String currentMonthYear = DateFormat('MMM yyyy').format(DateTime.now());
 
     return Scaffold(
       backgroundColor: bgPremium,
@@ -102,13 +107,12 @@ class _SchedulePageState extends State<SchedulePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- HEADER BULAN ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Aug 2023',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: textDark, letterSpacing: -0.5),
+                Text(
+                  currentMonthYear,
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: textDark, letterSpacing: -0.5),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -122,11 +126,9 @@ class _SchedulePageState extends State<SchedulePage> {
             ),
             const SizedBox(height: 20),
 
-            // --- DATE SELECTOR ---
             _buildDateSelector(),
             const SizedBox(height: 35),
 
-            // --- SECTION HEADER ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -135,76 +137,87 @@ class _SchedulePageState extends State<SchedulePage> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: textDark),
                 ),
                 Text(
-                  '${currentSchedules.length} Classes',
+                  '${_apiSchedules.length} Classes',
                   style: const TextStyle(fontSize: 13, color: textMuted, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
             const SizedBox(height: 20),
 
-            // --- LIST JADWAL DINAMIS DENGAN FITUR DELETE ---
-            currentSchedules.isEmpty
-                ? Center(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 50.0),
-                child: Column(
-                  children: [
-                    Icon(Icons.event_busy_rounded, size: 80, color: Colors.grey.shade300),
-                    const SizedBox(height: 15),
-                    Text("No classes left today!", style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
-                  ],
+            if (_isLoading)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 50.0),
+                  child: CircularProgressIndicator(color: primaryBlue),
                 ),
-              ),
-            )
-                : ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: currentSchedules.length,
-              itemBuilder: (context, index) {
-                final item = currentSchedules[index];
-
-                // 💡 FITUR SWIPE TO DELETE (DISMISSIBLE)
-                return Dismissible(
-                  key: Key(item['subject'] + item['time'] + index.toString()),
-                  direction: DismissDirection.endToStart, // Hanya bisa digeser ke kiri
-                  background: Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.symmetric(horizontal: 25),
-                    decoration: BoxDecoration(
-                        color: const Color(0xFFEF4444), // Merah Bahaya
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [BoxShadow(color: const Color(0xFFEF4444).withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8))]
-                    ),
-                    alignment: Alignment.centerRight,
-                    child: const Icon(Icons.delete_sweep_rounded, color: Colors.white, size: 32),
+              )
+            else if (_apiSchedules.isEmpty)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 50.0),
+                  child: Column(
+                    children: [
+                      Icon(Icons.event_busy_rounded, size: 80, color: Colors.grey.shade300),
+                      const SizedBox(height: 15),
+                      Text("No classes left today!", style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
+                    ],
                   ),
-                  onDismissed: (direction) {
-                    // Logika menghapus data dari list
-                    setState(() {
-                      if (isStudent) {
-                        _studentSchedules.removeAt(index);
-                      } else {
-                        _teacherSchedules.removeAt(index);
-                      }
-                    });
+                ),
+              )
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _apiSchedules.length,
+                itemBuilder: (context, index) {
+                  final itemRaw = _apiSchedules[index];
 
-                    // Tampilkan notifikasi kecil di bawah
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("${item['subject']} class deleted from schedule!"),
-                        backgroundColor: const Color(0xFFEF4444),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  bool isOngoing = _isNowInSchedule(itemRaw['schedule_time_start'], itemRaw['schedule_time_end']);
+
+                  Map<String, dynamic> mappedData = {
+                    "subject": itemRaw['subjectclass_name'] ?? 'Unknown',
+                    "person": isStudent ? (itemRaw['teacher_name'] ?? '-') : (itemRaw['class_name'] ?? '-'),
+                    "room": itemRaw['room_name'] ?? 'TBA',
+                    "time": "${itemRaw['schedule_time_start']} - ${itemRaw['schedule_time_end']}",
+                    "status": isOngoing ? "Sedang Berlangsung" : "Akan Datang",
+                    "color": isOngoing ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
+                    "activityCount": 0,
+                    "avatars": 0
+                  };
+
+                  return Dismissible(
+                    key: Key(mappedData['time'] + index.toString()),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      decoration: BoxDecoration(
+                          color: const Color(0xFFEF4444),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [BoxShadow(color: const Color(0xFFEF4444).withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8))]
                       ),
-                    );
-                  },
-                  child: _buildPremiumScheduleCard(
-                    data: item,
-                    isStudent: isStudent,
-                  ),
-                );
-              },
-            ),
+                      alignment: Alignment.centerRight,
+                      child: const Icon(Icons.delete_sweep_rounded, color: Colors.white, size: 32),
+                    ),
+                    onDismissed: (direction) {
+                      setState(() {
+                        _apiSchedules.removeAt(index);
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("${mappedData['subject']} class removed from view!"),
+                          backgroundColor: const Color(0xFFEF4444),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    },
+                    child: _buildPremiumScheduleCard(
+                      data: mappedData,
+                      isStudent: isStudent,
+                    ),
+                  );
+                },
+              ),
           ],
         ),
       ),
@@ -212,21 +225,17 @@ class _SchedulePageState extends State<SchedulePage> {
   }
 
   Widget _buildDateSelector() {
-    final List<Map<String, dynamic>> dates = [
-      {'day': 'Fri', 'date': '11'},
-      {'day': 'Sat', 'date': '12'},
-      {'day': 'Sun', 'date': '14'},
-      {'day': 'Mon', 'date': '15'},
-      {'day': 'Tue', 'date': '16'},
-    ];
+    final now = DateTime.now();
+    final List<DateTime> dateList = List.generate(5, (index) => now.add(Duration(days: index - 2)));
 
     return SizedBox(
       height: 85,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
-        itemCount: dates.length,
+        itemCount: dateList.length,
         itemBuilder: (context, index) {
+          final date = dateList[index];
           final bool isActive = index == _selectedDateIndex;
 
           return GestureDetector(
@@ -249,12 +258,12 @@ class _SchedulePageState extends State<SchedulePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                      dates[index]['day']!,
+                      DateFormat('EEE').format(date),
                       style: TextStyle(color: isActive ? Colors.white.withOpacity(0.9) : textMuted, fontSize: 13, fontWeight: isActive ? FontWeight.w600 : FontWeight.w500)
                   ),
                   const SizedBox(height: 5),
                   Text(
-                      dates[index]['date']!,
+                      DateFormat('dd').format(date),
                       style: TextStyle(color: isActive ? Colors.white : textDark, fontWeight: FontWeight.w900, fontSize: 18)
                   ),
                 ],
@@ -283,14 +292,12 @@ class _SchedulePageState extends State<SchedulePage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Garis Indikator Kiri
           Container(
               width: 4, height: 70,
               decoration: BoxDecoration(color: statusColor, borderRadius: BorderRadius.circular(5))
           ),
           const SizedBox(width: 15),
 
-          // Konten Tengah
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,7 +315,6 @@ class _SchedulePageState extends State<SchedulePage> {
                 ),
                 const SizedBox(height: 10),
 
-                // Subject & Avatar Stack
                 Row(
                   children: [
                     Flexible(
@@ -345,9 +351,6 @@ class _SchedulePageState extends State<SchedulePage> {
 
           const SizedBox(width: 10),
 
-          // ========================================================
-          // 🚀 TOMBOL SHORTCUT CLASS ACTIVITY
-          // ========================================================
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

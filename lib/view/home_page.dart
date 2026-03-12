@@ -27,10 +27,14 @@ class _HomePageState extends State<HomePage> {
   int _currentPage = 0;
   Timer? _timer;
 
+  // 💡 Variabel API Announcement
   List<dynamic> _announcements = [];
   bool _isLoadingBanner = true;
-
   final String baseImageUrl = 'https://fastly.picsum.photos/id/517/1600/900.jpg?hmac=CdnOMbQEo4LItWYoyDHPpmPs3HPyGBFBnOFiel377XI/';
+
+  // 💡 TAMBAHAN: Variabel API Jadwal Kelas
+  Map<String, dynamic>? _todayClass;
+  bool _isLoadingClass = true;
 
   final List<Map<String, dynamic>> _feeds = [
     {
@@ -66,12 +70,13 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     fetchAnnouncements();
+    fetchTodayClass();
   }
 
   Future<void> fetchAnnouncements() async {
     try {
       String? token = await Session().getUserToken();
-      print("🎫 CEK TOKEN DI HP: $token");
+      // print("🎫 CEK TOKEN DI HP: $token");
 
       final response = await http.post(
         Uri.parse('https://schoolapp-api-dev.zeabur.app/api/home/announcement'),
@@ -83,12 +88,8 @@ class _HomePageState extends State<HomePage> {
         body: jsonEncode({}),
       );
 
-      print("📡 STATUS DARI SERVER: ${response.statusCode}");
-      print("📦 BALASAN SERVER: ${response.body}");
-
       if (response.statusCode == 200) {
         final result = jsonDecode(response.body);
-
         if (mounted) {
           setState(() {
             _announcements = (result['data'] as List)
@@ -96,16 +97,80 @@ class _HomePageState extends State<HomePage> {
                 .toList();
             _isLoadingBanner = false;
           });
-          print("✅ BERHASIL! Jumlah pengumuman: ${_announcements.length}");
           _startAutoSlider();
         }
       } else {
-        print("❌ GAGAL! Server menolak. Status: ${response.statusCode}");
         if (mounted) setState(() => _isLoadingBanner = false);
       }
     } catch (e) {
       print("🚨 ERROR FATAL: $e");
       if (mounted) setState(() => _isLoadingBanner = false);
+    }
+  }
+
+  Future<void> fetchTodayClass() async {
+    try {
+      String? token = await Session().getUserToken();
+      final response = await http.post(
+        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/home/mytodayclass'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({}),
+      );
+
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+
+        final dataNode = result['data'];
+        List classList = dataNode is List ? dataNode : (dataNode?['data'] ?? []);
+
+        Map<String, dynamic>? activeOrNextClass;
+
+        if (classList.isNotEmpty) {
+          for (var c in classList) {
+            if (_isNowInSchedule(c['schedule_time_start'], c['schedule_time_end'])) {
+              activeOrNextClass = Map<String, dynamic>.from(c);
+              activeOrNextClass['is_ongoing'] = true;
+              break;
+            }
+          }
+          if (activeOrNextClass == null) {
+            activeOrNextClass = Map<String, dynamic>.from(classList.first);
+            activeOrNextClass['is_ongoing'] = false;
+          }
+        }
+
+        if (mounted) {
+          setState(() {
+            _todayClass = activeOrNextClass;
+            _isLoadingClass = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _isLoadingClass = false);
+      }
+    } catch (e) {
+      print("🚨 Error fetch class: $e");
+      if (mounted) setState(() => _isLoadingClass = false);
+    }
+  }
+
+  bool _isNowInSchedule(String? start, String? end) {
+    if (start == null || end == null) return false;
+    try {
+      final now = DateTime.now();
+      final startParts = start.split(':');
+      final endParts = end.split(':');
+
+      final startTime = DateTime(now.year, now.month, now.day, int.parse(startParts[0]), int.parse(startParts[1]));
+      final endTime = DateTime(now.year, now.month, now.day, int.parse(endParts[0]), int.parse(endParts[1]));
+
+      return now.isAfter(startTime) && now.isBefore(endTime);
+    } catch (e) {
+      return false;
     }
   }
 
@@ -517,6 +582,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // 💡 TAMBAHAN: UI WIDGET JADWAL SUDAH PAKAI DATA API
   Widget _buildScheduleCardContent({required bool isPrincipal, required bool isStudent}) {
     if (isPrincipal) {
       return Column(
@@ -529,16 +595,31 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    bool hasOngoingClass = true;
+    if (_isLoadingClass) {
+      return const Center(child: CircularProgressIndicator(color: Colors.white));
+    }
 
-    if (hasOngoingClass) {
-      Map<String, String> data = isStudent
-          ? {"subject": "Matematika", "subtitle": "Bpk. Yoga Pratama", "time": "08:00 - 09:30", "room": "Kelas XII-A"}
-          : {"subject": "Matematika", "subtitle": "Kelas XII TKJ B", "time": "08:00 - 09:30", "room": "Lab Komputer 1"};
-
+    if (_todayClass == null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(isStudent ? "My Schedule\nClass" : "Teaching\nSchedule", style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900, height: 1.2)),
+          const SizedBox(height: 15),
+          Text("No class\nschedule\ntoday", style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600, height: 1.3)),
+        ],
+      );
+    }
+
+    // Terjemahkan data server ke layar
+    String subject = _todayClass!['subjectclass_name'] ?? 'Unknown Subject';
+    String subtitle = isStudent ? (_todayClass!['teacher_name'] ?? '-') : (_todayClass!['class_name'] ?? '-');
+    String time = "${_todayClass!['schedule_time_start']} - ${_todayClass!['schedule_time_end']}";
+    bool isOngoing = _todayClass!['is_ongoing'] == true;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (isOngoing)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(color: Colors.red.shade500, borderRadius: BorderRadius.circular(6)),
@@ -550,39 +631,28 @@ class _HomePageState extends State<HomePage> {
                 Text("ONGOING", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
               ],
             ),
+          )
+        else
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(color: Colors.white.withOpacity(0.3), borderRadius: BorderRadius.circular(6)),
+            child: const Text("UPCOMING", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
           ),
-          const SizedBox(height: 12),
-          Text(data['subject']!, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: -0.3)),
-          const SizedBox(height: 4),
-          Text(data['subtitle']!, style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600)),
-          const Spacer(),
-          Row(
-            children: [
-              Icon(Icons.access_time_rounded, color: Colors.white.withOpacity(0.8), size: 14),
-              const SizedBox(width: 6),
-              Text(data['time']!, style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12, fontWeight: FontWeight.w600)),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Icon(Icons.location_on_rounded, color: Colors.white.withOpacity(0.8), size: 14),
-              const SizedBox(width: 6),
-              Text(data['room']!, style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12, fontWeight: FontWeight.w600)),
-            ],
-          ),
-        ],
-      );
-    } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(isStudent ? "My Schedule\nClass" : "Teaching\nSchedule", style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900, height: 1.2)),
-          const SizedBox(height: 15),
-          Text("No class\nschedule\ntoday", style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600, height: 1.3)),
-        ],
-      );
-    }
+
+        const SizedBox(height: 12),
+        Text(subject, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: -0.3), maxLines: 1, overflow: TextOverflow.ellipsis),
+        const SizedBox(height: 4),
+        Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+        const Spacer(),
+        Row(
+          children: [
+            Icon(Icons.access_time_rounded, color: Colors.white.withOpacity(0.8), size: 14),
+            const SizedBox(width: 6),
+            Text(time, style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12, fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ],
+    );
   }
 
   Widget _buildActionCard({required List<Color> colors, required String title, required String time, required String buttonText, required IconData icon, VoidCallback? onTap}) {
