@@ -18,7 +18,8 @@ class SchedulePage extends StatefulWidget {
 class _SchedulePageState extends State<SchedulePage> {
   int _selectedDateIndex = 2;
 
-  final List<Map<String, dynamic>> _studentSchedules = [
+  // 💡 PERBAIKAN: List sekarang tidak final agar bisa kita hapus isinya
+  List<Map<String, dynamic>> _studentSchedules = [
     {
       "subject": "Matematika",
       "person": "Bpk. Yoga Pratama",
@@ -51,7 +52,7 @@ class _SchedulePageState extends State<SchedulePage> {
     },
   ];
 
-  final List<Map<String, dynamic>> _teacherSchedules = [
+  List<Map<String, dynamic>> _teacherSchedules = [
     {
       "subject": "Matematika",
       "person": "Kelas XII TKJ B",
@@ -101,6 +102,7 @@ class _SchedulePageState extends State<SchedulePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- HEADER BULAN ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -120,9 +122,11 @@ class _SchedulePageState extends State<SchedulePage> {
             ),
             const SizedBox(height: 20),
 
+            // --- DATE SELECTOR ---
             _buildDateSelector(),
             const SizedBox(height: 35),
 
+            // --- SECTION HEADER ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -138,14 +142,66 @@ class _SchedulePageState extends State<SchedulePage> {
             ),
             const SizedBox(height: 20),
 
-            ListView.builder(
+            // --- LIST JADWAL DINAMIS DENGAN FITUR DELETE ---
+            currentSchedules.isEmpty
+                ? Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 50.0),
+                child: Column(
+                  children: [
+                    Icon(Icons.event_busy_rounded, size: 80, color: Colors.grey.shade300),
+                    const SizedBox(height: 15),
+                    Text("No classes left today!", style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+            )
+                : ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: currentSchedules.length,
               itemBuilder: (context, index) {
-                return _buildPremiumScheduleCard(
-                  data: currentSchedules[index],
-                  isStudent: isStudent,
+                final item = currentSchedules[index];
+
+                // 💡 FITUR SWIPE TO DELETE (DISMISSIBLE)
+                return Dismissible(
+                  key: Key(item['subject'] + item['time'] + index.toString()),
+                  direction: DismissDirection.endToStart, // Hanya bisa digeser ke kiri
+                  background: Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    decoration: BoxDecoration(
+                        color: const Color(0xFFEF4444), // Merah Bahaya
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [BoxShadow(color: const Color(0xFFEF4444).withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8))]
+                    ),
+                    alignment: Alignment.centerRight,
+                    child: const Icon(Icons.delete_sweep_rounded, color: Colors.white, size: 32),
+                  ),
+                  onDismissed: (direction) {
+                    // Logika menghapus data dari list
+                    setState(() {
+                      if (isStudent) {
+                        _studentSchedules.removeAt(index);
+                      } else {
+                        _teacherSchedules.removeAt(index);
+                      }
+                    });
+
+                    // Tampilkan notifikasi kecil di bawah
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("${item['subject']} class deleted from schedule!"),
+                        backgroundColor: const Color(0xFFEF4444),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                    );
+                  },
+                  child: _buildPremiumScheduleCard(
+                    data: item,
+                    isStudent: isStudent,
+                  ),
                 );
               },
             ),
@@ -227,12 +283,14 @@ class _SchedulePageState extends State<SchedulePage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Garis Indikator Kiri
           Container(
               width: 4, height: 70,
               decoration: BoxDecoration(color: statusColor, borderRadius: BorderRadius.circular(5))
           ),
           const SizedBox(width: 15),
 
+          // Konten Tengah
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,6 +345,9 @@ class _SchedulePageState extends State<SchedulePage> {
 
           const SizedBox(width: 10),
 
+          // ========================================================
+          // 🚀 TOMBOL SHORTCUT CLASS ACTIVITY
+          // ========================================================
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
