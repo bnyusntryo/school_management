@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../config/pref.dart';
 
 class TeacherProfilePage extends StatefulWidget {
   final Map<String, String> teacherData;
@@ -12,11 +15,20 @@ class TeacherProfilePage extends StatefulWidget {
 class _TeacherProfilePageState extends State<TeacherProfilePage> {
   late TextEditingController _nameController;
   late TextEditingController _nipController;
+  late TextEditingController _nuptkController;
   late TextEditingController _subjectController;
   late TextEditingController _classController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
+  late TextEditingController _bornPlaceController;
+  late TextEditingController _bornDateController;
+  late TextEditingController _joinDateController;
+
+  String _selectedGender = 'Select';
+  String _activeStatus = 'Unknown';
+
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -25,25 +37,103 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
     _nipController = TextEditingController(text: widget.teacherData['nip']);
     _subjectController = TextEditingController(text: widget.teacherData['subject']);
     _classController = TextEditingController(text: widget.teacherData['class']);
-    _emailController = TextEditingController(text: 'teacher@school.com');
-    _phoneController = TextEditingController(text: '081234567890');
-    _addressController = TextEditingController(text: 'Jl. Pendidikan No. 123, Jakarta');
+
+    _nuptkController = TextEditingController();
+    _emailController = TextEditingController();
+    _phoneController = TextEditingController();
+    _addressController = TextEditingController();
+    _bornPlaceController = TextEditingController();
+    _bornDateController = TextEditingController();
+    _joinDateController = TextEditingController();
+
+    _fetchCompleteProfile();
+  }
+
+  Future<void> _fetchCompleteProfile() async {
+    try {
+      String? token = await Session().getUserToken();
+      String nip = widget.teacherData['nip']?.trim() ?? '';
+
+      String exactPayload = jsonEncode({
+        "teacher_userid": nip
+      });
+
+      var personalRequest = http.post(
+        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/teacher/teacher-info/personal'),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        body: exactPayload,
+      );
+
+      var detailRequest = http.post(
+        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/teacher/teacher-info/detail'),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        body: exactPayload,
+      );
+
+      var responses = await Future.wait([personalRequest, detailRequest]);
+      var personalRes = responses[0];
+
+      if (mounted) {
+        setState(() {
+          if (personalRes.statusCode == 200) {
+            var decodedPersonal = jsonDecode(personalRes.body);
+            if (decodedPersonal['data'] != null) {
+              var personalData = decodedPersonal['data'];
+
+              _nuptkController.text = personalData['nuptk']?.toString() ?? '-';
+              _bornPlaceController.text = personalData['born_place']?.toString() ?? '';
+
+              String rawBornDate = personalData['born_date']?.toString() ?? '';
+              _bornDateController.text = rawBornDate.isNotEmpty ? rawBornDate.split('T')[0] : '';
+
+              String email = personalData['email']?.toString() ?? '';
+              _emailController.text = (email == '0' || email.isEmpty) ? 'Belum ada email' : email;
+
+              _addressController.text = personalData['address']?.toString() ?? '';
+              _phoneController.text = personalData['phone_no']?.toString() ?? '';
+
+              String rawJoinDate = personalData['join_date']?.toString() ?? '';
+              _joinDateController.text = rawJoinDate.isNotEmpty ? rawJoinDate.split('T')[0] : '';
+
+              _activeStatus = personalData['active_status']?.toString() == 'Y' ? 'Active' : 'Inactive';
+
+              String gender = personalData['gender']?.toString() ?? '';
+              if (gender == 'L') _selectedGender = 'Male';
+              else if (gender == 'P') _selectedGender = 'Female';
+            }
+          }
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("🚨 Error Dual Fetch Teacher: $e");
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _nipController.dispose();
+    _nuptkController.dispose();
     _subjectController.dispose();
     _classController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
+    _bornPlaceController.dispose();
+    _bornDateController.dispose();
+    _joinDateController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    String photoUrl = widget.teacherData['image'] ?? '';
+    bool isValidUrl = photoUrl.isNotEmpty && photoUrl.startsWith('http');
+    if (!isValidUrl) {
+      photoUrl = 'https://i.pravatar.cc/150?u=${widget.teacherData['nip']}';
+    }
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       body: CustomScrollView(
@@ -83,7 +173,7 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
                           child: CircleAvatar(
                             radius: 50,
                             backgroundColor: Colors.white,
-                            backgroundImage: NetworkImage(widget.teacherData['image']!),
+                            backgroundImage: NetworkImage(photoUrl),
                           ),
                         ),
                         const SizedBox(height: 15),
@@ -109,7 +199,12 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
           ),
 
           SliverToBoxAdapter(
-            child: Padding(
+            child: _isLoading
+                ? const Padding(
+              padding: EdgeInsets.only(top: 80.0),
+              child: Center(child: CircularProgressIndicator(color: Colors.pink)),
+            )
+                : Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
@@ -125,7 +220,7 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
                       children: [
                         _buildProfessionalInfo(Icons.menu_book_rounded, "Subject", widget.teacherData['subject'] ?? "-", Colors.indigo),
                         Container(height: 40, width: 1, color: Colors.grey.shade200),
-                        _buildProfessionalInfo(Icons.class_rounded, "Main Class", widget.teacherData['class'] ?? "-", Colors.blue),
+                        _buildProfessionalInfo(Icons.verified_rounded, "Status", _activeStatus, Colors.green),
                       ],
                     ),
                   ),
@@ -168,9 +263,13 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
 
                         _buildInputField("Full Name", _nameController, Icons.person_rounded),
                         _buildInputField("NIP", _nipController, Icons.badge_rounded),
-                        _buildInputField("Expertise (Subject)", _subjectController, Icons.school_rounded),
+                        _buildInputField("NUPTK", _nuptkController, Icons.card_membership_rounded),
+                        _buildGenderDropdown(),
+                        _buildInputField("Born Place", _bornPlaceController, Icons.location_city_rounded),
+                        _buildInputField("Born Date", _bornDateController, Icons.cake_rounded),
                         _buildInputField("Email", _emailController, Icons.email_rounded),
                         _buildInputField("Phone", _phoneController, Icons.phone_android_rounded),
+                        _buildInputField("Join Date", _joinDateController, Icons.calendar_month_rounded),
                         _buildInputField("Address", _addressController, Icons.home_rounded, isMultiline: true),
 
                         const SizedBox(height: 30),
@@ -252,6 +351,39 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
               enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
               focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.pink.shade400, width: 1.5)),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGenderDropdown() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Gender", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            value: _selectedGender,
+            icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.pink.shade400),
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.wc_rounded, color: Colors.pink.shade300, size: 20),
+              filled: true,
+              fillColor: const Color(0xFFF8F9FA),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.pink.shade400, width: 1.5)),
+            ),
+            items: ['Select', 'Male', 'Female'].map((String value) {
+              return DropdownMenuItem<String>(value: value, child: Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)));
+            }).toList(),
+            onChanged: (newValue) {
+              setState(() {
+                _selectedGender = newValue!;
+              });
+            },
           ),
         ],
       ),
