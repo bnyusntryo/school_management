@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../config/pref.dart';
 import 'sidebar_menu.dart';
 import 'student_profile_page.dart';
 import 'add_student_page.dart';
@@ -14,20 +17,78 @@ class _StudentListPageState extends State<StudentListPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
 
-  final List<Map<String, String>> _students = [
-    {"name": "Yoga Pratama", "nis": "30291737282", "kelas": "XII", "jurusan": "Teknik Komputer Jaringan"},
-    {"name": "Budi Santoso", "nis": "30291737283", "kelas": "XII", "jurusan": "Rekayasa Perangkat Lunak"},
-    {"name": "Diana Sari", "nis": "30291737284", "kelas": "XII", "jurusan": "Desain Komunikasi Visual"},
-    {"name": "Eko Prabowo", "nis": "30291737285", "kelas": "XII", "jurusan": "Sistem Informasi"},
-    {"name": "Fani Lestari", "nis": "30291737286", "kelas": "XI", "jurusan": "Akuntansi"},
-  ];
-
+  List<Map<String, String>> _students = [];
   List<Map<String, String>> _filteredStudents = [];
+
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _filteredStudents = _students;
+    _fetchStudents();
+  }
+
+  Future<void> _fetchStudents() async {
+    try {
+      String? token = await Session().getUserToken();
+      print("🕵️‍♂️ [SADAP] Token aktif: ${token != null ? 'ADA' : 'KOSONG'}");
+
+      final response = await http.post(
+        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/student/student-info/list'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          "limit": 100, // Coba kita minta 100 data
+          "offset": 0,
+          "sortField": "userid",
+          "sortOrder": 1,
+          "filters": {
+            "userid": "",
+            "full_name": "",
+            "class_name": "",
+            "grade_code": ""
+          },
+          "global": ""
+        }),
+      );
+
+      // 💡 INI ALAT PENYADAPNYA: Akan mencetak jawaban jujur dari server
+      print("🕵️‍♂️ [SADAP] Status Code: ${response.statusCode}");
+      print("🕵️‍♂️ [SADAP] Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+        final List data = result['data'] ?? [];
+
+        List<Map<String, String>> fetchedStudents = data.map((item) {
+          return {
+            "name": item['full_name']?.toString() ?? 'Unknown',
+            "nis": item['userid']?.toString() ?? '-',
+            "kelas": item['grade_code']?.toString() ?? '-',
+            "jurusan": item['class_name']?.toString() ?? '-',
+            "photo": item['user_photo']?.toString() ?? '',
+          };
+        }).toList();
+
+        if (mounted) {
+          setState(() {
+            _students = fetchedStudents;
+            _filteredStudents = _students;
+            _isLoading = false;
+          });
+        }
+      } else {
+        // Kalau server menolak (Status bukan 200)
+        print("🚨 [SADAP] GAGAL FETCH! Server menolak.");
+        if (mounted) setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      print("🚨 [SADAP] ERROR FATAL: $e");
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   void _filterStudents(String query) {
@@ -186,7 +247,11 @@ class _StudentListPageState extends State<StudentListPage> {
 
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
-            sliver: _filteredStudents.isEmpty
+            sliver: _isLoading
+                ? const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator(color: Colors.orange)),
+            )
+                : _filteredStudents.isEmpty
                 ? SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.only(top: 50),
@@ -225,6 +290,9 @@ class _StudentListPageState extends State<StudentListPage> {
   }
 
   Widget _buildStudentCard(Map<String, String> student) {
+    String rawPhoto = student['photo'] ?? '';
+    String avatarUrl = rawPhoto.isNotEmpty ? rawPhoto : 'https://i.pravatar.cc/150?u=${student['nis']}';
+
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       decoration: BoxDecoration(
@@ -269,7 +337,7 @@ class _StudentListPageState extends State<StudentListPage> {
                         child: CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.orange.shade50,
-                          backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=${student['nis']}'),
+                          backgroundImage: NetworkImage(avatarUrl),
                           onBackgroundImageError: (exception, stackTrace) {},
                           child: student['name'] == null ? Icon(Icons.person_rounded, color: Colors.orange.shade400) : null,
                         ),
