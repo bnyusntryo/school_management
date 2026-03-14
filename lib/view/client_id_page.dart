@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import '../config/pref.dart';
 import '../model/client_model.dart';
@@ -16,13 +15,9 @@ class ClientIdPage extends StatefulWidget {
 class _ClientIdPageState extends State<ClientIdPage> {
   final TextEditingController _controller = TextEditingController();
   String? _errorMessage;
-
   final AuthViewmodel _viewmodel = AuthViewmodel();
-
   bool _isLoading = false;
-
   List<ClientModel> _clients = [];
-
   Timer? _debounce;
 
   Future<void> _searchClient(String query) async {
@@ -49,7 +44,6 @@ class _ClientIdPageState extends State<ClientIdPage> {
         _isLoading = false;
 
         if (resp.data != null) {
-
           if (resp.data is List) {
             _clients = (resp.data as List)
                 .map((e) => ClientModel.fromJson(e as Map<String, dynamic>))
@@ -60,7 +54,6 @@ class _ClientIdPageState extends State<ClientIdPage> {
             _clients = [];
             _errorMessage = "Format data tidak dikenali";
           }
-
         } else {
           _clients = [];
           _errorMessage = resp.message?.toString() ?? "Client tidak ditemukan";
@@ -79,11 +72,8 @@ class _ClientIdPageState extends State<ClientIdPage> {
 
   void _selectClient(ClientModel client) async {
     final String clientId = client.clientId;
-
     await Session().setClientId(clientId);
-
     if (!mounted) return;
-
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -110,9 +100,8 @@ class _ClientIdPageState extends State<ClientIdPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -125,25 +114,25 @@ class _ClientIdPageState extends State<ClientIdPage> {
                     ],
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.school, size: 40, color: Color(0xFF2E3E5C)),
-                          SizedBox(width: 10),
-                          Text(
-                            "GLORA",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF2E3E5C),
-                            ),
-                          ),
-                        ],
+                      Image.asset(
+                        'assets/images/glora-final-cropped.png',
+                        height: 50,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Column(
+                            children: [
+                              Icon(Icons.error_outline, color: Colors.red, size: 40),
+                              Text("Logo Not Found\nCheck pubspec.yaml & folder name",
+                                  textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: Colors.red))
+                            ],
+                          );
+                        },
                       ),
-                      const SizedBox(height: 20),
+
+                      const SizedBox(height: 25),
+
                       RichText(
                         textAlign: TextAlign.center,
                         text: const TextSpan(
@@ -162,6 +151,7 @@ class _ClientIdPageState extends State<ClientIdPage> {
                           ],
                         ),
                       ),
+
                       const SizedBox(height: 8),
                       const Text(
                         "Please enter your account code to continue",
@@ -170,10 +160,12 @@ class _ClientIdPageState extends State<ClientIdPage> {
                       ),
                       const SizedBox(height: 30),
 
-
-                      const Text(
-                        "Account Code",
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Account Code",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
                       ),
                       const SizedBox(height: 8),
 
@@ -182,7 +174,6 @@ class _ClientIdPageState extends State<ClientIdPage> {
                           TextField(
                             controller: _controller,
                             onChanged: (value) {
-
                               final cleaned = value
                                   .toLowerCase()
                                   .trim()
@@ -258,8 +249,6 @@ class _ClientIdPageState extends State<ClientIdPage> {
                             ),
                         ],
                       ),
-
-                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
