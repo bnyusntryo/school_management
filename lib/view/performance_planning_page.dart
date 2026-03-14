@@ -330,7 +330,6 @@ class _SubKPIListPageState extends State<SubKPIListPage> {
                     contentPadding: const EdgeInsets.all(15),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
 
-                    // 💡 PELATUK DI PINDAH KE SINI: Seluruh kotak bisa diklik!
                     onTap: isApproved ? null : () => _showKPIDialog(existingKpi: kpis[index], index: index),
 
                     title: Text(kpis[index]['name'], style: const TextStyle(fontWeight: FontWeight.bold)),

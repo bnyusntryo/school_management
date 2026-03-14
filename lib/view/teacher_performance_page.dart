@@ -3,8 +3,6 @@ import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/pref.dart';
-
-// 💡 KITA IMPORT 3 FILE BARU TADI DI SINI
 import 'performance_planning_page.dart';
 import 'performance_monitoring_page.dart';
 import 'performance_evaluation_page.dart';
@@ -18,46 +16,67 @@ class TeacherPerformancePage extends StatefulWidget {
 
 class _TeacherPerformancePageState extends State<TeacherPerformancePage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+
   List<Map<String, dynamic>> _apiPlanningList = [];
+  List<Map<String, dynamic>> _apiMonitoringList = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _fetchPeriods();
+    _fetchAllPeriods();
   }
 
-  Future<void> _fetchPeriods() async {
+  Future<void> _fetchAllPeriods() async {
     try {
       String? token = await Session().getUserToken();
-      final response = await http.post(
+
+      var planReq = http.post(
         Uri.parse('https://schoolapp-api-dev.zeabur.app/api/teacherperf/plan/list-period'),
         headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
         body: jsonEncode({}),
       );
 
-      if (response.statusCode == 200) {
-        final result = jsonDecode(response.body);
-        final List data = result['data'] ?? [];
+      var monitReq = http.post(
+        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/teacherperf/monit/list-period'),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        body: jsonEncode({}),
+      );
 
-        List<Map<String, dynamic>> fetchedPeriods = data.map((item) {
-          return {
-            "id": item['perfperiod_id']?.toString() ?? '',
-            "name": item['perfperiod_name']?.toString() ?? 'Unnamed Period',
-            "period": "${item['plan_startdate'] ?? ''} - ${item['plan_enddate'] ?? ''}",
-            "teachers": <Map<String, dynamic>>[],
-          };
-        }).toList();
+      var responses = await Future.wait([planReq, monitReq]);
+      var planRes = responses[0];
+      var monitRes = responses[1];
 
-        if (mounted) {
-          setState(() {
-            _apiPlanningList = fetchedPeriods;
-            _isLoading = false;
-          });
-        }
-      } else {
-        if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() {
+          if (planRes.statusCode == 200) {
+            final result = jsonDecode(planRes.body);
+            final List data = result['data'] ?? [];
+            _apiPlanningList = data.map((item) {
+              return {
+                "id": item['perfperiod_id']?.toString() ?? '',
+                "name": item['perfperiod_name']?.toString() ?? 'Unnamed Period',
+                "period": "${item['plan_startdate'] ?? ''} - ${item['plan_enddate'] ?? ''}",
+                "teachers": <Map<String, dynamic>>[],
+              };
+            }).toList();
+          }
+
+          if (monitRes.statusCode == 200) {
+            final result = jsonDecode(monitRes.body);
+            final List data = result['data'] ?? [];
+            _apiMonitoringList = data.map((item) {
+              return {
+                "id": item['perfperiod_id']?.toString() ?? '',
+                "name": item['perfperiod_name']?.toString() ?? 'Unnamed Period',
+                "period": "${item['monitoring_startdate'] ?? ''} - ${item['monitoring_enddate'] ?? ''}",
+                "teachers": <Map<String, dynamic>>[],
+              };
+            }).toList();
+          }
+          _isLoading = false;
+        });
       }
     } catch (e) {
       if (mounted) setState(() => _isLoading = false);
@@ -197,7 +216,14 @@ class _TeacherPerformancePageState extends State<TeacherPerformancePage> with Si
       return const Center(child: CircularProgressIndicator(color: Colors.pink));
     }
 
-    final list = _apiPlanningList;
+    List<Map<String, dynamic>> list = [];
+    if (mode == "planning") {
+      list = _apiPlanningList;
+    } else if (mode == "monitoring") {
+      list = _apiMonitoringList;
+    } else {
+      list = _apiPlanningList;
+    }
 
     if (list.isEmpty) {
       return Center(
@@ -206,7 +232,7 @@ class _TeacherPerformancePageState extends State<TeacherPerformancePage> with Si
             children: [
               Icon(Icons.folder_off_rounded, size: 80, color: Colors.grey.shade300),
               const SizedBox(height: 15),
-              Text("No periods available.\nPlease add in Planning tab.", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
+              Text("No periods available for $mode.", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
             ],
           )
       );
@@ -233,16 +259,10 @@ class _TeacherPerformancePageState extends State<TeacherPerformancePage> with Si
             child: InkWell(
               borderRadius: BorderRadius.circular(20),
               onTap: () async {
-                Widget target;
-                if (mode == "planning") {
-                  target = SubTeacherListPage(periodData: data, mode: "planning");
-                } else if (mode == "monitoring") {
-                  target = SubTeacherListPage(periodData: data, mode: "monitoring");
-                } else {
-                  target = SubTeacherListPage(periodData: data, mode: "evaluation");
-                }
-
-                await Navigator.push(context, MaterialPageRoute(builder: (context) => target));
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SubTeacherListPage(periodData: data, mode: mode))
+                );
                 setState(() {});
               },
               child: Padding(
@@ -288,7 +308,6 @@ class _TeacherPerformancePageState extends State<TeacherPerformancePage> with Si
   }
 }
 
-// 💡 KITA TETAP SIMPAN SUBTEACHERLISTPAGE DI SINI KARENA DIPAKAI OLEH SEMUA TAB
 class SubTeacherListPage extends StatefulWidget {
   final Map<String, dynamic> periodData;
   final String mode;
@@ -319,14 +338,16 @@ class _SubTeacherListPageState extends State<SubTeacherListPage> {
         "perfperiod_id": periodId
       });
 
+      String endpointType = widget.mode == 'monitoring' ? 'monit' : 'plan';
+
       var headerReq = http.post(
-        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/teacherperf/plan/header-period'),
+        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/teacherperf/$endpointType/header-period'),
         headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
         body: exactPayload,
       );
 
       var listReq = http.post(
-        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/teacherperf/plan/list-teacher'),
+        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/teacherperf/$endpointType/list-teacher'),
         headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
         body: exactPayload,
       );
@@ -412,6 +433,52 @@ class _SubTeacherListPageState extends State<SubTeacherListPage> {
     );
   }
 
+  Widget _buildPeriodHeader() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 15, 20, 5),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 5))],
+        border: Border.all(color: Colors.blue.shade50, width: 2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.info_outline_rounded, color: Colors.blue.shade600, size: 20),
+              const SizedBox(width: 8),
+              const Text("Period Information", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            ],
+          ),
+          const Padding(padding: EdgeInsets.symmetric(vertical: 10), child: Divider(height: 1)),
+
+          _buildInfoRow("Period ID", widget.periodData['id'] ?? '-'),
+          const SizedBox(height: 10),
+          _buildInfoRow("Period Name", _periodName),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 100,
+          child: Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade500)),
+        ),
+        const Text(" :  ", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+        Expanded(
+          child: Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87)),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final teachers = _apiTeachers;
@@ -457,8 +524,14 @@ class _SubTeacherListPageState extends State<SubTeacherListPage> {
               const SizedBox(width: 10),
             ],
           ),
+
+          if (!_isLoading)
+            SliverToBoxAdapter(
+              child: _buildPeriodHeader(),
+            ),
+
           SliverPadding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(20, 5, 20, 20),
             sliver: _isLoading
                 ? SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.only(top: 100), child: Center(child: CircularProgressIndicator(color: themeColor))))
                 : teachers.isEmpty
@@ -504,11 +577,10 @@ class _SubTeacherListPageState extends State<SubTeacherListPage> {
                       trailing: Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.grey.shade400),
                       onTap: () async {
                         Widget target;
-                        // 💡 KINI JEMBATAN INI MENGARAH KE 3 FILE BARU ANDA!
                         if (widget.mode == "planning") {
                           target = SubKPIListPage(teacherData: teacher, periodData: widget.periodData);
                         } else if (widget.mode == "monitoring") {
-                          target = SubMonitoringKPIList(teacherData: teacher, periodName: widget.periodData['name']);
+                          target = SubMonitoringKPIList(teacherData: teacher, periodName: widget.periodData['name'], periodData: widget.periodData);
                         } else {
                           target = SubEvaluationFormPage(teacherData: teacher);
                         }
