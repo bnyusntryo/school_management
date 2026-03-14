@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/pref.dart';
+
 import 'performance_planning_page.dart';
 import 'performance_monitoring_page.dart';
 import 'performance_evaluation_page.dart';
@@ -19,6 +20,7 @@ class _TeacherPerformancePageState extends State<TeacherPerformancePage> with Si
 
   List<Map<String, dynamic>> _apiPlanningList = [];
   List<Map<String, dynamic>> _apiMonitoringList = [];
+  List<Map<String, dynamic>> _apiEvaluationList = [];
   bool _isLoading = true;
 
   @override
@@ -44,9 +46,16 @@ class _TeacherPerformancePageState extends State<TeacherPerformancePage> with Si
         body: jsonEncode({}),
       );
 
-      var responses = await Future.wait([planReq, monitReq]);
+      var evalReq = http.post(
+        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/teacherperf/eval/list-period'),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        body: jsonEncode({}),
+      );
+
+      var responses = await Future.wait([planReq, monitReq, evalReq]);
       var planRes = responses[0];
       var monitRes = responses[1];
+      var evalRes = responses[2];
 
       if (mounted) {
         setState(() {
@@ -75,6 +84,20 @@ class _TeacherPerformancePageState extends State<TeacherPerformancePage> with Si
               };
             }).toList();
           }
+
+          if (evalRes.statusCode == 200) {
+            final result = jsonDecode(evalRes.body);
+            final List data = result['data'] ?? [];
+            _apiEvaluationList = data.map((item) {
+              return {
+                "id": item['perfperiod_id']?.toString() ?? '',
+                "name": item['perfperiod_name']?.toString() ?? 'Unnamed Period',
+                "period": "${item['eval_startdate'] ?? ''} - ${item['eval_enddate'] ?? ''}",
+                "teachers": <Map<String, dynamic>>[],
+              };
+            }).toList();
+          }
+
           _isLoading = false;
         });
       }
@@ -222,7 +245,7 @@ class _TeacherPerformancePageState extends State<TeacherPerformancePage> with Si
     } else if (mode == "monitoring") {
       list = _apiMonitoringList;
     } else {
-      list = _apiPlanningList;
+      list = _apiEvaluationList;
     }
 
     if (list.isEmpty) {
@@ -338,7 +361,9 @@ class _SubTeacherListPageState extends State<SubTeacherListPage> {
         "perfperiod_id": periodId
       });
 
-      String endpointType = widget.mode == 'monitoring' ? 'monit' : 'plan';
+      String endpointType = 'plan';
+      if (widget.mode == 'monitoring') endpointType = 'monit';
+      if (widget.mode == 'evaluation') endpointType = 'eval';
 
       var headerReq = http.post(
         Uri.parse('https://schoolapp-api-dev.zeabur.app/api/teacherperf/$endpointType/header-period'),
@@ -356,34 +381,66 @@ class _SubTeacherListPageState extends State<SubTeacherListPage> {
       var headerRes = responses[0];
       var listRes = responses[1];
 
+      if (headerRes.statusCode == 200) {
+        var decodedHeader = jsonDecode(headerRes.body);
+        if (decodedHeader['data'] != null) {
+          _periodName = decodedHeader['data']['perfperiod_name'] ?? _periodName;
+        }
+      }
+
+      if (listRes.statusCode == 200) {
+        var decodedList = jsonDecode(listRes.body);
+        List data = decodedList['data'] ?? [];
+
+        _apiTeachers = data.map((item) {
+          return {
+            "id": item['teacher_userid']?.toString() ?? '',
+            "name": item['full_name']?.toString() ?? 'Unknown',
+            "perfplanh_id": item['perfplanh_id']?.toString() ?? '',
+            "perfevalh_id": item['perfevalh_id']?.toString() ?? '',
+            "status": "Unapproved",
+            "kpis": <Map<String, dynamic>>[],
+          };
+        }).toList();
+
+        List<Future<void>> statusTasks = [];
+        for (int i = 0; i < _apiTeachers.length; i++) {
+          statusTasks.add(_fetchSingleTeacherStatus(token, endpointType, periodId, i));
+        }
+
+        await Future.wait(statusTasks);
+      }
+
       if (mounted) {
         setState(() {
-          if (headerRes.statusCode == 200) {
-            var decodedHeader = jsonDecode(headerRes.body);
-            if (decodedHeader['data'] != null) {
-              _periodName = decodedHeader['data']['perfperiod_name'] ?? _periodName;
-            }
-          }
-
-          if (listRes.statusCode == 200) {
-            var decodedList = jsonDecode(listRes.body);
-            List data = decodedList['data'] ?? [];
-
-            _apiTeachers = data.map((item) {
-              return {
-                "id": item['teacher_userid']?.toString() ?? '',
-                "name": item['full_name']?.toString() ?? 'Unknown',
-                "perfplanh_id": item['perfplanh_id']?.toString() ?? '',
-                "status": "Unapproved",
-                "kpis": <Map<String, dynamic>>[],
-              };
-            }).toList();
-          }
           _isLoading = false;
         });
       }
     } catch (e) {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _fetchSingleTeacherStatus(String? token, String endpointType, String periodId, int index) async {
+    try {
+      String teacherId = _apiTeachers[index]['id'];
+      var req = await http.post(
+        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/teacherperf/$endpointType/detail'),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "perfperiod_id": periodId,
+          "teacher_userid": teacherId
+        }),
+      );
+
+      if (req.statusCode == 200) {
+        var res = jsonDecode(req.body);
+        if (res['data'] != null && res['data']['status'] != null) {
+          _apiTeachers[index]['status'] = res['data']['status'];
+        }
+      }
+    } catch (e) {
+      print("🚨 Error fetch status for $index: $e");
     }
   }
 
@@ -418,6 +475,8 @@ class _SubTeacherListPageState extends State<SubTeacherListPage> {
                   _apiTeachers.add({
                     "id": "TCH-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}",
                     "name": nameCtrl.text,
+                    "perfplanh_id": "",
+                    "perfevalh_id": "",
                     "status": "Unapproved",
                     "kpis": <Map<String, dynamic>>[],
                   });
@@ -562,6 +621,7 @@ class _SubTeacherListPageState extends State<SubTeacherListPage> {
                         child: CircleAvatar(backgroundColor: themeColor.withOpacity(0.1), child: Icon(Icons.person, color: themeColor)),
                       ),
                       title: Text(teacher['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Row(
@@ -574,6 +634,7 @@ class _SubTeacherListPageState extends State<SubTeacherListPage> {
                           ],
                         ),
                       ),
+
                       trailing: Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.grey.shade400),
                       onTap: () async {
                         Widget target;
@@ -582,11 +643,15 @@ class _SubTeacherListPageState extends State<SubTeacherListPage> {
                         } else if (widget.mode == "monitoring") {
                           target = SubMonitoringKPIList(teacherData: teacher, periodName: widget.periodData['name'], periodData: widget.periodData);
                         } else {
-                          target = SubEvaluationFormPage(teacherData: teacher);
+                          target = SubEvaluationFormPage(teacherData: teacher, periodData: widget.periodData);
                         }
 
                         await Navigator.push(context, MaterialPageRoute(builder: (context) => target));
-                        setState(() {});
+
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        _fetchPeriodDetails();
                       },
                     ),
                   );
