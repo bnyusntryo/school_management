@@ -41,17 +41,17 @@ class _SidebarMenuState extends State<SidebarMenu> {
   final Color _selectedColor = const Color(0xFF3B82F6);
 
   // =========================================================
-  // DATA SUBMENU
+  // DATA SUBMENU (💡 Class Activity dipindah ke School Activity)
   // =========================================================
   final List<String> _principalSubMenus = ["Task Assignment"];
   final List<String> _studentSubMenus = ["Student Information"];
   final List<String> _teacherSubMenus = ["Teacher Information", "Teacher Certificate", "Teacher Performance"];
   final List<String> _cbtSubMenus = ["Question Library", "Exam Management", "Exam Period", "Monitoring Exam", "CBT Reports"];
   final List<String> _staffSubMenus = ["Staff Information"];
-  final List<String> _attendanceSubMenus = ["Record Attendance", "Class Activity", "Attendance Reports"];
+  final List<String> _attendanceSubMenus = ["Record Attendance", "Attendance Reports"]; // <-- Class Activity dihapus dari sini
   final List<String> _bankMiniSubMenus = ["My Account", "Transaction", "Reports", "Print Out"];
   final List<String> _eLearningSubMenus = ["E-Learning Class", "E-Learning Reports"];
-  final List<String> _schoolActivitySubMenus = ["Announcement", "School Activity Reports"];
+  final List<String> _schoolActivitySubMenus = ["Announcement", "Class Activity", "School Activity Reports"]; // <-- Class Activity ditambahkan ke sini
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../config/pref.dart';
 import 'sidebar_menu.dart';
 import 'teacher_profile_page.dart';
 import 'add_teacher_page.dart';
@@ -14,38 +17,9 @@ class _TeacherListPageState extends State<TeacherListPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
 
-  final List<Map<String, String>> _teachers = [
-    {
-      "name": "Sarah Wijaya, M.Pd",
-      "nip": "198503122010012005",
-      "subject": "Mathematics",
-      "class": "XII IPA 1",
-      "image": "https://i.pravatar.cc/150?img=32"
-    },
-    {
-      "name": "Bambang Hermawan, S.T",
-      "nip": "197805202005011003",
-      "subject": "Physics",
-      "class": "XII IPA 2",
-      "image": "https://i.pravatar.cc/150?img=11"
-    },
-    {
-      "name": "Dewi Lestari, S.S",
-      "nip": "199011052015032001",
-      "subject": "English",
-      "class": "XI BHS 1",
-      "image": "https://i.pravatar.cc/150?img=45"
-    },
-    {
-      "name": "Rahmat Hidayat, M.Kom",
-      "nip": "198207152008011002",
-      "subject": "Computer Science",
-      "class": "XII TKJ 1",
-      "image": "https://i.pravatar.cc/150?img=13"
-    },
-  ];
-
+  List<Map<String, String>> _teachers = [];
   List<Map<String, String>> _filteredTeachers = [];
+  bool _isLoading = true;
 
   final List<Color> _cardColors = [
     Colors.pink.shade400,
@@ -57,7 +31,59 @@ class _TeacherListPageState extends State<TeacherListPage> {
   @override
   void initState() {
     super.initState();
-    _filteredTeachers = _teachers;
+    _fetchTeachers();
+  }
+
+  Future<void> _fetchTeachers() async {
+    try {
+      String? token = await Session().getUserToken();
+      final response = await http.post(
+        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/teacher/teacher-info/list'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          "limit": 100,
+          "offset": 0,
+          "filters": {
+            "full_name": "",
+            "userid": ""
+          },
+          "global": ""
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+        final List data = result['data'] ?? [];
+
+        List<Map<String, String>> fetchedTeachers = data.map((item) {
+          return {
+            "name": item['full_name']?.toString() ?? 'Unknown',
+            "nip": item['userid']?.toString() ?? '-',
+            "subject": "-",
+            "class": "-",
+            "image": item['user_photo']?.toString() ?? '',
+          };
+        }).toList();
+
+        if (mounted) {
+          setState(() {
+            _teachers = fetchedTeachers;
+            _filteredTeachers = _teachers;
+            _isLoading = false;
+          });
+        }
+      } else {
+        print("🚨 Server menolak: ${response.body}");
+        if (mounted) setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      print("🚨 Error fetch teachers: $e");
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   void _filterTeachers(String query) {
@@ -208,7 +234,11 @@ class _TeacherListPageState extends State<TeacherListPage> {
 
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
-            sliver: _filteredTeachers.isEmpty
+            sliver: _isLoading
+                ? const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator(color: Colors.pink)),
+            )
+                : _filteredTeachers.isEmpty
                 ? SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.only(top: 50),
@@ -251,6 +281,9 @@ class _TeacherListPageState extends State<TeacherListPage> {
   Widget _buildTeacherCard(Map<String, String> teacher, int index) {
     final cardColor = _cardColors[index % _cardColors.length];
 
+    String rawPhoto = teacher['image'] ?? '';
+    String avatarUrl = rawPhoto.isNotEmpty ? rawPhoto : 'https://i.pravatar.cc/150?u=${teacher['nip']}';
+
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       decoration: BoxDecoration(
@@ -289,7 +322,7 @@ class _TeacherListPageState extends State<TeacherListPage> {
                         child: CircleAvatar(
                           radius: 30,
                           backgroundColor: cardColor.withOpacity(0.1),
-                          backgroundImage: NetworkImage(teacher['image']!),
+                          backgroundImage: NetworkImage(avatarUrl),
                           onBackgroundImageError: (_, __) {},
                           child: teacher['name'] == null ? Icon(Icons.person_rounded, color: cardColor) : null,
                         ),
