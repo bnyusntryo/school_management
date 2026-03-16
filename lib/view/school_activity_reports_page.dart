@@ -1,625 +1,343 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../viewmodel/school_activity_reports_viewmodel.dart';
+import 'school_activity_report_preview_page.dart';
 
-class SchoolActivityReportsPage extends StatelessWidget {
+class SchoolActivityReportsPage extends StatefulWidget {
   const SchoolActivityReportsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 120,
-            floating: false,
-            pinned: true,
-            backgroundColor: Colors.transparent,
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Colors.teal.shade500, Colors.green.shade700],
-                ),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
-                ),
-              ),
-              child: const FlexibleSpaceBar(
-                titlePadding: EdgeInsets.only(left: 60, bottom: 20),
-                title: Text(
-                  "Activity Reports",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
-                ),
-              ),
-            ),
-            leading: Container(
-              margin: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
-              child: IconButton(icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white), onPressed: () => Navigator.pop(context)),
-            ),
-          ),
-
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Available Reports", style: TextStyle(fontSize: 14, color: Colors.grey.shade600, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 15),
-                  Container(
-                    padding: const EdgeInsets.all(25),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(color: Colors.teal.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 10)),
-                      ],
-                      border: Border.all(color: Colors.grey.shade100),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(15)),
-                              child: Icon(Icons.assignment_rounded, color: Colors.green.shade600, size: 28),
-                            ),
-                            const SizedBox(width: 15),
-                            const Expanded(
-                              child: Text("Class Activity Report", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 15),
-                        Text(
-                          "Show activity that has been recorded in class by teacher. Filter by date and class to generate a detailed summary.",
-                          style: TextStyle(fontSize: 13, color: Colors.grey.shade600, height: 1.5),
-                        ),
-                        const SizedBox(height: 25),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ClassActivityFilterPage())),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.teal.shade600,
-                              foregroundColor: Colors.white,
-                              elevation: 4,
-                              shadowColor: Colors.teal.withOpacity(0.4),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                            ),
-                            child: const Text("Preview Report", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  State<SchoolActivityReportsPage> createState() => _SchoolActivityReportsPageState();
 }
 
-class ClassActivityFilterPage extends StatefulWidget {
-  const ClassActivityFilterPage({super.key});
+class _SchoolActivityReportsPageState extends State<SchoolActivityReportsPage> {
+  final SchoolActivityReportsViewModel _viewModel = SchoolActivityReportsViewModel();
+
+  bool _isLoading = true;
+  DateTime? _startDate;
+  DateTime? _endDate;
+
+  List<dynamic> _allClasses = [];
+  Set<String> _selectedClassIds = {};
+
+  final Color gradientStart = const Color(0xFF0EA5E9);
+  final Color gradientEnd = const Color(0xFF6366F1);
+  final Color bgSlate = const Color(0xFFF8FAFC);
+  final Color textDark = const Color(0xFF0F172A);
 
   @override
-  State<ClassActivityFilterPage> createState() => _ClassActivityFilterPageState();
-}
-
-class _ClassActivityFilterPageState extends State<ClassActivityFilterPage> {
-  final _dateRangeCtrl = TextEditingController();
-  final List<String> _selectedClasses = [];
-
-  // ✅ PERBAIKAN: Menambahkan Data Kelas Mandiri
-  final List<String> _availableClasses = [
-    "X TKJ B", "X MIPA A", "X IPS C", "IX B", "VIII A"
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 120,
-            floating: false,
-            pinned: true,
-            backgroundColor: Colors.transparent,
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Colors.teal.shade500, Colors.green.shade700],
-                ),
-                borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
-              ),
-              child: const FlexibleSpaceBar(
-                titlePadding: EdgeInsets.only(left: 60, bottom: 20),
-                title: Text("Filter Report", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-              ),
-            ),
-            leading: Container(
-              margin: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
-              child: IconButton(icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white), onPressed: () => Navigator.pop(context)),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(25),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionTitle("Date Range"),
-                  TextField(
-                    controller: _dateRangeCtrl,
-                    readOnly: true,
-                    onTap: () async {
-                      final picked = await showDateRangePicker(
-                        context: context,
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2030),
-                        builder: (context, child) {
-                          return Theme(
-                            data: Theme.of(context).copyWith(colorScheme: ColorScheme.light(primary: Colors.teal.shade600)),
-                            child: child!,
-                          );
-                        },
-                      );
-                      if (picked != null) {
-                        setState(() {
-                          _dateRangeCtrl.text = "${DateFormat('dd MMM yyyy').format(picked.start)} - ${DateFormat('dd MMM yyyy').format(picked.end)}";
-                        });
-                      }
-                    },
-                    style: const TextStyle(fontWeight: FontWeight.w500),
-                    decoration: InputDecoration(
-                      hintText: "Select Period",
-                      prefixIcon: Icon(Icons.calendar_month_outlined, color: Colors.teal.shade400, size: 22),
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.all(16),
-                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.grey.shade300)),
-                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: Colors.teal.shade400, width: 1.5)),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-
-                  _buildSectionTitle("Select Class"),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey.shade200),
-                      boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))],
-                    ),
-                    child: Column(
-                      children: _availableClasses.map((className) {
-                        bool isSelected = _selectedClasses.contains(className);
-                        return CheckboxListTile(
-                          title: Text(className, style: TextStyle(fontSize: 14, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500, color: isSelected ? Colors.teal.shade800 : Colors.black87)),
-                          value: isSelected,
-                          activeColor: Colors.teal.shade600,
-                          checkboxShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
-                          onChanged: (val) {
-                            setState(() {
-                              if (val!) {
-                                _selectedClasses.add(className);
-                              } else {
-                                _selectedClasses.remove(className);
-                              }
-                            });
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))]),
-        child: SizedBox(
-          width: double.infinity,
-          height: 55,
-          child: ElevatedButton(
-            onPressed: () {
-              if (_dateRangeCtrl.text.isEmpty || _selectedClasses.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text("Please select date and classes", style: TextStyle(color: Colors.white)), backgroundColor: Colors.red.shade600, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), behavior: SnackBarBehavior.floating));
-                return;
-              }
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ClassActivityReportResultPage(
-                selectedClasses: _selectedClasses,
-                dateRange: _dateRangeCtrl.text,
-              )));
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.teal.shade600,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-              elevation: 4,
-              shadowColor: Colors.teal.withOpacity(0.4),
-            ),
-            child: const Text("Generate Report", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-          ),
-        ),
-      ),
-    );
+  void initState() {
+    super.initState();
+    _fetchClasses();
   }
 
-  Widget _buildSectionTitle(String title) => Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.teal.shade800)),
-  );
-}
+  Future<void> _fetchClasses() async {
+    setState(() => _isLoading = true);
+    try {
+      var resp = await _viewModel.fetchClassListForReport();
+      if (!mounted) return;
 
-class ClassActivityReportResultPage extends StatelessWidget {
-  final List<String> selectedClasses;
-  final String dateRange;
-
-  const ClassActivityReportResultPage({super.key, required this.selectedClasses, required this.dateRange});
-
-  void _exportPdf(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: const [
-            CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-            SizedBox(width: 15),
-            Text("Generating PDF document..."),
-          ],
-        ),
-        duration: const Duration(seconds: 2),
-        backgroundColor: Colors.teal.shade600,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    Future.delayed(const Duration(seconds: 2), () {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.green, content: Text("PDF Report exported successfully!"), behavior: SnackBarBehavior.floating));
-    });
+      if (resp.data != null) {
+        setState(() {
+          _allClasses = resp.data ?? [];
+          _isLoading = false;
+        });
+      } else {
+        setState(() => _isLoading = false);
+        _showError(resp.message ?? "Gagal mengambil daftar kelas.");
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      _showError("Terjadi kesalahan sistem: $e");
+    }
   }
 
-  void _shareReport(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25))),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(25),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text("Share Report via", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            const SizedBox(height: 25),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _shareOption(Icons.message_rounded, "WhatsApp", Colors.green),
-                _shareOption(Icons.email_rounded, "Email", Colors.redAccent),
-                _shareOption(Icons.copy_rounded, "Copy Link", Colors.blue),
-              ],
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
-    );
+  void _showError(String msg) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: gradientEnd, behavior: SnackBarBehavior.floating));
+    }
   }
 
-  Widget _shareOption(IconData icon, String label, Color color) {
-    return Column(
-      children: [
-        CircleAvatar(radius: 25, backgroundColor: color.withOpacity(0.1), child: Icon(icon, color: color)),
-        const SizedBox(height: 8),
-        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // ✅ PERBAIKAN: Menambahkan Data Laporan Mandiri
-    final Map<String, List<Map<String, dynamic>>> allActivities = {
-      "X TKJ B": [
-        {
-          "name": "Pertemuan 1 - Pengenalan Jaringan",
-          "description": "Membahas topologi dasar dan kabel UTP.",
-          "date": "10 Oct 2023",
-          "time": "08:00 - 09:30",
-          "attendance": [
-            {"fullName": "Banyu Bintang", "userId": "STU001", "present": true},
-            {"fullName": "Savannah Nguyen", "userId": "STU002", "present": true},
-            {"fullName": "Jerome Bell", "userId": "STU003", "present": false},
-          ]
-        },
-        {
-          "name": "Pertemuan 2 - Praktik Crimping",
-          "description": "Siswa melakukan praktik pembuatan kabel straight dan cross.",
-          "date": "17 Oct 2023",
-          "time": "08:00 - 09:30",
-          "attendance": [
-            {"fullName": "Banyu Bintang", "userId": "STU001", "present": true},
-            {"fullName": "Savannah Nguyen", "userId": "STU002", "present": false},
-            {"fullName": "Jerome Bell", "userId": "STU003", "present": true},
-          ]
-        }
-      ],
-      "X MIPA A": [
-        {
-          "name": "Pertemuan 1 - Aljabar Linear",
-          "description": "Membahas konsep dasar matriks dan vektor.",
-          "date": "12 Oct 2023",
-          "time": "10:00 - 11:30",
-          "attendance": [
-            {"fullName": "Eleanor Pena", "userId": "STU004", "present": true},
-            {"fullName": "Albert Flores", "userId": "STU005", "present": true},
-          ]
-        }
-      ]
-    };
-
-    List<Map<String, dynamic>> filteredActivities = [];
-
-    // Logika Filtering
-    allActivities.forEach((key, list) {
-      if (selectedClasses.contains(key)) {
-        filteredActivities.addAll(list);
+  void _toggleSelection(String id) {
+    setState(() {
+      if (_selectedClassIds.contains(id)) {
+        _selectedClassIds.remove(id);
+      } else {
+        _selectedClassIds.add(id);
       }
     });
+  }
 
+  void _selectAll() {
+    setState(() {
+      _selectedClassIds = _allClasses.map((c) => c['userid'].toString()).toSet();
+    });
+  }
+
+  void _clearAll() {
+    setState(() {
+      _selectedClassIds.clear();
+    });
+  }
+
+  Future<void> _selectDate(BuildContext context, bool isStart) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      builder: (context, child) {
+        return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.light(primary: gradientEnd, onPrimary: Colors.white, onSurface: textDark),
+            ),
+            child: child!
+        );
+      },
+    );
+    if (picked != null && mounted) {
+      setState(() {
+        if (isStart) _startDate = picked;
+        else _endDate = picked;
+      });
+    }
+  }
+
+  Future<void> _submitReport() async {
+    if (_startDate == null || _endDate == null || _selectedClassIds.isEmpty) {
+      _showError("Harap isi tanggal dan pilih minimal 1 kelas!");
+      return;
+    }
+
+    showDialog(context: context, barrierDismissible: false, builder: (context) => const Center(child: CircularProgressIndicator()));
+
+    try {
+      String startStr = DateFormat('yyyy-MM-dd').format(_startDate!);
+      String endStr = DateFormat('yyyy-MM-dd').format(_endDate!);
+      List<String> codesToSubmit = _selectedClassIds.toList();
+
+      var resp = await _viewModel.generateReportData(
+        startDate: startStr,
+        endDate: endStr,
+        classCodes: codesToSubmit,
+      );
+
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      if (resp.data != null) {
+        List<dynamic> rawReportData = resp.data ?? [];
+        if (rawReportData.isEmpty) {
+          _showError("Tidak ada data aktivitas untuk kriteria tersebut.");
+          return;
+        }
+
+        Navigator.push(context, MaterialPageRoute(builder: (context) => SchoolActivityReportPreviewPage(reportData: rawReportData)));
+      } else {
+        _showError(resp.message ?? "Gagal Generate Report.");
+      }
+    } catch (e) {
+      if (mounted) Navigator.pop(context);
+      _showError("Terjadi kesalahan sistem: $e");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: bgSlate,
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            expandedHeight: 120,
-            floating: false,
+            expandedHeight: 140.0,
             pinned: true,
-            backgroundColor: Colors.transparent,
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.teal.shade500, Colors.green.shade700]),
-                borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
-              ),
-              child: const FlexibleSpaceBar(
-                titlePadding: EdgeInsets.only(left: 60, bottom: 20),
-                title: Text("Report Result", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-              ),
-            ),
-            leading: Container(
-              margin: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
-              child: IconButton(icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white), onPressed: () => Navigator.pop(context)),
-            ),
-            actions: [
-              IconButton(onPressed: () => _shareReport(context), icon: const Icon(Icons.share_rounded, color: Colors.white)),
-              IconButton(onPressed: () => _exportPdf(context), icon: const Icon(Icons.picture_as_pdf_rounded, color: Colors.white)),
-              const SizedBox(width: 5),
-            ],
-          ),
-
-          SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.all(20),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.teal.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, 5))]),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.date_range_rounded, size: 16, color: Colors.teal.shade600),
-                      const SizedBox(width: 8),
-                      Text(dateRange, style: const TextStyle(fontSize: 13, color: Colors.black87, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                  const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: Divider(height: 1)),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: selectedClasses.map((c) => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.green.shade100)),
-                      child: Text(c, style: TextStyle(fontSize: 11, color: Colors.green.shade700, fontWeight: FontWeight.bold)),
-                    )).toList(),
-                  ),
-                ],
+            backgroundColor: gradientEnd,
+            elevation: 0,
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 10.0, top: 8, bottom: 8),
+              child: InkWell(
+                onTap: () => Navigator.pop(context),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 16)),
               ),
             ),
-          ),
-
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            sliver: filteredActivities.isEmpty
-                ? SliverToBoxAdapter(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+            flexibleSpace: FlexibleSpaceBar(
+              titlePadding: const EdgeInsets.only(left: 60, bottom: 16),
+              title: const Text("Class Activity Report", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: -0.5)),
+              background: Container(
+                decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [gradientStart, gradientEnd])),
+                child: Stack(
                   children: [
-                    const SizedBox(height: 50),
-                    Icon(Icons.folder_off_rounded, size: 80, color: Colors.grey.shade300),
-                    const SizedBox(height: 15),
-                    Text("No activities found", style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold, fontSize: 16)),
+                    Positioned(right: -30, top: -20, child: CircleAvatar(radius: 60, backgroundColor: Colors.white.withOpacity(0.1))),
+                    Positioned(left: 40, bottom: -40, child: CircleAvatar(radius: 40, backgroundColor: Colors.white.withOpacity(0.05))),
                   ],
                 ),
               ),
-            )
-                : SliverList(
-              delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                  final item = filteredActivities[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey.shade200),
-                      boxShadow: [BoxShadow(color: Colors.teal.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 5))],
-                    ),
-                    child: InkWell(
-                      onTap: () => _showAttendanceDetail(context, item),
-                      borderRadius: BorderRadius.circular(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+          ),
+
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Period Filter", style: TextStyle(color: textDark, fontWeight: FontWeight.w900, fontSize: 16)),
+                  const SizedBox(height: 15),
+
+                  Row(
+                    children: [
+                      Expanded(child: _buildDateCard("Start Date", _startDate, () => _selectDate(context, true))),
+                      const SizedBox(width: 15),
+                      Expanded(child: _buildDateCard("End Date", _endDate, () => _selectDate(context, false))),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: Colors.teal.shade50,
-                              borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(child: Text(item['name'], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.teal.shade800), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                                Icon(Icons.chevron_right_rounded, size: 20, color: Colors.teal.shade300),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(item['description'], style: TextStyle(fontSize: 13, color: Colors.grey.shade700, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
-                                const SizedBox(height: 15),
-                                Row(
-                                  children: [
-                                    _buildTimeInfo(Icons.calendar_today_rounded, item['date'], Colors.blue),
-                                    const SizedBox(width: 20),
-                                    _buildTimeInfo(Icons.access_time_filled_rounded, item['time'], Colors.orange),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
+                          Text("Target Classes", style: TextStyle(color: textDark, fontWeight: FontWeight.w900, fontSize: 16)),
+                          const SizedBox(width: 8),
+                          if (_selectedClassIds.isNotEmpty)
+                            Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: gradientStart, borderRadius: BorderRadius.circular(10)), child: Text("${_selectedClassIds.length}", style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold))),
                         ],
                       ),
+
+                      Row(
+                        children: [
+                          if (_selectedClassIds.isNotEmpty)
+                            TextButton(
+                              onPressed: _clearAll,
+                              style: TextButton.styleFrom(visualDensity: VisualDensity.compact, foregroundColor: Colors.redAccent),
+                              child: const Text("Clear", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            ),
+                          TextButton(
+                            onPressed: _selectAll,
+                            style: TextButton.styleFrom(visualDensity: VisualDensity.compact, foregroundColor: gradientEnd),
+                            child: const Text("Select All", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  _isLoading
+                      ? SizedBox(height: 200, child: Center(child: CircularProgressIndicator(color: gradientEnd)))
+                      : _allClasses.isEmpty
+                      ? Container(
+                    width: double.infinity, padding: const EdgeInsets.all(30),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.grey.shade200)),
+                    child: Column(
+                      children: [
+                        Icon(Icons.search_off_rounded, color: Colors.grey.shade300, size: 40),
+                        const SizedBox(height: 10),
+                        Text("No classes available", style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
+                      ],
                     ),
-                  );
-                },
-                childCount: filteredActivities.length,
+                  )
+                      : Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: _allClasses.map((c) {
+                      String id = c['userid']?.toString() ?? "";
+                      String name = c['full_name']?.toString() ?? "Unknown";
+                      bool isSelected = _selectedClassIds.contains(id);
+
+                      return GestureDetector(
+                        onTap: () => _toggleSelection(id),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: isSelected ? gradientEnd : Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: isSelected ? [BoxShadow(color: gradientEnd.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 4, offset: const Offset(0, 2))],
+                            border: Border.all(color: isSelected ? gradientEnd : Colors.grey.shade200),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(isSelected ? Icons.check_circle_rounded : Icons.circle_outlined, size: 16, color: isSelected ? Colors.white : Colors.grey.shade400),
+                              const SizedBox(width: 8),
+                              Text(name, style: TextStyle(fontSize: 13, fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600, color: isSelected ? Colors.white : textDark)),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+
+                  const SizedBox(height: 100),
+                ],
               ),
             ),
           ),
-          const SliverPadding(padding: EdgeInsets.only(bottom: 40)),
         ],
+      ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: SizedBox(
+          width: double.infinity,
+          child: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [gradientStart, gradientEnd]),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [BoxShadow(color: gradientEnd.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 8))]
+            ),
+            child: ElevatedButton.icon(
+              onPressed: _submitReport,
+              icon: const Icon(Icons.analytics_rounded, color: Colors.white, size: 20),
+              label: const Text("Generate Report", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildTimeInfo(IconData icon, String text, MaterialColor color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(color: color.shade50, borderRadius: BorderRadius.circular(6)),
-      child: Row(
-        children: [
-          Icon(icon, size: 12, color: color.shade600),
-          const SizedBox(width: 6),
-          Text(text, style: TextStyle(fontSize: 10, color: color.shade800, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-
-  void _showAttendanceDetail(BuildContext context, Map<String, dynamic> activity) {
-    final List attendance = activity['attendance'] as List;
-
-    int presentCount = attendance.where((s) => s['present'] == true).length;
-    int absentCount = attendance.length - presentCount;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.75,
-        padding: const EdgeInsets.all(25),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+  Widget _buildDateCard(String label, DateTime? value, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 5))],
+            border: Border.all(color: Colors.grey.shade100)
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(width: 50, height: 5, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10))),
-            const SizedBox(height: 20),
-            Text(activity['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18), textAlign: TextAlign.center),
-            const SizedBox(height: 15),
-
+            Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey.shade500)),
+            const SizedBox(height: 8),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildStatBadge("Present", presentCount.toString(), Colors.green),
-                const SizedBox(width: 15),
-                _buildStatBadge("Absent", absentCount.toString(), Colors.red),
+                Text(
+                  value != null ? DateFormat('dd MMM yy').format(value) : "Select",
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: value != null ? textDark : Colors.grey.shade400),
+                ),
+                Icon(Icons.calendar_month_rounded, size: 16, color: gradientEnd),
               ],
-            ),
-            const Padding(padding: EdgeInsets.symmetric(vertical: 15), child: Divider()),
-
-            Expanded(
-              child: ListView.builder(
-                itemCount: attendance.length,
-                itemBuilder: (context, index) {
-                  final student = attendance[index];
-                  bool isPresent = student['present'];
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    decoration: BoxDecoration(
-                        color: isPresent ? Colors.green.shade50.withOpacity(0.5) : Colors.red.shade50.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: isPresent ? Colors.green.shade100 : Colors.red.shade100)
-                    ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: isPresent ? Colors.green.shade100 : Colors.red.shade100,
-                        child: Text("${index + 1}", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isPresent ? Colors.green.shade700 : Colors.red.shade700)),
-                      ),
-                      title: Text(student['fullName'], style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                      subtitle: Text("ID: ${student['userId']}", style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
-                      trailing: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(color: isPresent ? Colors.green.shade500 : Colors.red.shade500, borderRadius: BorderRadius.circular(10)),
-                        child: Text(isPresent ? "Present" : "Absent", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                  );
-                },
-              ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatBadge(String label, String count, MaterialColor color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(color: color.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: color.shade200)),
-      child: Row(
-        children: [
-          Icon(label == "Present" ? Icons.check_circle_rounded : Icons.cancel_rounded, size: 14, color: color.shade600),
-          const SizedBox(width: 6),
-          Text("$count $label", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color.shade700)),
-        ],
       ),
     );
   }

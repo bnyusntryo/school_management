@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../config/pref.dart';
+import '../viewmodel/ClassActivity_viewmodel.dart';
+import 'class_activity_list_page.dart';
 
 class ClassActivitySubjectPage extends StatefulWidget {
   final String classCode;
@@ -13,21 +12,24 @@ class ClassActivitySubjectPage extends StatefulWidget {
 }
 
 class _ClassActivitySubjectPageState extends State<ClassActivitySubjectPage> {
-  bool _isLoading = true;
+  final ClassActivityViewmodel _viewModel = ClassActivityViewmodel();
 
+  bool _isLoading = true;
   Map<String, dynamic>? _classDetail;
   List<dynamic> _allSubjects = [];
   List<dynamic> _filteredSubjects = [];
-
   final TextEditingController _searchCtrl = TextEditingController();
 
-  final Color primaryBlue = const Color(0xFF3B82F6);
+  final Color gradientStart = const Color(0xFFEC4899);
+  final Color gradientEnd = const Color(0xFF6366F1);
+  final Color gradientSecondary = const Color(0xFF38BDF8);
+  final Color bgSlate = const Color(0xFFF1F5F9);
   final Color textDark = const Color(0xFF1E293B);
 
   @override
   void initState() {
     super.initState();
-    _fetchDataGanda();
+    _fetchDataFromViewModel();
   }
 
   @override
@@ -36,64 +38,40 @@ class _ClassActivitySubjectPageState extends State<ClassActivitySubjectPage> {
     super.dispose();
   }
 
-  Future<void> _fetchDataGanda() async {
+  Future<void> _fetchDataFromViewModel() async {
     setState(() => _isLoading = true);
-
     try {
-      String? token = await Session().getUserToken();
-      Map<String, String> headers = {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'};
-
-      var detailReq = http.post(
-        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/schoolactivity/classactivity/class-detail'),
-        headers: headers,
-        body: jsonEncode({"class_code": widget.classCode}),
-      );
-
-      var payloadList = {
-        "limit": 100,
-        "offset": 0,
-        "sortField": "subjectclass_code",
-        "sortOrder": 1,
-        "filters": {},
-        "global": "",
-        "class_code": widget.classCode
-      };
-
-      var listReq = http.post(
-        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/schoolactivity/classactivity/subject-list'),
-        headers: headers,
-        body: jsonEncode(payloadList),
-      );
-
-      var results = await Future.wait([detailReq, listReq]);
-      var detailRes = results[0];
-      var listRes = results[1];
+      var results = await Future.wait([
+        _viewModel.fetchClassDetail(widget.classCode),
+        _viewModel.fetchSubjectList(widget.classCode)
+      ]);
 
       if (!mounted) return;
 
-      if (detailRes.statusCode == 200 && listRes.statusCode == 200) {
-        var detailJson = jsonDecode(detailRes.body);
-        var listJson = jsonDecode(listRes.body);
+      var detailResp = results[0];
+      var listResp = results[1];
 
+      if (detailResp.data != null || listResp.data != null) {
         setState(() {
-          _classDetail = detailJson['data'];
-          _allSubjects = listJson['data'] ?? [];
+          _classDetail = detailResp.data;
+          _allSubjects = listResp.data ?? [];
           _filteredSubjects = _allSubjects;
           _isLoading = false;
         });
       } else {
         setState(() => _isLoading = false);
-        _showError("Gagal mengambil data dari server.");
+        _showError(detailResp.message ?? "Gagal mengambil data dari server.");
       }
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
-      _showError("Terjadi kesalahan jaringan.");
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      _showError("Terjadi kesalahan sistem: $e");
     }
   }
 
   void _showError(String msg) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: gradientStart));
     }
   }
 
@@ -111,65 +89,133 @@ class _ClassActivitySubjectPageState extends State<ClassActivitySubjectPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FB),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 10.0),
-          child: IconButton(
-              icon: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5)]), child: const Icon(Icons.arrow_back_ios_rounded, color: Colors.black87, size: 16)),
-              onPressed: () => Navigator.pop(context)
-          ),
-        ),
-        title: const Text("Class Activity Subjects", style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 0.5)),
-      ),
-      body: SafeArea(
-        child: _isLoading
-            ? Center(child: CircularProgressIndicator(color: primaryBlue))
-            : Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 5))]),
-                child: Column(
-                  children: [
-                    _buildHeaderRow("Class Code", _classDetail?['class_code'] ?? "-"),
-                    const Divider(height: 25, color: Color(0xFFF1F5F9)),
-                    _buildHeaderRow("Class Name", _classDetail?['class_name'] ?? "-"),
-                  ],
-                ),
+      backgroundColor: bgSlate,
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator(color: gradientEnd))
+          : CustomScrollView(
+        physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 250.0,
+            pinned: true,
+            backgroundColor: gradientEnd,
+            elevation: 0,
+            leading: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: InkWell(
+                onTap: () => Navigator.pop(context),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 16)),
               ),
             ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                children: [
+                  Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [gradientStart, gradientEnd]))),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+                  Positioned(right: -80, top: -50, child: Container(width: 250, height: 250, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(0.08)))),
+                  Positioned(left: -30, bottom: 40, child: Container(width: 120, height: 120, decoration: BoxDecoration(shape: BoxShape.circle, color: gradientSecondary.withOpacity(0.15)))),
+                  Positioned(left: 100, top: 60, child: Container(width: 20, height: 20, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(0.2)))),
+
+                  Positioned(
+                    bottom: 40, left: 20, right: 20,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(10)), child: Text(_classDetail?['class_code']?.toString() ?? "-", style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1))),
+                        const SizedBox(height: 12),
+                        Text(_classDetail?['class_name']?.toString() ?? "Subjects", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 28, height: 1.1, letterSpacing: -1)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.grey.shade200, width: 1.5)),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30), boxShadow: [BoxShadow(color: gradientEnd.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10))]),
                 child: TextField(
                   controller: _searchCtrl,
                   onChanged: _filterData,
-                  decoration: InputDecoration(icon: Icon(Icons.search_rounded, color: primaryBlue, size: 22), hintText: "Search subject, teacher...", hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13, fontWeight: FontWeight.w500), border: InputBorder.none),
+                  decoration: InputDecoration(
+                    prefixIcon: Padding(padding: const EdgeInsets.only(left: 20, right: 10), child: Icon(Icons.search_rounded, color: Colors.grey.shade400, size: 22)),
+                    hintText: "Search subject or teacher...",
+                    hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13, fontWeight: FontWeight.w500),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 18),
+                  ),
                 ),
               ),
             ),
+          ),
+
+          if (_filteredSubjects.isEmpty)
+            SliverFillRemaining(child: Center(child: Text("No subjects found.", style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold))))
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                      (context, index) => _buildModernSubjectCard(_filteredSubjects[index]),
+                  childCount: _filteredSubjects.length,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernSubjectCard(Map<String, dynamic> data) {
+    String subjectName = data['subject_name']?.toString() ?? "-";
+    String subjectCode = data['subject_code']?.toString() ?? "-";
+    String teacherName = data['teacher_name']?.toString() ?? "No Teacher Assigned";
+    if (teacherName.isEmpty) teacherName = "No Teacher Assigned";
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 15, offset: const Offset(0, 10)),
+          BoxShadow(color: gradientEnd.withOpacity(0.01), blurRadius: 5, offset: const Offset(0, -2)),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(22),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                _buildSubjectIcon(subjectName),
+                const SizedBox(width: 12),
+                Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: bgSlate, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade100)), child: Text(subjectCode, style: TextStyle(color: gradientEnd, fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 0.5))),
+
+                const Spacer(),
+
+                _buildModernSelectButton(subjectName, data['subjectclass_code']?.toString() ?? ""),
+              ],
+            ),
             const SizedBox(height: 20),
 
-            Expanded(
-              child: _filteredSubjects.isEmpty
-                  ? Center(child: Text("No subjects found.", style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold)))
-                  : ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                physics: const BouncingScrollPhysics(),
-                itemCount: _filteredSubjects.length,
-                itemBuilder: (context, index) {
-                  return _buildSubjectCard(_filteredSubjects[index]);
-                },
+            Text(subjectName, style: TextStyle(color: textDark, fontWeight: FontWeight.w900, fontSize: 19, height: 1.1, letterSpacing: -0.5)),
+            const SizedBox(height: 20),
+
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.grey.shade100), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.01), blurRadius: 10, offset: const Offset(0, 5))]),
+              child: Row(
+                children: [
+                  CircleAvatar(radius: 12, backgroundColor: Colors.grey.shade100, child: Icon(Icons.person_outline_rounded, size: 14, color: Colors.grey.shade600)),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(teacherName, style: TextStyle(fontSize: 13, color: textDark.withOpacity(0.8), fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                ],
               ),
             ),
           ],
@@ -178,71 +224,49 @@ class _ClassActivitySubjectPageState extends State<ClassActivitySubjectPage> {
     );
   }
 
-  Widget _buildHeaderRow(String title, String value) {
-    return Row(
-      children: [
-        SizedBox(width: 100, child: Text(title, style: TextStyle(fontSize: 13, color: Colors.grey.shade600, fontWeight: FontWeight.bold))),
-        const Text(":", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-        const SizedBox(width: 15),
-        Expanded(child: Container(padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10), decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(8)), child: Text(value, style: TextStyle(color: textDark, fontWeight: FontWeight.w900, fontSize: 14)))),
-      ],
+  Widget _buildSubjectIcon(String name) {
+    String firstChar = name.isNotEmpty ? name[0].toUpperCase() : "?";
+    List<Color> iconColors = (firstChar.codeUnitAt(0) % 2 == 0) ? [gradientEnd, gradientSecondary] : [gradientStart, const Color(0xFFFBBF24)];
+
+    return Container(
+      height: 36, width: 36,
+      decoration: BoxDecoration(gradient: LinearGradient(colors: [iconColors[0].withOpacity(0.1), iconColors[1].withOpacity(0.1)]), shape: BoxShape.circle),
+      child: Center(child: Text(firstChar, style: TextStyle(color: iconColors[0], fontWeight: FontWeight.bold, fontSize: 16))),
     );
   }
 
-  Widget _buildSubjectCard(Map<String, dynamic> data) {
-    String subjectName = data['subject_name']?.toString() ?? "-";
-    String subjectCode = data['subject_code']?.toString() ?? "-";
-    String teacherName = data['teacher_name']?.toString() ?? "No Teacher Assigned";
-
+  Widget _buildModernSelectButton(String subjectName, String subjectClassCode) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.grey.shade200), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 5))]),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 15),
-            child: Column(
-              children: [
-                Text(subjectName, textAlign: TextAlign.center, style: TextStyle(color: textDark, fontWeight: FontWeight.w900, fontSize: 15)),
-                const SizedBox(height: 5),
-                Text(subjectCode, style: TextStyle(color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 12)),
-              ],
-            ),
-          ),
-
-          Divider(height: 1, color: Colors.grey.shade100, thickness: 1.5),
-
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            child: Row(
-              children: [
-                Icon(Icons.person_outline_rounded, size: 18, color: Colors.blue.shade400),
-                const SizedBox(width: 10),
-                Expanded(child: Text(teacherName, style: TextStyle(fontSize: 13, color: Colors.grey.shade700, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
-              ],
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Membuka Detail: $subjectName")));
-                },
-                icon: const Icon(Icons.edit_outlined, color: Colors.white, size: 16),
-                label: const Text("Select Subject", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(
+          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [gradientStart, gradientEnd]),
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [BoxShadow(color: gradientEnd.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5))]
+      ),
+      child: ElevatedButton(
+        onPressed: () {
+          if (subjectClassCode.isNotEmpty) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ClassActivityListPage(
+                  classCode: widget.classCode,
+                  subjectClassCode: subjectClassCode,
                 ),
               ),
-            ),
-          )
-        ],
+            );
+          } else {
+            _showError("Kode Subjek tidak valid.");
+          }
+        },
+        style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)), visualDensity: VisualDensity.compact),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Select", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+            SizedBox(width: 5),
+            Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 14),
+          ],
+        ),
       ),
     );
   }

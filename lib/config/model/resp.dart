@@ -1,53 +1,42 @@
-import 'dart:convert';
-
-// import '../../model/pagination.dart';
-
+// ✅ Resp model untuk wrap API response
+// Response structure: {data: ..., message: "...", total: ...}
+// HTTP statusCode diambil dari Dio response, bukan dari body
 
 class Resp {
-  int? code;
-  dynamic error;
-  dynamic status;
-  dynamic message;
-  dynamic categories;
-  dynamic data;
-  dynamic success;
-  dynamic type;
-  // Pagination? pagination;
+  final int? code;      // ← dari HTTP statusCode (200, 404, 500)
+  final dynamic data;   // ← dari response body
+  final dynamic message;
+  final dynamic error;
 
   Resp({
-    this.error,
     this.code,
-    this.status,
-    this.message,
     this.data,
-    this.type,
-    this.categories,
-    // this.pagination,
+    this.message,
+    this.error,
   });
-  factory Resp.fromRawJson(String str) => Resp.fromJson(json.decode(str));
 
-  String toRawJson() => json.encode(toJson());
+  // ✅ PENTING: fromJson harus menerima FULL response dari Network class
+  // Bukan hanya response body, tapi juga statusCode
+  factory Resp.fromJson(Map<String, dynamic> json) {
+    return Resp(
+      code: json['statusCode'] ?? json['code'], // ← dari wrapper Network class
+      data: json['data'],                        // ← dari response body
+      message: json['message'],                  // ← dari response body
+      error: json['error'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'code': code,
+      'data': data,
+      'message': message,
+      'error': error,
+    };
+  }
+
   @override
-  String toString() => json.encode(this);
-
-  factory Resp.fromJson(Map<String, dynamic> json) => Resp(
-    code: json["code"],
-    error: json["error"],
-    status: json["status"],
-    message: json["message"],
-    data: json["data"],
-    type: json["type"],
-    categories: json["categories"],
-    // pagination: json["pagination"] == null ? null : Pagination.fromJson(json["pagination"]),
-  );
-  Map<String, dynamic> toJson() => {
-    "code": code,
-    "error": error,
-    "status": status,
-    "message": message,
-    "data": data,
-    "type": type,
-    "categories": categories,
-    // "pagination": pagination?.toJson(),
-  };
+  String toString() {
+    return 'Resp(code: $code, message: $message, hasData: ${data != null})';
+  }
 }
