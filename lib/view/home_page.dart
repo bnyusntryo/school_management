@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:io';
-import 'package:provider/provider.dart'; // 💡 TAMBAHAN: Import Provider
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import '../config/pref.dart';
 import 'sidebar_menu.dart';
 import 'schedule_page.dart';
 import 'announcement_page.dart';
@@ -24,7 +27,11 @@ class _HomePageState extends State<HomePage> {
   int _currentPage = 0;
   Timer? _timer;
 
-  // Logika Dummy Feed
+  List<dynamic> _announcements = [];
+  bool _isLoadingBanner = true;
+
+  final String baseImageUrl = 'https://fastly.picsum.photos/id/517/1600/900.jpg?hmac=CdnOMbQEo4LItWYoyDHPpmPs3HPyGBFBnOFiel377XI/';
+
   final List<Map<String, dynamic>> _feeds = [
     {
       "name": "Lisa Tran",
@@ -58,35 +65,80 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _startAutoSlider();
+    fetchAnnouncements();
+  }
+
+  Future<void> fetchAnnouncements() async {
+    try {
+      String? token = await Session().getUserToken();
+      print("🎫 CEK TOKEN DI HP: $token");
+
+      final response = await http.post(
+        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/home/announcement'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({}),
+      );
+
+      print("📡 STATUS DARI SERVER: ${response.statusCode}");
+      print("📦 BALASAN SERVER: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+
+        if (mounted) {
+          setState(() {
+            _announcements = (result['data'] as List)
+                .where((item) => item['show_announcement'] == 'Y')
+                .toList();
+            _isLoadingBanner = false;
+          });
+          print("✅ BERHASIL! Jumlah pengumuman: ${_announcements.length}");
+          _startAutoSlider();
+        }
+      } else {
+        print("❌ GAGAL! Server menolak. Status: ${response.statusCode}");
+        if (mounted) setState(() => _isLoadingBanner = false);
+      }
+    } catch (e) {
+      print("🚨 ERROR FATAL: $e");
+      if (mounted) setState(() => _isLoadingBanner = false);
+    }
   }
 
   void _startAutoSlider() {
-    final bannerCount = AnnouncementPage.announcements.where((a) => a['show'] == 'Yes').length;
+    _timer?.cancel();
+
+    final bannerCount = _announcements.length;
+    if (bannerCount <= 1) return;
 
     _timer = Timer.periodic(const Duration(seconds: 4), (Timer timer) {
-      if (bannerCount > 0) {
+      if (mounted && _pageController.hasClients) {
         if (_currentPage < bannerCount - 1) {
           _currentPage++;
         } else {
           _currentPage = 0;
         }
-        if (_pageController.hasClients) {
-          _pageController.animateToPage(_currentPage, duration: const Duration(milliseconds: 800), curve: Curves.easeInOutCubic);
-        }
+        _pageController.animateToPage(
+            _currentPage,
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeInOutCubic
+        );
       }
     });
   }
 
   void _addNewPost() {
     if (_postController.text.isNotEmpty) {
-      // 💡 PERBAIKAN: Tarik data dari Provider saat membuat postingan baru
       final authData = Provider.of<AuthProvider>(context, listen: false);
 
       setState(() {
         _feeds.insert(0, {
-          "name": authData.userName, // Menggunakan data Provider
-          "role": authData.role,     // Menggunakan data Provider
+          "name": authData.userName,
+          "role": authData.role,
           "time": "Just Now",
           "content": _postController.text,
           "likes": 0,
@@ -122,12 +174,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // 💡 SUNTIKAN PROVIDER: Tarik data untuk merender UI
     final authData = Provider.of<AuthProvider>(context);
-
-    final List<Map<String, String>> activeAnnouncements = AnnouncementPage.announcements.where((a) => a['show'] == 'Yes').toList();
-
-    // 🚦 SAKLAR PINTAR ROLE (Menggunakan Provider)
     String currentRole = authData.role;
     bool isStudent = currentRole == 'Student';
     bool isPrincipal = currentRole == 'Principal';
@@ -135,7 +182,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: const SidebarMenu(),
-      backgroundColor: const Color(0xFFF4F7FB), // Warna Premium Background
+      backgroundColor: const Color(0xFFF4F7FB),
       appBar: AppBar(
         backgroundColor: const Color(0xFFF4F7FB),
         elevation: 0,
@@ -161,7 +208,6 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- 1. PROFILE SECTION ---
             Row(
               children: [
                 CircleAvatar(
@@ -176,7 +222,6 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text("Hello $currentRole", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
                     const SizedBox(height: 2),
-                    // 💡 PERBAIKAN: Menggunakan nama dari Provider
                     Text(authData.userName, style: const TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w600)),
                   ],
                 ),
@@ -184,20 +229,32 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 25),
 
-            // --- 2. BANNER DINAMIS ---
-            if (activeAnnouncements.isNotEmpty) ...[
+            if (_isLoadingBanner)
+              const SizedBox(
+                height: 160,
+                child: Center(
+                  child: CircularProgressIndicator(color: Color(0xFF3B82F6)),
+                ),
+              )
+            else if (_announcements.isNotEmpty) ...[
               SizedBox(
                 height: 160,
                 child: PageView.builder(
                   controller: _pageController,
                   onPageChanged: (int page) => setState(() => _currentPage = page),
-                  itemCount: activeAnnouncements.length,
+                  itemCount: _announcements.length,
                   itemBuilder: (context, index) {
-                    final item = activeAnnouncements[index];
+                    final item = _announcements[index];
+                    final String title = item['announcement_title'] ?? 'No Title';
+                    final List images = item['announcement_img'] ?? [];
+
+                    final String imageUrl = images.isNotEmpty
+                        ? 'https://fastly.picsum.photos/id/517/1600/900.jpg?hmac=CdnOMbQEo4LItWYoyDHPpmPs3HPyGBFBnOFiel377XI'
+                        : 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=2000&auto=format&fit=crop';
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 2),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
+                        color: Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 8))],
                       ),
@@ -206,9 +263,13 @@ class _HomePageState extends State<HomePage> {
                           Positioned.fill(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(24),
-                              child: item['isLocal'] == 'true'
-                                  ? Image.file(File(item['image']!), fit: BoxFit.cover)
-                                  : Image.network(item['image']!, fit: BoxFit.cover),
+                              child: Image.network(
+                                imageUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Center(child: Icon(Icons.broken_image_rounded, size: 50, color: Colors.grey));
+                                },
+                              ),
                             ),
                           ),
                           Positioned(
@@ -228,7 +289,7 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 const Text("Announcement", style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 2),
-                                Text(item['title']!, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900), maxLines: 2, overflow: TextOverflow.ellipsis),
+                                Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900), maxLines: 2, overflow: TextOverflow.ellipsis),
                               ],
                             ),
                           ),
@@ -241,7 +302,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(activeAnnouncements.length, (index) => Container(
+                children: List.generate(_announcements.length, (index) => Container(
                     width: _currentPage == index ? 20 : 8, height: 6, margin: const EdgeInsets.symmetric(horizontal: 3),
                     decoration: BoxDecoration(color: _currentPage == index ? const Color(0xFF3B82F6) : Colors.grey.shade300, borderRadius: BorderRadius.circular(3))
                 )),
@@ -249,8 +310,6 @@ class _HomePageState extends State<HomePage> {
             ],
 
             const SizedBox(height: 30),
-
-            // --- 3. EXPLORE CLASS SECTION ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -263,16 +322,13 @@ class _HomePageState extends State<HomePage> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // KOTAK KIRI (Live Monitor / Schedule Card)
                 Expanded(
                   flex: 1,
                   child: InkWell(
-                    // ✅ LOGIKA NAVIGASI KEPSEK
                     onTap: () {
                       if (!isPrincipal) {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const SchedulePage()));
                       } else {
-                        // Jika Kepsek, arahkan langsung ke ClassActivityPage
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const ClassActivityPage()));
                       }
                     },
@@ -309,7 +365,6 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(width: 15),
 
-                // KOTAK KANAN (Tap In & Tap Out)
                 Expanded(
                   flex: 1,
                   child: Column(
@@ -343,7 +398,6 @@ class _HomePageState extends State<HomePage> {
 
             const SizedBox(height: 35),
 
-            // --- 4. SOSIAL FEED & CREATE POST ---
             if (!isStudent) ...[
               Row(
                 children: [
@@ -463,9 +517,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // =======================================================================
-  // LOGIKA KARTU KUNING (LIVE MONITOR / SCHEDULE)
-  // =======================================================================
   Widget _buildScheduleCardContent({required bool isPrincipal, required bool isStudent}) {
     if (isPrincipal) {
       return Column(

@@ -6,7 +6,6 @@ import 'package:school_management/view/bank_mini_reports_page.dart';
 import 'package:school_management/view/cbt_report_page.dart';
 import 'package:school_management/view/monitoring_exam_page.dart';
 import 'package:school_management/view/task_assignment_page.dart';
-
 import 'student_list_page.dart';
 import 'home_page.dart';
 import 'teacher_list_page.dart';
@@ -41,6 +40,9 @@ class _SidebarMenuState extends State<SidebarMenu> {
   final Color _iconColor = const Color(0xFF64748B);
   final Color _selectedColor = const Color(0xFF3B82F6);
 
+  // =========================================================
+  // DATA SUBMENU
+  // =========================================================
   final List<String> _principalSubMenus = ["Task Assignment"];
   final List<String> _studentSubMenus = ["Student Information"];
   final List<String> _teacherSubMenus = ["Teacher Information", "Teacher Certificate", "Teacher Performance"];
@@ -53,10 +55,19 @@ class _SidebarMenuState extends State<SidebarMenu> {
 
   @override
   Widget build(BuildContext context) {
+    // 💡 AMBIL DATA ROLE DARI PROVIDER
     final authData = Provider.of<AuthProvider>(context);
     bool isStudent = authData.role == 'Student';
     bool isTeacher = authData.role == 'Teacher';
     bool isPrincipal = authData.role == 'Principal';
+
+    // =========================================================
+    // 💡 PERBAIKAN: VARIABEL NOTIFIKASI DINAMIS
+    // =========================================================
+    // Saat ini diset 0 agar badge merah hilang.
+    // Nanti jika API sudah siap, Anda tinggal menggantinya menjadi:
+    // int staffNotifCount = authData.staffNotificationCount;
+    int staffNotifCount = 0;
 
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.75,
@@ -65,6 +76,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
       child: SafeArea(
         child: Column(
           children: [
+            // --- HEADER SIDEBAR ---
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
               child: Row(
@@ -90,6 +102,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
             ),
             const SizedBox(height: 10),
 
+            // --- MENU UTAMA SCROLLABLE DENGAN FILTER ROLE ---
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -115,8 +128,14 @@ class _SidebarMenuState extends State<SidebarMenu> {
                       if (isPrincipal || isTeacher)
                         _buildExpandableMenuItem(title: "CBT", icon: Icons.show_chart_rounded, subMenus: _cbtSubMenus),
 
+                      // 💡 PENGGUNAAN BADGE DINAMIS
                       if (isPrincipal)
-                        _buildExpandableMenuItem(title: "Staff", icon: Icons.calendar_today_outlined, subMenus: _staffSubMenus, badgeCount: 2),
+                        _buildExpandableMenuItem(
+                            title: "Staff",
+                            icon: Icons.calendar_today_outlined,
+                            subMenus: _staffSubMenus,
+                            badgeCount: staffNotifCount // <-- Tidak lagi hardcode "2"
+                        ),
 
                       _buildExpandableMenuItem(title: "Attendance", icon: Icons.access_time_rounded, subMenus: _attendanceSubMenus),
 
@@ -130,6 +149,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
               ),
             ),
 
+            // --- BOTTOM MENU (Settings & Logout) ---
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
               child: Column(
@@ -151,6 +171,10 @@ class _SidebarMenuState extends State<SidebarMenu> {
       ),
     );
   }
+
+  // =========================================================
+  // HELPER WIDGETS
+  // =========================================================
 
   Widget _buildSingleMenuItem({required int index, required String title, required IconData icon, required VoidCallback onTap}) {
     bool isSelected = _selectedIndex == index;
@@ -175,6 +199,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
         title: Row(
           children: [
             Expanded(child: Text(title, style: TextStyle(color: _textColor, fontWeight: FontWeight.w600, fontSize: 14))),
+            // 💡 Logika: Badge hanya muncul jika badgeCount lebih dari 0
             if (badgeCount > 0)
               Container(
                 padding: const EdgeInsets.all(5), decoration: const BoxDecoration(color: Color(0xFFF44336), shape: BoxShape.circle),
@@ -197,6 +222,7 @@ class _SidebarMenuState extends State<SidebarMenu> {
     );
   }
 
+  // Logika Navigasi ke Halaman Lain
   void _handleSubMenuNavigation(String subMenu) {
     if (subMenu == "Task Assignment") Navigator.push(context, MaterialPageRoute(builder: (context) => const TaskAssignmentPage()));
     else if (subMenu == "Student Information") Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentListPage()));
