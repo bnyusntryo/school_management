@@ -17,17 +17,17 @@ class _TeacherListPageState extends State<TeacherListPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final _viewmodel = TeacherViewmodel(); // ✅ ARCH-1: pakai ViewModel
+  final _viewmodel = TeacherViewmodel();
 
-  List<TeacherInfoModel> _teachers = []; // ✅ Pakai TeacherModel, bukan Map
+  List<TeacherInfoModel> _teachers = [];
   List<TeacherInfoModel> _filteredTeachers = [];
   bool _isLoading = true;
-  bool _isLoadingMore = false; // ✅ loading indicator untuk pagination
-  bool _hasMore = true; // ✅ flag untuk cek apakah masih ada data
-  int _currentPage = 0; // ✅ tracking halaman saat ini
-  final int _pageSize = 20; // ✅ jumlah item per page
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
+  int _currentPage = 0;
+  final int _pageSize = 20;
 
-  String _currentSearchQuery = ''; // ✅ simpan query untuk pagination
+  String _currentSearchQuery = '';
 
   final List<Color> _cardColors = [
     Colors.pink.shade400,
@@ -39,28 +39,24 @@ class _TeacherListPageState extends State<TeacherListPage> {
   @override
   void initState() {
     super.initState();
-    _fetchTeachers(); // ✅ load initial data
+    _fetchTeachers();
     _scrollController.addListener(_onScroll); // ✅ listen scroll event
   }
 
   @override
   void dispose() {
-    // ✅ WAJIB dispose controller - FLUTTER-3
     _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
-  // ✅ Deteksi scroll mendekati bottom
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      // ✅ Trigger load more saat 200px dari bottom
       _loadMore();
     }
   }
 
-  // ✅ Load initial data (page 0)
   Future<void> _fetchTeachers() async {
     setState(() {
       _isLoading = true;
