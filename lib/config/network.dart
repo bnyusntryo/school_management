@@ -3,39 +3,97 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
+import 'endpoint.dart';
 import 'model/resp.dart';
+import 'pref.dart';
 
 // final baseUrl = '';
 // final baseUrl = dotenv.env['BASEURL_PRODUCTION']!;
 String get _baseUrl => dotenv.env['BASEURL_STAGING'] ?? 'https://example.com';
 
+class TokenRefreshInterceptor extends Interceptor {
+  final Dio _dio;
+  static bool _isRefreshing = false;
+
+  TokenRefreshInterceptor(this._dio);
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    final statusCode = err.response?.statusCode;
+    final isRetry = err.requestOptions.extra['_isRetry'] == true;
+
+    if ((statusCode == 401 || statusCode == 403) && !isRetry && !_isRefreshing) {
+      _isRefreshing = true;
+      try {
+        final String? oldToken = await Session().getUserToken();
+        if (oldToken == null) {
+          _isRefreshing = false;
+          return handler.next(err);
+        }
+
+        final refreshDio = Dio(BaseOptions(
+          baseUrl: _baseUrl,
+          connectTimeout: const Duration(milliseconds: 30000),
+          receiveTimeout: const Duration(milliseconds: 30000),
+        ));
+
+        final refreshResp = await refreshDio.get(
+          Endpoint.refreshTokenUrl,
+          options: Options(headers: {
+            'Authorization': 'Bearer $oldToken',
+            'Content-Type': 'application/json',
+          }),
+        );
+
+        if (refreshResp.statusCode == 200 && refreshResp.data['token'] != null) {
+          final newToken = refreshResp.data['token'] as String;
+          await Session().setUserToken(newToken);
+
+          final options = err.requestOptions;
+          options.headers['Authorization'] = 'Bearer $newToken';
+          options.extra['_isRetry'] = true;
+
+          final retryResp = await _dio.fetch(options);
+          _isRefreshing = false;
+          return handler.resolve(retryResp);
+        }
+      } catch (e) {
+        debugPrint('Token refresh failed: $e');
+      }
+      _isRefreshing = false;
+    }
+    handler.next(err);
+  }
+}
+
 class Network {
   static final Network _instance = Network._internal();
   factory Network() => _instance;
   Network._internal();
+
+  static Dio _buildDio({String? baseUrl, int maxRedirects = 0, String? contentType}) {
+    final dio = Dio(BaseOptions(
+      baseUrl: baseUrl ?? _baseUrl,
+      connectTimeout: const Duration(milliseconds: 500000),
+      receiveTimeout: const Duration(milliseconds: 300000),
+      responseType: ResponseType.json,
+      maxRedirects: maxRedirects,
+      contentType: contentType,
+    ));
+    dio.interceptors.addAll([
+      TokenRefreshInterceptor(dio),
+      PrettyDioLogger(
+        requestHeader: true,
+        requestBody: true,
+        filter: (options, args) => !args.isResponse || !args.hasUint8ListData,
+      ),
+    ]);
+    return dio;
+  }
+
   static Future<dynamic> postApi(String url, dynamic formData, {String? baseUrl}) async {
     try {
-      var dio =
-          Dio(
-              BaseOptions(
-                baseUrl: baseUrl ?? _baseUrl,
-                connectTimeout: const Duration(milliseconds: 500000),
-                receiveTimeout: const Duration(milliseconds: 300000),
-                responseType: ResponseType.json,
-                maxRedirects: 0,
-                contentType: 'application/json',
-              ),
-            )
-            ..interceptors.addAll([
-              PrettyDioLogger(
-                requestHeader: true,
-                requestBody: true,
-                filter: (options, args) {
-                  //  return !options.uri.path.contains('posts');
-                  return !args.isResponse || !args.hasUint8ListData;
-                },
-              ),
-            ]);
+      var dio = _buildDio(baseUrl: baseUrl, contentType: 'application/json');
 
       Response rest = await dio.post(url, data: formData);
       dio.close();
@@ -75,26 +133,7 @@ class Network {
       {String? baseUrl,}
   ) async {
     try {
-      var dio =
-          Dio(
-              BaseOptions(
-                baseUrl: baseUrl ?? _baseUrl,
-                connectTimeout: const Duration(milliseconds: 500000),
-                receiveTimeout: const Duration(milliseconds: 300000),
-                responseType: ResponseType.json,
-                maxRedirects: 0,
-              ),
-            )
-            ..interceptors.addAll([
-              PrettyDioLogger(
-                requestHeader: true,
-                requestBody: true,
-                filter: (options, args) {
-                  //  return !options.uri.path.contains('posts');
-                  return !args.isResponse || !args.hasUint8ListData;
-                },
-              ),
-            ]);
+      var dio = _buildDio(baseUrl: baseUrl);
 
       Response restValue = await dio.post(
         url,
@@ -138,26 +177,7 @@ class Network {
       {String? baseUrl,}
   ) async {
     try {
-      var dio =
-          Dio(
-              BaseOptions(
-                baseUrl: baseUrl ?? _baseUrl,
-                connectTimeout: const Duration(milliseconds: 500000),
-                receiveTimeout: const Duration(milliseconds: 300000),
-                responseType: ResponseType.json,
-                maxRedirects: 0,
-              ),
-            )
-            ..interceptors.addAll([
-              PrettyDioLogger(
-                requestHeader: true,
-                requestBody: true,
-                filter: (options, args) {
-                  //  return !options.uri.path.contains('posts');
-                  return !args.isResponse || !args.hasUint8ListData;
-                },
-              ),
-            ]);
+      var dio = _buildDio(baseUrl: baseUrl);
 
       Response restValue = await dio.post(
         url,
@@ -200,28 +220,7 @@ class Network {
       {String? baseUrl,}
   ) async {
     try {
-      var dio =
-          Dio(
-              BaseOptions(
-                baseUrl: baseUrl ?? _baseUrl  ,
-                connectTimeout: const Duration(milliseconds: 500000),
-                receiveTimeout: const Duration(milliseconds: 300000),
-                responseType: ResponseType.json,
-                maxRedirects: 0,
-                contentType: 'application/json',
-                headers: header,
-              ),
-            )
-            ..interceptors.addAll([
-              PrettyDioLogger(
-                requestHeader: true,
-                requestBody: true,
-                filter: (options, args) {
-                  //  return !options.uri.path.contains('posts');
-                  return !args.isResponse || !args.hasUint8ListData;
-                },
-              ),
-            ]);
+      var dio = _buildDio(baseUrl: baseUrl, contentType: 'application/json');
 
       Response restValue = await dio.post(
         url,
@@ -260,26 +259,7 @@ class Network {
 
   Future<dynamic> getApi(String url, {String? baseUrl}) async {
     try {
-      var dio =
-          Dio(
-              BaseOptions(
-                baseUrl: baseUrl ?? _baseUrl,
-                connectTimeout: const Duration(milliseconds: 500000),
-                receiveTimeout: const Duration(milliseconds: 300000),
-                responseType: ResponseType.json,
-                maxRedirects: 0,
-              ),
-            )
-            ..interceptors.addAll([
-              PrettyDioLogger(
-                requestHeader: true,
-                requestBody: true,
-                filter: (options, args) {
-                  //  return !options.uri.path.contains('posts');
-                  return !args.isResponse || !args.hasUint8ListData;
-                },
-              ),
-            ]);
+      var dio = _buildDio(baseUrl: baseUrl);
 
       Response restGet = await dio.get(url);
       dio.close();
@@ -317,26 +297,7 @@ class Network {
     String? baseUrl,
   }) async {
     try {
-      var dio =
-          Dio(
-              BaseOptions(
-                baseUrl: baseUrl ?? _baseUrl,
-                connectTimeout: const Duration(milliseconds: 500000),
-                receiveTimeout: const Duration(milliseconds: 300000),
-                responseType: ResponseType.json,
-                maxRedirects: 0,
-              ),
-            )
-            ..interceptors.addAll([
-              PrettyDioLogger(
-                requestHeader: true,
-                requestBody: true,
-                filter: (options, args) {
-                  //  return !options.uri.path.contains('posts');
-                  return !args.isResponse || !args.hasUint8ListData;
-                },
-              ),
-            ]);
+      var dio = _buildDio(baseUrl: baseUrl);
 
       Response restGet = await dio.get(url, options: Options(headers: header));
       dio.close();
@@ -371,26 +332,7 @@ class Network {
 
   Future<dynamic> putApi(String url, dynamic formData, {String? baseUrl}) async {
     try {
-      var dio =
-          Dio(
-              BaseOptions(
-                baseUrl: baseUrl ?? _baseUrl,
-                connectTimeout: const Duration(milliseconds: 500000),
-                receiveTimeout: const Duration(milliseconds: 300000),
-                responseType: ResponseType.json,
-                maxRedirects: 0,
-              ),
-            )
-            ..interceptors.addAll([
-              PrettyDioLogger(
-                requestHeader: true,
-                requestBody: true,
-                filter: (options, args) {
-                  //  return !options.uri.path.contains('posts');
-                  return !args.isResponse || !args.hasUint8ListData;
-                },
-              ),
-            ]);
+      var dio = _buildDio(baseUrl: baseUrl);
 
       Response restValue = await dio.put(url, data: formData);
       dio.close();
@@ -429,26 +371,7 @@ class Network {
       {String? baseUrl}
   ) async {
     try {
-      var dio =
-          Dio(
-              BaseOptions(
-                baseUrl: baseUrl ?? _baseUrl,
-                connectTimeout: const Duration(milliseconds: 500000),
-                receiveTimeout: const Duration(milliseconds: 300000),
-                responseType: ResponseType.json,
-                maxRedirects: 0,
-              ),
-            )
-            ..interceptors.addAll([
-              PrettyDioLogger(
-                requestHeader: true,
-                requestBody: true,
-                filter: (options, args) {
-                  //  return !options.uri.path.contains('posts');
-                  return !args.isResponse || !args.hasUint8ListData;
-                },
-              ),
-            ]);
+      var dio = _buildDio(baseUrl: baseUrl);
 
       Response restValue = await dio.put(
         url,
@@ -494,26 +417,7 @@ class Network {
       {String? baseUrl}
   ) async {
     try {
-      var dio =
-          Dio(
-              BaseOptions(
-                baseUrl: baseUrl ?? _baseUrl,
-                connectTimeout: const Duration(milliseconds: 500000),
-                receiveTimeout: const Duration(milliseconds: 300000),
-                responseType: ResponseType.json,
-                maxRedirects: 0,
-              ),
-            )
-            ..interceptors.addAll([
-              PrettyDioLogger(
-                requestHeader: true,
-                requestBody: true,
-                filter: (options, args) {
-                  //  return !options.uri.path.contains('posts');
-                  return !args.isResponse || !args.hasUint8ListData;
-                },
-              ),
-            ]);
+      var dio = _buildDio(baseUrl: baseUrl);
 
       Response restValue = await dio.patch(
         url,
@@ -556,26 +460,7 @@ class Network {
       {String? baseUrl}
   ) async {
     try {
-      var dio =
-          Dio(
-              BaseOptions(
-                baseUrl: baseUrl ?? _baseUrl,
-                connectTimeout: const Duration(milliseconds: 500000),
-                receiveTimeout: const Duration(milliseconds: 300000),
-                responseType: ResponseType.json,
-                maxRedirects: 1,
-              ),
-            )
-            ..interceptors.addAll([
-              PrettyDioLogger(
-                requestHeader: true,
-                requestBody: true,
-                filter: (options, args) {
-                  //  return !options.uri.path.contains('posts');
-                  return !args.isResponse || !args.hasUint8ListData;
-                },
-              ),
-            ]);
+      var dio = _buildDio(baseUrl: baseUrl, maxRedirects: 1);
 
       Response restGet = await dio.delete(
         url,
@@ -621,26 +506,7 @@ class Network {
       {String? baseUrl,}
   ) async {
     try {
-      var dio =
-          Dio(
-              BaseOptions(
-                baseUrl: baseUrl ?? _baseUrl,
-                connectTimeout: const Duration(milliseconds: 500000),
-                receiveTimeout: const Duration(milliseconds: 300000),
-                responseType: ResponseType.json,
-                maxRedirects: 0,
-              ),
-            )
-            ..interceptors.addAll([
-              PrettyDioLogger(
-                requestHeader: true,
-                requestBody: true,
-                filter: (options, args) {
-                  //  return !options.uri.path.contains('posts');
-                  return !args.isResponse || !args.hasUint8ListData;
-                },
-              ),
-            ]);
+      var dio = _buildDio(baseUrl: baseUrl);
 
       Response restGet = await dio.delete(
         url,
