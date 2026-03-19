@@ -5,10 +5,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:school_management/view/auth/auth_provider.dart';
 
 // Sesuaikan path import ini jika berbeda
-import '../config/pref.dart';
-import 'auth_provider.dart';
+import '../../config/pref.dart';
 
 class AnnouncementPage extends StatefulWidget {
   const AnnouncementPage({super.key});
@@ -97,7 +97,11 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                 titlePadding: EdgeInsets.only(left: 60, bottom: 20),
                 title: Text(
                   "Announcements",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -108,7 +112,10 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white),
+                icon: const Icon(
+                  Icons.arrow_back_ios_rounded,
+                  color: Colors.white,
+                ),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
@@ -118,36 +125,44 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
             padding: const EdgeInsets.all(20),
             sliver: _isLoading
                 ? const SliverToBoxAdapter(
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 50.0),
-                  child: CircularProgressIndicator(color: Colors.teal),
-                ),
-              ),
-            )
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 50.0),
+                        child: CircularProgressIndicator(color: Colors.teal),
+                      ),
+                    ),
+                  )
                 : _announcementsList.isEmpty
                 ? SliverToBoxAdapter(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 50),
-                    Icon(Icons.campaign_rounded, size: 80, color: Colors.grey.shade300),
-                    const SizedBox(height: 15),
-                    Text("No Announcements Yet", style: TextStyle(color: Colors.grey.shade500, fontSize: 16, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-            )
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 50),
+                          Icon(
+                            Icons.campaign_rounded,
+                            size: 80,
+                            color: Colors.grey.shade300,
+                          ),
+                          const SizedBox(height: 15),
+                          Text(
+                            "No Announcements Yet",
+                            style: TextStyle(
+                              color: Colors.grey.shade500,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
                 : SliverList(
-              delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                  final item = _announcementsList[index];
-                  return _buildAnnouncementCard(item, index, isPrincipal);
-                },
-                childCount: _announcementsList.length,
-              ),
-            ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final item = _announcementsList[index];
+                      return _buildAnnouncementCard(item, index, isPrincipal);
+                    }, childCount: _announcementsList.length),
+                  ),
           ),
         ],
       ),
@@ -155,15 +170,23 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       // 💡 HANYA MUNCUL JIKA KEPALA SEKOLAH
       floatingActionButton: isPrincipal
           ? FloatingActionButton(
-        onPressed: () => _showAddEditDialog(),
-        backgroundColor: Colors.teal.shade600,
-        child: const Icon(Icons.add_rounded, color: Colors.white, size: 30),
-      )
+              onPressed: () => _showAddEditDialog(),
+              backgroundColor: Colors.teal.shade600,
+              child: const Icon(
+                Icons.add_rounded,
+                color: Colors.white,
+                size: 30,
+              ),
+            )
           : null,
     );
   }
 
-  Widget _buildAnnouncementCard(Map<String, dynamic> item, int index, bool isPrincipal) {
+  Widget _buildAnnouncementCard(
+    Map<String, dynamic> item,
+    int index,
+    bool isPrincipal,
+  ) {
     // 💡 TRANSLATE DATA API KE UI ANDA
     String title = item['announcement_title'] ?? 'No Title';
     String idStr = item['announcement_id'] ?? 'Unknown ID';
@@ -202,7 +225,14 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                child: Image.network(imagePath, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image_rounded, color: Colors.grey.shade400)),
+                child: Image.network(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Icon(
+                    Icons.broken_image_rounded,
+                    color: Colors.grey.shade400,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 15),
@@ -213,35 +243,56 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2D3142),
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.tag_rounded, size: 14, color: Colors.grey.shade500),
+                      Icon(
+                        Icons.tag_rounded,
+                        size: 14,
+                        color: Colors.grey.shade500,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         idStr,
-                        style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: isShow ? Colors.green.shade50 : Colors.red.shade50,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: isShow ? Colors.green.shade200 : Colors.red.shade200),
+                      border: Border.all(
+                        color: isShow
+                            ? Colors.green.shade200
+                            : Colors.red.shade200,
+                      ),
                     ),
                     child: Text(
                       isShow ? "Visible (Y)" : "Hidden (N)",
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: isShow ? Colors.green.shade700 : Colors.red.shade700,
+                        color: isShow
+                            ? Colors.green.shade700
+                            : Colors.red.shade700,
                       ),
                     ),
                   ),
@@ -252,8 +303,13 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
             // 💡 TOMBOL EDIT HANYA UNTUK KEPSEK
             if (isPrincipal)
               IconButton(
-                icon: Icon(Icons.edit_note_rounded, color: Colors.teal.shade500, size: 26),
-                onPressed: () => _showAddEditDialog(existingData: item, index: index),
+                icon: Icon(
+                  Icons.edit_note_rounded,
+                  color: Colors.teal.shade500,
+                  size: 26,
+                ),
+                onPressed: () =>
+                    _showAddEditDialog(existingData: item, index: index),
                 tooltip: "Edit",
               ),
           ],
@@ -264,8 +320,12 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
 
   // NOTE: Fungsi Dialog Tetap Sama, tapi aksi Save-nya belum nyambung ke API POST/Create Reonaldi
   void _showAddEditDialog({Map<String, dynamic>? existingData, int? index}) {
-    final titleCtrl = TextEditingController(text: existingData?['announcement_title']);
-    String showValue = (existingData?['show_announcement'] == 'Y') ? 'Yes' : 'No';
+    final titleCtrl = TextEditingController(
+      text: existingData?['announcement_title'],
+    );
+    String showValue = (existingData?['show_announcement'] == 'Y')
+        ? 'Yes'
+        : 'No';
     String? currentImagePath;
     bool isImageLocal = false;
 
@@ -275,12 +335,17 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       backgroundColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: Container(
             padding: const EdgeInsets.all(25),
             decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
+              ),
             ),
             child: SingleChildScrollView(
               child: Column(
@@ -291,33 +356,79 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                          existingData == null ? "Add Announcement" : "Edit Announcement",
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.teal.shade800)
+                        existingData == null
+                            ? "Add Announcement"
+                            : "Edit Announcement",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.teal.shade800,
+                        ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close_rounded, color: Colors.grey),
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          color: Colors.grey,
+                        ),
                         onPressed: () => Navigator.pop(context),
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 10),
 
-                  _buildModalInputField("Announcement Title", titleCtrl, Icons.title_rounded, maxLines: 1),
+                  _buildModalInputField(
+                    "Announcement Title",
+                    titleCtrl,
+                    Icons.title_rounded,
+                    maxLines: 1,
+                  ),
                   const SizedBox(height: 15),
 
-                  Text("Show Announcement", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
+                  Text(
+                    "Show Announcement",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
                     value: showValue,
-                    icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.teal.shade400),
+                    icon: Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: Colors.teal.shade400,
+                    ),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.visibility_rounded, color: Colors.teal.shade400, size: 20),
+                      prefixIcon: Icon(
+                        Icons.visibility_rounded,
+                        color: Colors.teal.shade400,
+                        size: 20,
+                      ),
                       filled: true,
                       fillColor: Colors.grey.shade50,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 15,
+                        vertical: 14,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
-                    items: ['Yes', 'No'].map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontWeight: FontWeight.w500)))).toList(),
+                    items: ['Yes', 'No']
+                        .map(
+                          (e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(
+                              e,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
                     onChanged: (v) => setModalState(() => showValue = v!),
                   ),
                   const SizedBox(height: 30),
@@ -328,19 +439,30 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                       onPressed: () {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text("Fitur API Create/Edit belum disambungkan!"),
-                              backgroundColor: Colors.orange.shade600,
-                              behavior: SnackBarBehavior.floating,
-                            )
+                          SnackBar(
+                            content: const Text(
+                              "Fitur API Create/Edit belum disambungkan!",
+                            ),
+                            backgroundColor: Colors.orange.shade600,
+                            behavior: SnackBarBehavior.floating,
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal.shade600,
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                       ),
-                      child: const Text("Save Announcement", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                      child: const Text(
+                        "Save Announcement",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -353,22 +475,42 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
     );
   }
 
-  Widget _buildModalInputField(String label, TextEditingController controller, IconData icon, {int maxLines = 1}) {
+  Widget _buildModalInputField(
+    String label,
+    TextEditingController controller,
+    IconData icon, {
+    int maxLines = 1,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey.shade700,
+          ),
+        ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           maxLines: maxLines,
           style: const TextStyle(fontWeight: FontWeight.w500),
           decoration: InputDecoration(
-            prefixIcon: maxLines == 1 ? Icon(icon, color: Colors.teal.shade400, size: 20) : null,
+            prefixIcon: maxLines == 1
+                ? Icon(icon, color: Colors.teal.shade400, size: 20)
+                : null,
             filled: true,
             fillColor: Colors.grey.shade50,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 15,
+              vertical: 14,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide.none,
+            ),
           ),
         ),
       ],

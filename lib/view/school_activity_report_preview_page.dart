@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../view/auth_provider.dart';
+import 'package:school_management/view/auth/auth_provider.dart';
 
 class SchoolActivityReportPreviewPage extends StatelessWidget {
   final List<dynamic> reportData;
@@ -16,7 +16,9 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authData = Provider.of<AuthProvider>(context, listen: false);
-    String generatedDate = DateFormat('dd MMM yyyy, h:mm a').format(DateTime.now());
+    String generatedDate = DateFormat(
+      'dd MMM yyyy, h:mm a',
+    ).format(DateTime.now());
 
     return Scaffold(
       backgroundColor: bgSlate,
@@ -33,14 +35,38 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
               child: InkWell(
                 onTap: () => Navigator.pop(context),
                 borderRadius: BorderRadius.circular(12),
-                child: Container(decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 16)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_ios_rounded,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
               ),
             ),
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 60, bottom: 16),
-              title: const Text("Report Preview", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: -0.5)),
+              title: const Text(
+                "Report Preview",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 18,
+                  letterSpacing: -0.5,
+                ),
+              ),
               background: Container(
-                decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [gradientStart, gradientEnd])),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [gradientStart, gradientEnd],
+                  ),
+                ),
               ),
             ),
           ),
@@ -48,7 +74,10 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
-              child: _buildReportHeaderSection(generatedDate, authData.userName),
+              child: _buildReportHeaderSection(
+                generatedDate,
+                authData.userName,
+              ),
             ),
           ),
 
@@ -57,11 +86,37 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 15),
               child: Row(
                 children: [
-                  Container(padding: const EdgeInsets.all(6), decoration: BoxDecoration(color: gradientEnd.withOpacity(0.1), shape: BoxShape.circle), child: Icon(Icons.analytics_outlined, size: 18, color: gradientEnd)),
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: gradientEnd.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.analytics_outlined,
+                      size: 18,
+                      color: gradientEnd,
+                    ),
+                  ),
                   const SizedBox(width: 10),
-                  Text("Activity Records", style: TextStyle(color: textDark, fontWeight: FontWeight.w900, fontSize: 17, letterSpacing: -0.5)),
+                  Text(
+                    "Activity Records",
+                    style: TextStyle(
+                      color: textDark,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 17,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
                   const Spacer(),
-                  Text("${reportData.length} entries", style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold, fontSize: 12)),
+                  Text(
+                    "${reportData.length} entries",
+                    style: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -71,7 +126,7 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
             padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
-                    (context, index) => _buildLuminousReportCard(reportData[index]),
+                (context, index) => _buildLuminousReportCard(reportData[index]),
                 childCount: reportData.length,
               ),
             ),
@@ -83,7 +138,17 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
 
   Widget _buildReportHeaderSection(String date, String generatedBy) {
     return Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 8))]),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,9 +160,21 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
 
           Row(
             children: [
-              Expanded(child: _buildDownloadBtn("Excel", Icons.insert_drive_file_outlined, const Color(0xFF2EBD59))),
+              Expanded(
+                child: _buildDownloadBtn(
+                  "Excel",
+                  Icons.insert_drive_file_outlined,
+                  const Color(0xFF2EBD59),
+                ),
+              ),
               const SizedBox(width: 10),
-              Expanded(child: _buildDownloadBtn("PDF", Icons.picture_as_pdf_outlined, const Color(0xFFE54D4D))),
+              Expanded(
+                child: _buildDownloadBtn(
+                  "PDF",
+                  Icons.picture_as_pdf_outlined,
+                  const Color(0xFFE54D4D),
+                ),
+              ),
             ],
           ),
         ],
@@ -110,9 +187,28 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 6.0),
       child: Row(
         children: [
-          SizedBox(width: 100, child: Text(label, style: TextStyle(fontSize: 12, color: Colors.grey.shade500, fontWeight: FontWeight.w600))),
+          SizedBox(
+            width: 100,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade500,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
           const SizedBox(width: 10),
-          Expanded(child: Text(value, style: TextStyle(color: textDark, fontSize: 12, fontWeight: FontWeight.bold))),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                color: textDark,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -122,16 +218,30 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
     return Builder(
       builder: (context) => ElevatedButton.icon(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Fitur Download $label segera hadir!"), behavior: SnackBarBehavior.floating));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Fitur Download $label segera hadir!"),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
         },
         icon: Icon(icon, color: color, size: 16),
-        label: Text("Download $label", style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
+        label: Text(
+          "Download $label",
+          style: TextStyle(
+            color: color,
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         style: ElevatedButton.styleFrom(
           backgroundColor: color.withOpacity(0.1),
           elevation: 0,
           side: BorderSide(color: color.withOpacity(0.2)),
           padding: const EdgeInsets.symmetric(vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );
@@ -145,30 +255,75 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
     String rawDate = data['classactivity_date']?.toString() ?? "-";
     String dateOnly = rawDate.contains('T') ? rawDate.split('T')[0] : rawDate;
 
-    String schedule = "${data['start_time'] ?? '-'} - ${data['end_time'] ?? '-'}";
+    String schedule =
+        "${data['start_time'] ?? '-'} - ${data['end_time'] ?? '-'}";
     String desc = data['classactivity_desc']?.toString() ?? "No description.";
     String attachment = data['attachment']?.toString() ?? "";
 
     return Container(
       margin: const EdgeInsets.only(bottom: 18),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 15, offset: const Offset(0, 10))]),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 15,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            decoration: BoxDecoration(color: gradientStart.withOpacity(0.03), borderRadius: const BorderRadius.vertical(top: Radius.circular(24)), border: Border(bottom: BorderSide(color: Colors.grey.shade100))),
+            decoration: BoxDecoration(
+              color: gradientStart.withOpacity(0.03),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+              border: Border(bottom: BorderSide(color: Colors.grey.shade100)),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), decoration: BoxDecoration(color: gradientEnd.withOpacity(0.1), borderRadius: BorderRadius.circular(8)), child: Text(dateOnly, style: TextStyle(color: gradientEnd, fontWeight: FontWeight.bold, fontSize: 11))),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: gradientEnd.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    dateOnly,
+                    style: TextStyle(
+                      color: gradientEnd,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
                 Row(
                   children: [
-                    Icon(Icons.access_time_rounded, size: 14, color: Colors.grey.shade500),
+                    Icon(
+                      Icons.access_time_rounded,
+                      size: 14,
+                      color: Colors.grey.shade500,
+                    ),
                     const SizedBox(width: 6),
-                    Text(schedule, style: TextStyle(fontSize: 12, color: Colors.grey.shade700, fontWeight: FontWeight.w600)),
+                    Text(
+                      schedule,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade700,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -178,13 +333,31 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: TextStyle(color: textDark, fontWeight: FontWeight.w900, fontSize: 18, height: 1.1, letterSpacing: -0.5)),
+                Text(
+                  name,
+                  style: TextStyle(
+                    color: textDark,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                    height: 1.1,
+                    letterSpacing: -0.5,
+                  ),
+                ),
                 const SizedBox(height: 15),
                 Wrap(
-                  spacing: 8, runSpacing: 8,
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
-                    _buildReportChip(Icons.person_outline_rounded, teacher, primaryIndigo),
-                    _buildReportChip(Icons.school_outlined, className, gradientStart),
+                    _buildReportChip(
+                      Icons.person_outline_rounded,
+                      teacher,
+                      primaryIndigo,
+                    ),
+                    _buildReportChip(
+                      Icons.school_outlined,
+                      className,
+                      gradientStart,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 15),
@@ -192,8 +365,19 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(color: bgSlate, borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.grey.shade100)),
-                  child: Text(desc, style: TextStyle(fontSize: 13, color: textDark.withOpacity(0.8), height: 1.4)),
+                  decoration: BoxDecoration(
+                    color: bgSlate,
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: Colors.grey.shade100),
+                  ),
+                  child: Text(
+                    desc,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: textDark.withOpacity(0.8),
+                      height: 1.4,
+                    ),
+                  ),
                 ),
 
                 if (attachment.isNotEmpty) ...[
@@ -215,13 +399,28 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
   Widget _buildReportChip(IconData icon, String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(color: color.withOpacity(0.05), borderRadius: BorderRadius.circular(30), border: Border.all(color: color.withOpacity(0.15))),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: color.withOpacity(0.15)),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: color),
           const SizedBox(width: 8),
-          Flexible(child: Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis)),
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
@@ -230,12 +429,27 @@ class SchoolActivityReportPreviewPage extends StatelessWidget {
   Widget _buildAttachmentPill(String filename) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
       child: Row(
         children: [
           Icon(Icons.attach_file_rounded, size: 16, color: gradientStart),
           const SizedBox(width: 10),
-          Expanded(child: Text(filename, style: TextStyle(fontSize: 12, color: gradientEnd, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
+          Expanded(
+            child: Text(
+              filename,
+              style: TextStyle(
+                fontSize: 12,
+                color: gradientEnd,
+                fontWeight: FontWeight.w600,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
           const SizedBox(width: 10),
           Icon(Icons.download_rounded, size: 16, color: Colors.grey.shade400),
         ],

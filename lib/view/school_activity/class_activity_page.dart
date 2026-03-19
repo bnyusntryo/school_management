@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../viewmodel/ClassActivity_viewmodel.dart';
-import 'class_activity_subject_page.dart';
+import 'package:school_management/view/class_activity_subject_page.dart';
+import 'package:school_management/viewmodel/ClassActivity_viewmodel.dart';
 
 class ClassActivityPage extends StatefulWidget {
   const ClassActivityPage({super.key});
@@ -60,7 +60,16 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
 
   void _showError(String msg) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: accentPink, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          backgroundColor: accentPink,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
     }
   }
 
@@ -70,7 +79,8 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
         final className = data['class_name']?.toString().toLowerCase() ?? '';
         final gradeCode = data['grade_code']?.toString().toLowerCase() ?? '';
         final searchLower = query.toLowerCase();
-        return className.contains(searchLower) || gradeCode.contains(searchLower);
+        return className.contains(searchLower) ||
+            gradeCode.contains(searchLower);
       }).toList();
     });
   }
@@ -80,7 +90,9 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
     return Scaffold(
       backgroundColor: bgSlate,
       body: CustomScrollView(
-        physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
         slivers: [
           SliverAppBar(
             expandedHeight: 160.0,
@@ -93,19 +105,64 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
               child: InkWell(
                 onTap: () => Navigator.pop(context),
                 borderRadius: BorderRadius.circular(12),
-                child: Container(decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 16)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_ios_rounded,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
               ),
             ),
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-              title: const Text("Class Activity", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20, letterSpacing: -0.5)),
+              title: const Text(
+                "Class Activity",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 20,
+                  letterSpacing: -0.5,
+                ),
+              ),
               background: Container(
-                decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [gradientStart, gradientEnd])),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [gradientStart, gradientEnd],
+                  ),
+                ),
                 child: Stack(
                   children: [
-                    Positioned(right: -30, top: -20, child: CircleAvatar(radius: 60, backgroundColor: Colors.white.withOpacity(0.1))),
-                    Positioned(left: 40, top: 50, child: CircleAvatar(radius: 15, backgroundColor: accentPink.withOpacity(0.2))),
-                    Positioned(right: 80, bottom: -40, child: CircleAvatar(radius: 40, backgroundColor: Colors.white.withOpacity(0.05))),
+                    Positioned(
+                      right: -30,
+                      top: -20,
+                      child: CircleAvatar(
+                        radius: 60,
+                        backgroundColor: Colors.white.withOpacity(0.1),
+                      ),
+                    ),
+                    Positioned(
+                      left: 40,
+                      top: 50,
+                      child: CircleAvatar(
+                        radius: 15,
+                        backgroundColor: accentPink.withOpacity(0.2),
+                      ),
+                    ),
+                    Positioned(
+                      right: 80,
+                      bottom: -40,
+                      child: CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Colors.white.withOpacity(0.05),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -116,14 +173,35 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 25),
               child: Container(
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30), boxShadow: [BoxShadow(color: gradientStart.withOpacity(0.06), blurRadius: 25, offset: const Offset(0, 10))]),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: gradientStart.withOpacity(0.06),
+                      blurRadius: 25,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
                 child: TextField(
                   controller: _searchCtrl,
                   onChanged: _filterData,
                   decoration: InputDecoration(
-                    prefixIcon: Padding(padding: const EdgeInsets.only(left: 20, right: 10), child: Icon(Icons.search_rounded, color: gradientStart, size: 22)),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 10),
+                      child: Icon(
+                        Icons.search_rounded,
+                        color: gradientStart,
+                        size: 22,
+                      ),
+                    ),
                     hintText: "Search class name or grade...",
-                    hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13, fontWeight: FontWeight.w500),
+                    hintStyle: TextStyle(
+                      color: Colors.grey.shade400,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(vertical: 18),
                   ),
@@ -133,7 +211,9 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
           ),
 
           if (_isLoading)
-            const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
+            const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
+            )
           else if (_filteredClasses.isEmpty)
             SliverFillRemaining(child: _buildEmptyState())
           else
@@ -141,7 +221,8 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
               padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
-                      (context, index) => _buildModernClassCard(_filteredClasses[index]),
+                  (context, index) =>
+                      _buildModernClassCard(_filteredClasses[index]),
                   childCount: _filteredClasses.length,
                 ),
               ),
@@ -163,8 +244,16 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 20, offset: const Offset(0, 10)),
-          BoxShadow(color: gradientStart.withOpacity(0.01), blurRadius: 5, offset: const Offset(0, -2)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: gradientStart.withOpacity(0.01),
+            blurRadius: 5,
+            offset: const Offset(0, -2),
+          ),
         ],
       ),
       child: Material(
@@ -173,7 +262,13 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
           borderRadius: BorderRadius.circular(30),
           onTap: () {
             if (classCode.isNotEmpty) {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ClassActivitySubjectPage(classCode: classCode)));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ClassActivitySubjectPage(classCode: classCode),
+                ),
+              );
             }
           },
           child: Padding(
@@ -181,12 +276,26 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
             child: Row(
               children: [
                 Container(
-                  height: 60, width: 60,
+                  height: 60,
+                  width: 60,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [gradientStart.withOpacity(0.15), gradientEnd.withOpacity(0.05)]),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        gradientStart.withOpacity(0.15),
+                        gradientEnd.withOpacity(0.05),
+                      ],
+                    ),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Center(child: Icon(Icons.school_outlined, color: gradientStart, size: 28)),
+                  child: Center(
+                    child: Icon(
+                      Icons.school_outlined,
+                      color: gradientStart,
+                      size: 28,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 18),
 
@@ -194,24 +303,48 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(className, style: TextStyle(color: textDark, fontWeight: FontWeight.w900, fontSize: 16, height: 1.1)),
+                      Text(
+                        className,
+                        style: TextStyle(
+                          color: textDark,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 16,
+                          height: 1.1,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          _buildModernChip("Grade $gradeCode", gradientStart.withOpacity(0.1), gradientStart),
+                          _buildModernChip(
+                            "Grade $gradeCode",
+                            gradientStart.withOpacity(0.1),
+                            gradientStart,
+                          ),
                           const SizedBox(width: 8),
-                          _buildModernChip(periodYear, accentPink.withOpacity(0.1), accentPink),
+                          _buildModernChip(
+                            periodYear,
+                            accentPink.withOpacity(0.1),
+                            accentPink,
+                          ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
 
                 Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade100)),
-                  child: Icon(Icons.arrow_forward_ios_rounded, size: 12, color: textDark.withOpacity(0.6)),
-                )
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade100),
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 12,
+                    color: textDark.withOpacity(0.6),
+                  ),
+                ),
               ],
             ),
           ),
@@ -223,8 +356,19 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
   Widget _buildModernChip(String label, Color bgColor, Color textColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(10)),
-      child: Text(label, style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+        ),
+      ),
     );
   }
 
@@ -235,13 +379,36 @@ class _ClassActivityPageState extends State<ClassActivityPage> {
         children: [
           Container(
             padding: const EdgeInsets.all(30),
-            decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: gradientStart.withOpacity(0.1), blurRadius: 20)]),
-            child: Icon(Icons.class_outlined, size: 70, color: gradientStart.withOpacity(0.4)),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: gradientStart.withOpacity(0.1),
+                  blurRadius: 20,
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.class_outlined,
+              size: 70,
+              color: gradientStart.withOpacity(0.4),
+            ),
           ),
           const SizedBox(height: 24),
-          Text("No Classes Found", style: TextStyle(color: textDark, fontWeight: FontWeight.w900, fontSize: 18)),
+          Text(
+            "No Classes Found",
+            style: TextStyle(
+              color: textDark,
+              fontWeight: FontWeight.w900,
+              fontSize: 18,
+            ),
+          ),
           const SizedBox(height: 8),
-          Text("There is no class data for this role.", style: TextStyle(color: Colors.grey.shade500, fontSize: 13)),
+          Text(
+            "There is no class data for this role.",
+            style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+          ),
         ],
       ),
     );

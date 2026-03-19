@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:school_management/view/attendance_report_page.dart';
-import 'package:school_management/view/bank_account_page.dart';
-import 'package:school_management/view/bank_mini_reports_page.dart';
-import 'package:school_management/view/cbt_report_page.dart';
-import 'package:school_management/view/monitoring_exam_page.dart';
-import 'package:school_management/view/task_assignment_page.dart';
-import 'student_list_page.dart';
+import 'package:school_management/view/attendance/attendance_report_page.dart';
+import 'package:school_management/view/attendance/record_attendance_page.dart';
+import 'package:school_management/view/auth/auth_provider.dart';
+import 'package:school_management/view/auth/client_id_page.dart';
+import 'package:school_management/view/bank_mini/bank_account_page.dart';
+import 'package:school_management/view/bank_mini/bank_mini_print_out_page.dart';
+import 'package:school_management/view/bank_mini/bank_mini_reports_page.dart';
+import 'package:school_management/view/bank_mini/transaction_list_page.dart';
+import 'package:school_management/view/cbt/cbt_report_page.dart';
+import 'package:school_management/view/cbt/exam_management_page.dart';
+import 'package:school_management/view/cbt/exam_period_page.dart';
+import 'package:school_management/view/cbt/monitoring_exam_page.dart';
+import 'package:school_management/view/cbt/question_library_page.dart';
+import 'package:school_management/view/e_learning/e_learning_class_page.dart';
+import 'package:school_management/view/principal/task_assignment_page.dart';
+import 'package:school_management/view/school_activity/announcement_page.dart';
+import 'package:school_management/view/school_activity/class_activity_page.dart';
+import 'package:school_management/view/school_activity/school_activity_reports_page.dart';
+import 'package:school_management/view/staff/staff_information_page.dart';
+import 'package:school_management/view/student/student_list_page.dart';
+import 'package:school_management/view/teacher/teacher_certificate_page.dart';
+import 'package:school_management/view/teacher/teacher_list_page.dart';
+import 'package:school_management/view/teacher/teacher_performance_page.dart';
 import 'home_page.dart';
-import 'teacher_list_page.dart';
-import 'teacher_certificate_page.dart';
-import 'teacher_performance_page.dart';
-import 'announcement_page.dart';
-import 'class_activity_page.dart';
-import 'school_activity_reports_page.dart';
-import 'question_library_page.dart';
-import 'exam_management_page.dart';
-import 'exam_period_page.dart';
-import 'staff_information_page.dart';
-import 'transaction_list_page.dart';
-import 'bank_mini_print_out_page.dart';
-import 'e_learning_class_page.dart';
-import 'record_attendance_page.dart';
 import '../config/pref.dart';
-import 'client_id_page.dart';
-import 'auth_provider.dart';
 
 class SidebarMenu extends StatefulWidget {
   const SidebarMenu({super.key});
@@ -45,13 +45,38 @@ class _SidebarMenuState extends State<SidebarMenu> {
   // =========================================================
   final List<String> _principalSubMenus = ["Task Assignment"];
   final List<String> _studentSubMenus = ["Student Information"];
-  final List<String> _teacherSubMenus = ["Teacher Information", "Teacher Certificate", "Teacher Performance"];
-  final List<String> _cbtSubMenus = ["Question Library", "Exam Management", "Exam Period", "Monitoring Exam", "CBT Reports"];
+  final List<String> _teacherSubMenus = [
+    "Teacher Information",
+    "Teacher Certificate",
+    "Teacher Performance",
+  ];
+  final List<String> _cbtSubMenus = [
+    "Question Library",
+    "Exam Management",
+    "Exam Period",
+    "Monitoring Exam",
+    "CBT Reports",
+  ];
   final List<String> _staffSubMenus = ["Staff Information"];
-  final List<String> _attendanceSubMenus = ["Record Attendance", "Attendance Reports"]; // <-- Class Activity dihapus dari sini
-  final List<String> _bankMiniSubMenus = ["My Account", "Transaction", "Reports", "Print Out"];
-  final List<String> _eLearningSubMenus = ["E-Learning Class", "E-Learning Reports"];
-  final List<String> _schoolActivitySubMenus = ["Announcement", "Class Activity", "School Activity Reports"]; // <-- Class Activity ditambahkan ke sini
+  final List<String> _attendanceSubMenus = [
+    "Record Attendance",
+    "Attendance Reports",
+  ]; // <-- Class Activity dihapus dari sini
+  final List<String> _bankMiniSubMenus = [
+    "My Account",
+    "Transaction",
+    "Reports",
+    "Print Out",
+  ];
+  final List<String> _eLearningSubMenus = [
+    "E-Learning Class",
+    "E-Learning Reports",
+  ];
+  final List<String> _schoolActivitySubMenus = [
+    "Announcement",
+    "Class Activity",
+    "School Activity Reports",
+  ]; // <-- Class Activity ditambahkan ke sini
 
   @override
   Widget build(BuildContext context) {
@@ -83,20 +108,45 @@ class _SidebarMenuState extends State<SidebarMenu> {
                 children: [
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.menu_rounded, color: Colors.black87, size: 28),
+                    child: const Icon(
+                      Icons.menu_rounded,
+                      color: Colors.black87,
+                      size: 28,
+                    ),
                   ),
                   const SizedBox(width: 15),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("SMK", style: TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.bold)),
-                      Text("Islamiyah", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                      const Text(
+                        "SMK",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Islamiyah",
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 12,
+                        ),
+                      ),
                     ],
                   ),
                   const Spacer(),
-                  Icon(Icons.search_rounded, color: Colors.grey.shade700, size: 22),
+                  Icon(
+                    Icons.search_rounded,
+                    color: Colors.grey.shade700,
+                    size: 22,
+                  ),
                   const SizedBox(width: 15),
-                  Icon(Icons.notifications_none_rounded, color: Colors.grey.shade700, size: 22),
+                  Icon(
+                    Icons.notifications_none_rounded,
+                    color: Colors.grey.shade700,
+                    size: 22,
+                  ),
                 ],
               ),
             ),
@@ -111,38 +161,78 @@ class _SidebarMenuState extends State<SidebarMenu> {
                   child: Column(
                     children: [
                       _buildSingleMenuItem(
-                        index: 0, title: "Home", icon: Icons.home_outlined,
-                        onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage())),
+                        index: 0,
+                        title: "Home",
+                        icon: Icons.home_outlined,
+                        onTap: () => Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HomePage(),
+                          ),
+                        ),
                       ),
 
                       if (isPrincipal)
-                        _buildExpandableMenuItem(title: "Principal", icon: Icons.admin_panel_settings_outlined, subMenus: _principalSubMenus),
+                        _buildExpandableMenuItem(
+                          title: "Principal",
+                          icon: Icons.admin_panel_settings_outlined,
+                          subMenus: _principalSubMenus,
+                        ),
 
                       if (isPrincipal || isTeacher)
-                        _buildExpandableMenuItem(title: "Teacher", icon: Icons.grid_view_rounded, subMenus: _teacherSubMenus),
+                        _buildExpandableMenuItem(
+                          title: "Teacher",
+                          icon: Icons.grid_view_rounded,
+                          subMenus: _teacherSubMenus,
+                        ),
 
-                      _buildExpandableMenuItem(title: "Student", icon: Icons.inventory_2_outlined, subMenus: _studentSubMenus),
+                      _buildExpandableMenuItem(
+                        title: "Student",
+                        icon: Icons.inventory_2_outlined,
+                        subMenus: _studentSubMenus,
+                      ),
 
-                      _buildExpandableMenuItem(title: "School Activity", icon: Icons.local_activity_outlined, subMenus: _schoolActivitySubMenus),
+                      _buildExpandableMenuItem(
+                        title: "School Activity",
+                        icon: Icons.local_activity_outlined,
+                        subMenus: _schoolActivitySubMenus,
+                      ),
 
                       if (isPrincipal || isTeacher)
-                        _buildExpandableMenuItem(title: "CBT", icon: Icons.show_chart_rounded, subMenus: _cbtSubMenus),
+                        _buildExpandableMenuItem(
+                          title: "CBT",
+                          icon: Icons.show_chart_rounded,
+                          subMenus: _cbtSubMenus,
+                        ),
 
                       // 💡 PENGGUNAAN BADGE DINAMIS
                       if (isPrincipal)
                         _buildExpandableMenuItem(
-                            title: "Staff",
-                            icon: Icons.calendar_today_outlined,
-                            subMenus: _staffSubMenus,
-                            badgeCount: staffNotifCount // <-- Tidak lagi hardcode "2"
+                          title: "Staff",
+                          icon: Icons.calendar_today_outlined,
+                          subMenus: _staffSubMenus,
+                          badgeCount:
+                              staffNotifCount, // <-- Tidak lagi hardcode "2"
                         ),
 
-                      _buildExpandableMenuItem(title: "Attendance", icon: Icons.access_time_rounded, subMenus: _attendanceSubMenus),
+                      _buildExpandableMenuItem(
+                        title: "Attendance",
+                        icon: Icons.access_time_rounded,
+                        subMenus: _attendanceSubMenus,
+                      ),
 
                       if (isPrincipal || isStudent)
-                        _buildExpandableMenuItem(title: "Bank Mini", icon: Icons.payments_outlined, subMenus: _bankMiniSubMenus),
+                        _buildExpandableMenuItem(
+                          title: "Bank Mini",
+                          icon: Icons.payments_outlined,
+                          subMenus: _bankMiniSubMenus,
+                        ),
 
-                      _buildExpandableMenuItem(title: "E-Learning", icon: Icons.menu_book_rounded, subMenus: _eLearningSubMenus),
+                      _buildExpandableMenuItem(
+                        title: "E-Learning",
+                        icon: Icons.menu_book_rounded,
+                        subMenus: _eLearningSubMenus,
+                      ),
                     ],
                   ),
                 ),
@@ -154,13 +244,26 @@ class _SidebarMenuState extends State<SidebarMenu> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
               child: Column(
                 children: [
-                  _buildSingleMenuItem(index: 98, title: "Settings", icon: Icons.settings_outlined, onTap: () {}),
                   _buildSingleMenuItem(
-                    index: 99, title: "Logout", icon: Icons.logout_rounded,
+                    index: 98,
+                    title: "Settings",
+                    icon: Icons.settings_outlined,
+                    onTap: () {},
+                  ),
+                  _buildSingleMenuItem(
+                    index: 99,
+                    title: "Logout",
+                    icon: Icons.logout_rounded,
                     onTap: () async {
                       await Session().logout();
                       if (!context.mounted) return;
-                      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const ClientIdPage()), (route) => false);
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ClientIdPage(),
+                        ),
+                        (route) => false,
+                      );
                     },
                   ),
                 ],
@@ -176,34 +279,82 @@ class _SidebarMenuState extends State<SidebarMenu> {
   // HELPER WIDGETS
   // =========================================================
 
-  Widget _buildSingleMenuItem({required int index, required String title, required IconData icon, required VoidCallback onTap}) {
+  Widget _buildSingleMenuItem({
+    required int index,
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
     bool isSelected = _selectedIndex == index;
     return Container(
       margin: const EdgeInsets.only(bottom: 5),
-      decoration: BoxDecoration(color: isSelected ? _selectedColor.withOpacity(0.08) : Colors.transparent, borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+        color: isSelected
+            ? _selectedColor.withOpacity(0.08)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: ListTile(
         onTap: onTap,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        leading: Icon(icon, color: isSelected ? _selectedColor : _iconColor, size: 22),
-        title: Text(title, style: TextStyle(color: isSelected ? _selectedColor : _textColor, fontWeight: isSelected ? FontWeight.bold : FontWeight.w600, fontSize: 14)),
+        leading: Icon(
+          icon,
+          color: isSelected ? _selectedColor : _iconColor,
+          size: 22,
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: isSelected ? _selectedColor : _textColor,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+            fontSize: 14,
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildExpandableMenuItem({required String title, required IconData icon, required List<String> subMenus, int badgeCount = 0}) {
+  Widget _buildExpandableMenuItem({
+    required String title,
+    required IconData icon,
+    required List<String> subMenus,
+    int badgeCount = 0,
+  }) {
     return Theme(
       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 15),
-        leading: Icon(icon, color: _iconColor, size: 22), iconColor: _iconColor, collapsedIconColor: _iconColor,
+        leading: Icon(icon, color: _iconColor, size: 22),
+        iconColor: _iconColor,
+        collapsedIconColor: _iconColor,
         title: Row(
           children: [
-            Expanded(child: Text(title, style: TextStyle(color: _textColor, fontWeight: FontWeight.w600, fontSize: 14))),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: _textColor,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ),
             // 💡 Logika: Badge hanya muncul jika badgeCount lebih dari 0
             if (badgeCount > 0)
               Container(
-                padding: const EdgeInsets.all(5), decoration: const BoxDecoration(color: Color(0xFFF44336), shape: BoxShape.circle),
-                child: Text(badgeCount.toString(), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                padding: const EdgeInsets.all(5),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF44336),
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  badgeCount.toString(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
           ],
         ),
@@ -211,9 +362,20 @@ class _SidebarMenuState extends State<SidebarMenu> {
           return Padding(
             padding: const EdgeInsets.only(left: 45, right: 15, bottom: 5),
             child: ListTile(
-              onTap: () => _handleSubMenuNavigation(subMenuTitle), dense: true, visualDensity: const VisualDensity(vertical: -2),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              title: Text(subMenuTitle, style: TextStyle(color: Colors.grey.shade600, fontSize: 13, fontWeight: FontWeight.w500)),
+              onTap: () => _handleSubMenuNavigation(subMenuTitle),
+              dense: true,
+              visualDensity: const VisualDensity(vertical: -2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              title: Text(
+                subMenuTitle,
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               hoverColor: Colors.grey.shade100,
             ),
           );
@@ -224,26 +386,113 @@ class _SidebarMenuState extends State<SidebarMenu> {
 
   // Logika Navigasi ke Halaman Lain
   void _handleSubMenuNavigation(String subMenu) {
-    if (subMenu == "Task Assignment") Navigator.push(context, MaterialPageRoute(builder: (context) => const TaskAssignmentPage()));
-    else if (subMenu == "Student Information") Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentListPage()));
-    else if (subMenu == "Teacher Information") Navigator.push(context, MaterialPageRoute(builder: (context) => const TeacherListPage()));
-    else if (subMenu == "Teacher Certificate") Navigator.push(context, MaterialPageRoute(builder: (context) => const TeacherCertificatePage()));
-    else if (subMenu == "Teacher Performance") Navigator.push(context, MaterialPageRoute(builder: (context) => const TeacherPerformancePage()));
-    else if (subMenu == "Question Library") Navigator.push(context, MaterialPageRoute(builder: (context) => const QuestionLibraryPage()));
-    else if (subMenu == "Exam Management") Navigator.push(context, MaterialPageRoute(builder: (context) => const ExamManagementPage()));
-    else if (subMenu == "Exam Period") Navigator.push(context, MaterialPageRoute(builder: (context) => const ExamPeriodPage()));
-    else if (subMenu == "Monitoring Exam") Navigator.push(context, MaterialPageRoute(builder: (context) => const MonitoringExamPage()));
-    else if (subMenu == "CBT Reports") Navigator.push(context, MaterialPageRoute(builder: (context) => const CBTReportsPage()));
-    else if (subMenu == "Staff Information") Navigator.push(context, MaterialPageRoute(builder: (context) => const StaffInformationPage()));
-    else if (subMenu == "Record Attendance") Navigator.push(context, MaterialPageRoute(builder: (context) => const RecordAttendancePage()));
-    else if (subMenu == "Class Activity") Navigator.push(context, MaterialPageRoute(builder: (context) => const ClassActivityPage()));
-    else if (subMenu == "Attendance Reports") Navigator.push(context, MaterialPageRoute(builder: (context) => const AttendanceReportPage()));
-    else if (subMenu == "Announcement") Navigator.push(context, MaterialPageRoute(builder: (context) => const AnnouncementPage()));
-    else if (subMenu == "School Activity Reports") Navigator.push(context, MaterialPageRoute(builder: (context) => const SchoolActivityReportsPage()));
-    else if (subMenu == "My Account") Navigator.push(context, MaterialPageRoute(builder: (context) => const BankAccountPage()));
-    else if (subMenu == "Transaction") Navigator.push(context, MaterialPageRoute(builder: (context) => const TransactionListPage()));
-    else if (subMenu == "Reports") Navigator.push(context, MaterialPageRoute(builder: (context) => const BankMiniReportsPage()));
-    else if (subMenu == "Print Out") Navigator.push(context, MaterialPageRoute(builder: (context) => const BankMiniPrintOutPage()));
-    else if (subMenu == "E-Learning Class") Navigator.push(context, MaterialPageRoute(builder: (context) => const ELearningClassPage()));
+    if (subMenu == "Task Assignment") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const TaskAssignmentPage()),
+      );
+    } else if (subMenu == "Student Information") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const StudentListPage()),
+      );
+    } else if (subMenu == "Teacher Information") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const TeacherListPage()),
+      );
+    } else if (subMenu == "Teacher Certificate") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const TeacherCertificatePage()),
+      );
+    } else if (subMenu == "Teacher Performance") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const TeacherPerformancePage()),
+      );
+    } else if (subMenu == "Question Library") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const QuestionLibraryPage()),
+      );
+    } else if (subMenu == "Exam Management") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ExamManagementPage()),
+      );
+    } else if (subMenu == "Exam Period") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ExamPeriodPage()),
+      );
+    } else if (subMenu == "Monitoring Exam") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MonitoringExamPage()),
+      );
+    } else if (subMenu == "CBT Reports") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const CBTReportsPage()),
+      );
+    } else if (subMenu == "Staff Information") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const StaffInformationPage()),
+      );
+    } else if (subMenu == "Record Attendance") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const RecordAttendancePage()),
+      );
+    } else if (subMenu == "Class Activity") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ClassActivityPage()),
+      );
+    } else if (subMenu == "Attendance Reports") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const AttendanceReportPage()),
+      );
+    } else if (subMenu == "Announcement") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const AnnouncementPage()),
+      );
+    } else if (subMenu == "School Activity Reports") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SchoolActivityReportsPage(),
+        ),
+      );
+    } else if (subMenu == "My Account") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const BankAccountPage()),
+      );
+    } else if (subMenu == "Transaction") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const TransactionListPage()),
+      );
+    } else if (subMenu == "Reports") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const BankMiniReportsPage()),
+      );
+    } else if (subMenu == "Print Out") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const BankMiniPrintOutPage()),
+      );
+    } else if (subMenu == "E-Learning Class") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ELearningClassPage()),
+      );
+    }
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:school_management/view/base_page.dart';
-import '../config/pref.dart';
-import '../viewmodel/auth_viewmodel.dart';
-import 'home_page.dart';
+import '../../config/pref.dart';
+import '../../viewmodel/auth_viewmodel.dart';
+import '../home_page.dart';
 import 'package:provider/provider.dart';
 import 'auth_provider.dart';
 
@@ -25,7 +25,6 @@ class _LoginPageState extends State<LoginPage> {
   String? _errorMessage;
 
   Future<void> _login() async {
-
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
 
@@ -41,10 +40,7 @@ class _LoginPageState extends State<LoginPage> {
       _errorMessage = null;
     });
 
-    final resp = await _viewmodel.login(
-      username: username,
-      password: password,
-    );
+    final resp = await _viewmodel.login(username: username, password: password);
 
     if (!mounted) return;
 
@@ -53,7 +49,6 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     if (resp.code == 200 && resp.data != null) {
-
       String apiStatus = resp.data['user_status'] ?? '';
       String apiName = resp.data['full_name'] ?? 'User';
 
@@ -72,24 +67,19 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
 
       // 2. ⚡ SUNTIKKAN KE PROVIDER (Pengganti UserSession)
-      Provider.of<AuthProvider>(context, listen: false).setUserData(
-        role: finalRole,
-        userName: apiName,
-      );
+      Provider.of<AuthProvider>(
+        context,
+        listen: false,
+      ).setUserData(role: finalRole, userName: apiName);
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const BasePage(),
-        ),
+        MaterialPageRoute(builder: (_) => const BasePage()),
       );
-
     } else {
-
       setState(() {
         _errorMessage = resp.message?.toString() ?? "Login gagal";
       });
-
     }
   }
 
@@ -114,19 +104,31 @@ class _LoginPageState extends State<LoginPage> {
                 Image.asset(
                   'assets/images/logo_smk.png',
                   height: 120,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.school, size: 80, color: Color(0xFF1565C0)),
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.school,
+                    size: 80,
+                    color: Color(0xFF1565C0),
+                  ),
                 ),
-                
+
                 const SizedBox(height: 20),
 
                 const Text(
                   "Welcome To",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.black87),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
                 ),
                 const Text(
                   "SMK Islamiyah Ciputat",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3142),
+                  ),
                 ),
                 const Text(
                   "Gerbang Layanan Operasional Akademik (GLORA)",
@@ -138,7 +140,13 @@ class _LoginPageState extends State<LoginPage> {
 
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Username", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
+                  child: const Text(
+                    "Username",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 TextField(
@@ -151,7 +159,10 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.black12),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                   ),
                 ),
 
@@ -159,7 +170,13 @@ class _LoginPageState extends State<LoginPage> {
 
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Password", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
+                  child: const Text(
+                    "Password",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 TextField(
@@ -170,14 +187,22 @@ class _LoginPageState extends State<LoginPage> {
                     filled: true,
                     fillColor: const Color(0xFFFFFDE7),
                     suffixIcon: IconButton(
-                      icon: Icon(_isObscure ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20),
+                      icon: Icon(
+                        _isObscure
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        size: 20,
+                      ),
                       onPressed: () => setState(() => _isObscure = !_isObscure),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.black12),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                   ),
                 ),
 
@@ -201,7 +226,10 @@ class _LoginPageState extends State<LoginPage> {
                         TextSpan(text: "Forgot your account? "),
                         TextSpan(
                           text: "Recover here",
-                          style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -219,8 +247,13 @@ class _LoginPageState extends State<LoginPage> {
                         backgroundColor: Colors.grey[300],
                         foregroundColor: Colors.black87,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 25,
+                          vertical: 12,
+                        ),
                       ),
                       child: const Text("Back"),
                     ),
@@ -233,18 +266,18 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: _isLoading
                           ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
                           : const Text(
-                        "Login",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    )
+                              "Login",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                    ),
                   ],
                 ),
               ],

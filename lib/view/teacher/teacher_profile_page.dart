@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import '../config/pref.dart';
-import '../model/teacher_info_model.dart';
-import '../model/teacher_personal_model.dart';
-import '../viewmodel/teacher_viewmodel.dart';
+import 'package:school_management/viewmodel/teacher_viewmodel.dart';
+import '../../model/teacher_info_model.dart';
+import '../../model/teacher_personal_model.dart';
 
 class TeacherProfilePage extends StatefulWidget {
   final TeacherInfoModel teacherData; // ✅ Pakai TeacherModel, bukan Map
@@ -46,7 +45,9 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
     _addressController = TextEditingController();
     _bornPlaceController = TextEditingController();
     _bornDateController = TextEditingController();
-    _joinDateController = TextEditingController(text: widget.teacherData.joinDate);
+    _joinDateController = TextEditingController(
+      text: widget.teacherData.joinDate,
+    );
 
     _fetchCompleteProfile();
   }
@@ -133,12 +134,16 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
             leading: Container(
               margin: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12)),
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_rounded,
-                      color: Colors.white),
-                  onPressed: () => Navigator.pop(context)),
+                icon: const Icon(
+                  Icons.arrow_back_ios_rounded,
+                  color: Colors.white,
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
             ),
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
@@ -151,8 +156,9 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
                         colors: [Colors.pink.shade400, Colors.pink.shade700],
                       ),
                       borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(40),
-                          bottomRight: Radius.circular(40)),
+                        bottomLeft: Radius.circular(40),
+                        bottomRight: Radius.circular(40),
+                      ),
                     ),
                   ),
                   Positioned(
@@ -164,8 +170,9 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
                         Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.3)),
+                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.3),
+                          ),
                           child: CircleAvatar(
                             radius: 50,
                             backgroundColor: Colors.white,
@@ -177,23 +184,28 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
                         Text(
                           widget.teacherData.displayName,
                           style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                         const SizedBox(height: 5),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 6),
+                            horizontal: 15,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(20)),
+                            color: Colors.black.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                           child: Text(
                             "NIP: ${widget.teacherData.userid}",
                             style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12),
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       ],
@@ -206,178 +218,241 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
           SliverToBoxAdapter(
             child: _isLoading
                 ? const Padding(
-              padding: EdgeInsets.only(top: 80.0),
-              child: Center(
-                  child: CircularProgressIndicator(color: Colors.pink)),
-            )
+                    padding: EdgeInsets.only(top: 80.0),
+                    child: Center(
+                      child: CircularProgressIndicator(color: Colors.pink),
+                    ),
+                  )
                 : Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  // ✅ Professional Info Card
-                  Container(
                     padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(25),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.pink.withOpacity(0.08),
-                            blurRadius: 20,
-                            offset: const Offset(0, 5))
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildProfessionalInfo(
-                            Icons.person_outline_rounded,
-                            "Gender",
-                            _selectedGender,
-                            Colors.indigo),
-                        Container(
-                            height: 40,
-                            width: 1,
-                            color: Colors.grey.shade200),
-                        _buildProfessionalInfo(
-                            Icons.verified_rounded,
-                            "Status",
-                            _activeStatus,
-                            Colors.green),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-
-                  // ✅ Form Card
-                  Container(
-                    padding: const EdgeInsets.all(25),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(25),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black.withOpacity(0.03),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10))
-                      ],
-                    ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(Icons.assignment_ind_rounded,
-                                    color: Colors.pink.shade500,
-                                    size: 20),
-                                const SizedBox(width: 10),
-                                const Text("Professional Details",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF2D3142))),
-                              ],
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                  color: Colors.pink.shade50,
-                                  borderRadius: BorderRadius.circular(8)),
-                              child: Row(
+                        // ✅ Professional Info Card
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(25),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.pink.withOpacity(0.08),
+                                blurRadius: 20,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _buildProfessionalInfo(
+                                Icons.person_outline_rounded,
+                                "Gender",
+                                _selectedGender,
+                                Colors.indigo,
+                              ),
+                              Container(
+                                height: 40,
+                                width: 1,
+                                color: Colors.grey.shade200,
+                              ),
+                              _buildProfessionalInfo(
+                                Icons.verified_rounded,
+                                "Status",
+                                _activeStatus,
+                                Colors.green,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+
+                        // ✅ Form Card
+                        Container(
+                          padding: const EdgeInsets.all(25),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(25),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.03),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(Icons.edit_note_rounded,
-                                      size: 14,
-                                      color: Colors.pink.shade600),
-                                  const SizedBox(width: 4),
-                                  Text("Edit",
-                                      style: TextStyle(
-                                          color: Colors.pink.shade700,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold)),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.assignment_ind_rounded,
+                                        color: Colors.pink.shade500,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      const Text(
+                                        "Professional Details",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF2D3142),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.pink.shade50,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.edit_note_rounded,
+                                          size: 14,
+                                          color: Colors.pink.shade600,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          "Edit",
+                                          style: TextStyle(
+                                            color: Colors.pink.shade700,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
-                            )
-                          ],
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 15),
+                                child: Divider(height: 1),
+                              ),
+
+                              _buildInputField(
+                                "Full Name",
+                                _nameController,
+                                Icons.person_rounded,
+                              ),
+                              _buildInputField(
+                                "NIP",
+                                _nipController,
+                                Icons.badge_rounded,
+                              ),
+                              _buildInputField(
+                                "NUPTK",
+                                _nuptkController,
+                                Icons.card_membership_rounded,
+                              ),
+                              _buildGenderDropdown(),
+                              _buildInputField(
+                                "Born Place",
+                                _bornPlaceController,
+                                Icons.location_city_rounded,
+                              ),
+                              _buildInputField(
+                                "Born Date",
+                                _bornDateController,
+                                Icons.cake_rounded,
+                              ),
+                              _buildInputField(
+                                "Email",
+                                _emailController,
+                                Icons.email_rounded,
+                              ),
+                              _buildInputField(
+                                "Phone",
+                                _phoneController,
+                                Icons.phone_android_rounded,
+                              ),
+                              _buildInputField(
+                                "Join Date",
+                                _joinDateController,
+                                Icons.calendar_month_rounded,
+                              ),
+                              _buildInputField(
+                                "Address",
+                                _addressController,
+                                Icons.home_rounded,
+                                isMultiline: true,
+                              ),
+
+                              const SizedBox(height: 30),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: _handleDelete,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFFE57373,
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 16,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            15,
+                                          ),
+                                        ),
+                                        elevation: 0,
+                                      ),
+                                      child: const Text(
+                                        "Delete",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 15),
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: _handleSave,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.pink.shade600,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 16,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            15,
+                                          ),
+                                        ),
+                                        elevation: 4,
+                                        shadowColor: Colors.pink.withOpacity(
+                                          0.4,
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        "Save",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                        const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            child: Divider(height: 1)),
-
-                        _buildInputField("Full Name", _nameController,
-                            Icons.person_rounded),
-                        _buildInputField(
-                            "NIP", _nipController, Icons.badge_rounded),
-                        _buildInputField("NUPTK", _nuptkController,
-                            Icons.card_membership_rounded),
-                        _buildGenderDropdown(),
-                        _buildInputField("Born Place",
-                            _bornPlaceController, Icons.location_city_rounded),
-                        _buildInputField("Born Date",
-                            _bornDateController, Icons.cake_rounded),
-                        _buildInputField(
-                            "Email", _emailController, Icons.email_rounded),
-                        _buildInputField("Phone", _phoneController,
-                            Icons.phone_android_rounded),
-                        _buildInputField("Join Date",
-                            _joinDateController, Icons.calendar_month_rounded),
-                        _buildInputField(
-                            "Address", _addressController, Icons.home_rounded,
-                            isMultiline: true),
-
-                        const SizedBox(height: 30),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: _handleDelete,
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                    const Color(0xFFE57373),
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(15)),
-                                    elevation: 0),
-                                child: const Text("Delete",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold)),
-                              ),
-                            ),
-                            const SizedBox(width: 15),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: _handleSave,
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.pink.shade600,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(15)),
-                                    elevation: 4,
-                                    shadowColor:
-                                    Colors.pink.withOpacity(0.4)),
-                                child: const Text("Save",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold)),
-                              ),
-                            ),
-                          ],
-                        )
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
           ),
         ],
       ),
@@ -403,7 +478,8 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
       builder: (context) => AlertDialog(
         title: const Text('Delete Teacher'),
         content: Text(
-            'Are you sure you want to delete ${widget.teacherData.displayName}?'),
+          'Are you sure you want to delete ${widget.teacherData.displayName}?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -432,43 +508,62 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
   }
 
   Widget _buildProfessionalInfo(
-      IconData icon, String label, String value, MaterialColor color) {
+    IconData icon,
+    String label,
+    String value,
+    MaterialColor color,
+  ) {
     return Column(
       children: [
         Container(
-            padding: const EdgeInsets.all(10),
-            decoration:
-            BoxDecoration(color: color.shade50, shape: BoxShape.circle),
-            child: Icon(icon, color: color.shade500, size: 20)),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: color.shade50,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: color.shade500, size: 20),
+        ),
         const SizedBox(height: 8),
-        Text(label,
-            style: TextStyle(
-                fontSize: 11,
-                color: Colors.grey.shade500,
-                fontWeight: FontWeight.bold)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: Colors.grey.shade500,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 4),
-        Text(value,
-            style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2D3142))),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2D3142),
+          ),
+        ),
       ],
     );
   }
 
   Widget _buildInputField(
-      String label, TextEditingController controller, IconData icon,
-      {bool isMultiline = false}) {
+    String label,
+    TextEditingController controller,
+    IconData icon, {
+    bool isMultiline = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
-              style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade700)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey.shade700,
+            ),
+          ),
           const SizedBox(height: 8),
           TextField(
             controller: controller,
@@ -480,15 +575,18 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
                   : null,
               filled: true,
               fillColor: const Color(0xFFF8F9FA),
-              contentPadding:
-              const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 15,
+                vertical: 14,
+              ),
               enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade200)),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade200),
+              ),
               focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                  BorderSide(color: Colors.pink.shade400, width: 1.5)),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.pink.shade400, width: 1.5),
+              ),
             ),
           ),
         ],
@@ -502,37 +600,53 @@ class _TeacherProfilePageState extends State<TeacherProfilePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Gender",
-              style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade700)),
+          Text(
+            "Gender",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey.shade700,
+            ),
+          ),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
             value: _selectedGender,
-            icon: Icon(Icons.keyboard_arrow_down_rounded,
-                color: Colors.pink.shade400),
+            icon: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: Colors.pink.shade400,
+            ),
             decoration: InputDecoration(
-              prefixIcon:
-              Icon(Icons.wc_rounded, color: Colors.pink.shade300, size: 20),
+              prefixIcon: Icon(
+                Icons.wc_rounded,
+                color: Colors.pink.shade300,
+                size: 20,
+              ),
               filled: true,
               fillColor: const Color(0xFFF8F9FA),
-              contentPadding:
-              const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 15,
+                vertical: 14,
+              ),
               enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade200)),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade200),
+              ),
               focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                  BorderSide(color: Colors.pink.shade400, width: 1.5)),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.pink.shade400, width: 1.5),
+              ),
             ),
             items: ['Select', 'Male', 'Female'].map((String value) {
               return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value,
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w600)));
+                value: value,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              );
             }).toList(),
             onChanged: (newValue) {
               setState(() {

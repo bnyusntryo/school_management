@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_management/config/pref.dart';
-import 'package:school_management/view/client_id_page.dart';
+import 'package:school_management/view/auth/auth_provider.dart';
+import 'package:school_management/view/auth/client_id_page.dart';
 import 'package:school_management/view/home_page.dart';
-import 'auth_provider.dart';
 
 class BasePage extends StatefulWidget {
   const BasePage({super.key});
@@ -13,7 +13,6 @@ class BasePage extends StatefulWidget {
 }
 
 class _BasePageState extends State<BasePage> {
-
   late Future<bool> _sessionCheckFuture;
 
   @override
@@ -32,10 +31,10 @@ class _BasePageState extends State<BasePage> {
 
     if (!context.mounted) return false;
 
-    Provider.of<AuthProvider>(context, listen: false).setUserData(
-      role: savedRole,
-      userName: savedName,
-    );
+    Provider.of<AuthProvider>(
+      context,
+      listen: false,
+    ).setUserData(role: savedRole, userName: savedName);
 
     return true;
   }
@@ -45,7 +44,6 @@ class _BasePageState extends State<BasePage> {
     return FutureBuilder<bool>(
       future: _sessionCheckFuture,
       builder: (context, snapshot) {
-
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(

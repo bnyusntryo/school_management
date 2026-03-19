@@ -3,8 +3,8 @@ import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'auth_provider.dart';
-import '../config/pref.dart';
+import 'package:school_management/view/auth/auth_provider.dart';
+import '../../config/pref.dart';
 
 class AttendanceReportPage extends StatefulWidget {
   const AttendanceReportPage({super.key});
@@ -46,8 +46,13 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
       String payloadStatus = userType.toUpperCase();
 
       var req = await http.post(
-        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/attendance/reports/get-user'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        Uri.parse(
+          'https://schoolapp-api-dev.zeabur.app/api/attendance/reports/get-user',
+        ),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
         body: jsonEncode({"user_status": payloadStatus}),
       );
 
@@ -55,7 +60,9 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
         var res = jsonDecode(req.body);
         if (res['data'] != null && mounted) {
           setState(() {
-            _availableUsers = (res['data'] as List).where((u) => u['full_name'] != "").toList();
+            _availableUsers = (res['data'] as List)
+                .where((u) => u['full_name'] != "")
+                .toList();
             _isLoadingUsers = false;
           });
         }
@@ -72,9 +79,13 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
   // =========================================================
   void _moveHighlightedToSelected() {
     setState(() {
-      var toMove = _availableUsers.where((u) => _highlightedAvailable.contains(u['userid'])).toList();
+      var toMove = _availableUsers
+          .where((u) => _highlightedAvailable.contains(u['userid']))
+          .toList();
       _selectedUsers.addAll(toMove);
-      _availableUsers.removeWhere((u) => _highlightedAvailable.contains(u['userid']));
+      _availableUsers.removeWhere(
+        (u) => _highlightedAvailable.contains(u['userid']),
+      );
       _highlightedAvailable.clear();
     });
   }
@@ -89,9 +100,13 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
 
   void _moveHighlightedToAvailable() {
     setState(() {
-      var toMove = _selectedUsers.where((u) => _highlightedSelected.contains(u['userid'])).toList();
+      var toMove = _selectedUsers
+          .where((u) => _highlightedSelected.contains(u['userid']))
+          .toList();
       _availableUsers.addAll(toMove);
-      _selectedUsers.removeWhere((u) => _highlightedSelected.contains(u['userid']));
+      _selectedUsers.removeWhere(
+        (u) => _highlightedSelected.contains(u['userid']),
+      );
       _highlightedSelected.clear();
     });
   }
@@ -114,13 +129,24 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
       builder: (context, child) {
-        return Theme(data: Theme.of(context).copyWith(colorScheme: ColorScheme.light(primary: Colors.blue.shade800, onPrimary: Colors.white, onSurface: Colors.black)), child: child!);
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.blue.shade800,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
       },
     );
     if (picked != null && mounted) {
       setState(() {
-        if (isStart) _startDate = picked;
-        else _endDate = picked;
+        if (isStart)
+          _startDate = picked;
+        else
+          _endDate = picked;
       });
     }
   }
@@ -129,24 +155,48 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
   // 🚀 MESIN API: SUBMIT REPORT
   // =========================================================
   Future<void> _submitReport() async {
-    if (_startDate == null || _endDate == null || _selectedUserType == null || _selectedUsers.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please fill all fields and select at least 1 user!"), backgroundColor: Colors.red));
+    if (_startDate == null ||
+        _endDate == null ||
+        _selectedUserType == null ||
+        _selectedUsers.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please fill all fields and select at least 1 user!"),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
 
-    showDialog(context: context, barrierDismissible: false, builder: (context) => const Center(child: CircularProgressIndicator(color: Colors.blue)));
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) =>
+          const Center(child: CircularProgressIndicator(color: Colors.blue)),
+    );
 
     try {
       String? token = await Session().getUserToken();
       String startStr = DateFormat('yyyy-MM-dd').format(_startDate!);
       String endStr = DateFormat('yyyy-MM-dd').format(_endDate!);
-      List<Map<String, String>> formattedUsers = _selectedUsers.map((u) => {"userid": u['userid'].toString()}).toList();
+      List<Map<String, String>> formattedUsers = _selectedUsers
+          .map((u) => {"userid": u['userid'].toString()})
+          .toList();
 
-      var payload = { "start_date": startStr, "end_date": endStr, "userid": formattedUsers };
+      var payload = {
+        "start_date": startStr,
+        "end_date": endStr,
+        "userid": formattedUsers,
+      };
 
       var req = await http.post(
-        Uri.parse('https://schoolapp-api-dev.zeabur.app/api/attendance/reports/attendance-list'),
-        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        Uri.parse(
+          'https://schoolapp-api-dev.zeabur.app/api/attendance/reports/attendance-list',
+        ),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
         body: jsonEncode(payload),
       );
 
@@ -159,17 +209,28 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
         var res = jsonDecode(req.body);
         if (res['error'] != null || res['data'] == null) {
           reportData = [];
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("No data found for selected period & users."), backgroundColor: Colors.orange));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("No data found for selected period & users."),
+              backgroundColor: Colors.orange,
+            ),
+          );
         } else {
           reportData = res['data'];
         }
       }
 
-      Navigator.push(context, MaterialPageRoute(builder: (context) => PreviewReportPage(reportData: reportData)));
-
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PreviewReportPage(reportData: reportData),
+        ),
+      );
     } catch (e) {
       if (mounted) Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
+      );
     }
   }
 
@@ -187,15 +248,36 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
         leading: Padding(
           padding: const EdgeInsets.only(left: 10.0),
           child: IconButton(
-              icon: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5)]),
-                  child: const Icon(Icons.arrow_back_ios_rounded, color: Colors.black87, size: 16)
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 5,
+                  ),
+                ],
               ),
-              onPressed: () => Navigator.pop(context)
+              child: const Icon(
+                Icons.arrow_back_ios_rounded,
+                color: Colors.black87,
+                size: 16,
+              ),
+            ),
+            onPressed: () => Navigator.pop(context),
           ),
         ),
-        title: const Text("Generate Report", style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 0.5)),
+        title: const Text(
+          "Generate Report",
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+            letterSpacing: 0.5,
+          ),
+        ),
       ),
       body: SafeArea(
         child: Padding(
@@ -203,14 +285,33 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Select parameters to generate attendance report.", style: TextStyle(color: Colors.grey.shade600, fontSize: 13, fontWeight: FontWeight.w500)),
+              Text(
+                "Select parameters to generate attendance report.",
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               const SizedBox(height: 25),
 
               Row(
                 children: [
-                  Expanded(child: _buildModernDateField("Start Date", _startDate, () => _selectDate(context, true))),
+                  Expanded(
+                    child: _buildModernDateField(
+                      "Start Date",
+                      _startDate,
+                      () => _selectDate(context, true),
+                    ),
+                  ),
                   const SizedBox(width: 15),
-                  Expanded(child: _buildModernDateField("End Date", _endDate, () => _selectDate(context, false))),
+                  Expanded(
+                    child: _buildModernDateField(
+                      "End Date",
+                      _endDate,
+                      () => _selectDate(context, false),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -221,58 +322,154 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Select Target Users", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Colors.black87)),
+                  const Text(
+                    "Select Target Users",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.black87,
+                    ),
+                  ),
                   if (_selectedUsers.isNotEmpty)
-                    Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(10)), child: Text("${_selectedUsers.length} Selected", style: TextStyle(color: Colors.green.shade700, fontSize: 11, fontWeight: FontWeight.bold))),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade50,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        "${_selectedUsers.length} Selected",
+                        style: TextStyle(
+                          color: Colors.green.shade700,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                 ],
               ),
               const SizedBox(height: 15),
 
               _isLoadingUsers
-                  ? Container(height: 250, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)), child: const Center(child: CircularProgressIndicator()))
+                  ? Container(
+                      height: 250,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Center(child: CircularProgressIndicator()),
+                    )
                   : SizedBox(
-                height: 280,
-                child: Row(
-                  children: [
-                    Expanded(flex: 5, child: _buildModernListBox("Available", _availableUsers, _highlightedAvailable, (id) { setState(() { if (_highlightedAvailable.contains(id)) _highlightedAvailable.remove(id); else _highlightedAvailable.add(id); }); }, false)),
-
-                    Expanded(
-                      flex: 2,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      height: 280,
+                      child: Row(
                         children: [
-                          _buildCircularTransferBtn(Icons.keyboard_arrow_right_rounded, _moveHighlightedToSelected),
-                          _buildCircularTransferBtn(Icons.keyboard_double_arrow_right_rounded, _moveAllToSelected),
-                          const SizedBox(height: 15),
-                          _buildCircularTransferBtn(Icons.keyboard_arrow_left_rounded, _moveHighlightedToAvailable),
-                          _buildCircularTransferBtn(Icons.keyboard_double_arrow_left_rounded, _moveAllToAvailable),
+                          Expanded(
+                            flex: 5,
+                            child: _buildModernListBox(
+                              "Available",
+                              _availableUsers,
+                              _highlightedAvailable,
+                              (id) {
+                                setState(() {
+                                  if (_highlightedAvailable.contains(id))
+                                    _highlightedAvailable.remove(id);
+                                  else
+                                    _highlightedAvailable.add(id);
+                                });
+                              },
+                              false,
+                            ),
+                          ),
+
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildCircularTransferBtn(
+                                  Icons.keyboard_arrow_right_rounded,
+                                  _moveHighlightedToSelected,
+                                ),
+                                _buildCircularTransferBtn(
+                                  Icons.keyboard_double_arrow_right_rounded,
+                                  _moveAllToSelected,
+                                ),
+                                const SizedBox(height: 15),
+                                _buildCircularTransferBtn(
+                                  Icons.keyboard_arrow_left_rounded,
+                                  _moveHighlightedToAvailable,
+                                ),
+                                _buildCircularTransferBtn(
+                                  Icons.keyboard_double_arrow_left_rounded,
+                                  _moveAllToAvailable,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          Expanded(
+                            flex: 5,
+                            child: _buildModernListBox(
+                              "Selected",
+                              _selectedUsers,
+                              _highlightedSelected,
+                              (id) {
+                                setState(() {
+                                  if (_highlightedSelected.contains(id))
+                                    _highlightedSelected.remove(id);
+                                  else
+                                    _highlightedSelected.add(id);
+                                });
+                              },
+                              true,
+                            ),
+                          ),
                         ],
                       ),
                     ),
-
-                    Expanded(flex: 5, child: _buildModernListBox("Selected", _selectedUsers, _highlightedSelected, (id) { setState(() { if (_highlightedSelected.contains(id)) _highlightedSelected.remove(id); else _highlightedSelected.add(id); }); }, true)),
-                  ],
-                ),
-              ),
               const SizedBox(height: 40),
 
               SizedBox(
                 width: double.infinity,
                 child: Container(
                   decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [attGradientStart, attGradientEnd]),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [BoxShadow(color: attGradientEnd.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 5))]
+                    gradient: LinearGradient(
+                      colors: [attGradientStart, attGradientEnd],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: attGradientEnd.withOpacity(0.4),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
                   ),
                   child: ElevatedButton.icon(
                     onPressed: _submitReport,
-                    icon: const Icon(Icons.analytics_rounded, color: Colors.white, size: 20),
-                    label: const Text("Generate Report", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                    icon: const Icon(
+                      Icons.analytics_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                    label: const Text(
+                      "Generate Report",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       shadowColor: Colors.transparent,
                       padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                     ),
                   ),
                 ),
@@ -289,11 +486,22 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
   // 🧩 KOMPONEN WIDGET KECIL (MODERN)
   // =========================================================
 
-  Widget _buildModernDateField(String label, DateTime? value, VoidCallback onTap) {
+  Widget _buildModernDateField(
+    String label,
+    DateTime? value,
+    VoidCallback onTap,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey.shade700,
+          ),
+        ),
         const SizedBox(height: 8),
         InkWell(
           onTap: onTap,
@@ -303,20 +511,38 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  value != null ? DateFormat('dd MMM yy').format(value) : "Select",
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: value != null ? Colors.black87 : Colors.grey.shade400),
+                  value != null
+                      ? DateFormat('dd MMM yy').format(value)
+                      : "Select",
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: value != null
+                        ? Colors.black87
+                        : Colors.grey.shade400,
+                  ),
                 ),
-                Icon(Icons.calendar_month_rounded, size: 18, color: attGradientStart),
+                Icon(
+                  Icons.calendar_month_rounded,
+                  size: 18,
+                  color: attGradientStart,
+                ),
               ],
             ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -325,33 +551,72 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Target Role", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
+        Text(
+          "Target Role",
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey.shade700,
+          ),
+        ),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(15),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: DropdownButtonFormField<String>(
             value: _selectedUserType,
-            hint: Text("Select Student or Teacher", style: TextStyle(fontSize: 13, color: Colors.grey.shade400, fontWeight: FontWeight.w600)),
-            icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey.shade400),
+            hint: Text(
+              "Select Student or Teacher",
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey.shade400,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            icon: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: Colors.grey.shade400,
+            ),
             decoration: const InputDecoration(
-              contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 15,
+                vertical: 12,
+              ),
               border: InputBorder.none,
             ),
             items: ["Student", "Teacher"].map((String val) {
               return DropdownMenuItem(
-                  value: val,
-                  child: Row(
-                    children: [
-                      Icon(val == "Student" ? Icons.school_rounded : Icons.work_rounded, size: 16, color: attGradientEnd),
-                      const SizedBox(width: 10),
-                      Text(val, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87)),
-                    ],
-                  )
+                value: val,
+                child: Row(
+                  children: [
+                    Icon(
+                      val == "Student"
+                          ? Icons.school_rounded
+                          : Icons.work_rounded,
+                      size: 16,
+                      color: attGradientEnd,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      val,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
               );
             }).toList(),
             onChanged: (val) {
@@ -385,13 +650,30 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
     );
   }
 
-  Widget _buildModernListBox(String title, List<dynamic> users, Set<String> highlightedSet, Function(String) onTap, bool isSelectedBox) {
+  Widget _buildModernListBox(
+    String title,
+    List<dynamic> users,
+    Set<String> highlightedSet,
+    Function(String) onTap,
+    bool isSelectedBox,
+  ) {
     return Container(
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 5))],
-          border: Border.all(color: isSelectedBox ? attGradientEnd.withOpacity(0.3) : Colors.transparent, width: 1.5)
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+        border: Border.all(
+          color: isSelectedBox
+              ? attGradientEnd.withOpacity(0.3)
+              : Colors.transparent,
+          width: 1.5,
+        ),
       ),
       child: Column(
         children: [
@@ -399,14 +681,33 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-                color: isSelectedBox ? attGradientEnd.withOpacity(0.05) : Colors.grey.shade50,
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                border: Border(bottom: BorderSide(color: Colors.grey.shade100))
+              color: isSelectedBox
+                  ? attGradientEnd.withOpacity(0.05)
+                  : Colors.grey.shade50,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              border: Border(bottom: BorderSide(color: Colors.grey.shade100)),
             ),
             child: Column(
               children: [
-                Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: isSelectedBox ? attGradientEnd : Colors.black87)),
-                Text("${users.length} items", style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900,
+                    color: isSelectedBox ? attGradientEnd : Colors.black87,
+                  ),
+                ),
+                Text(
+                  "${users.length} items",
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           ),
@@ -414,62 +715,109 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
           Expanded(
             child: users.isEmpty
                 ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(isSelectedBox ? Icons.check_circle_outline_rounded : Icons.search_off_rounded, color: Colors.grey.shade300, size: 30),
-                  const SizedBox(height: 5),
-                  Text("Empty", style: TextStyle(fontSize: 11, color: Colors.grey.shade400, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            )
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isSelectedBox
+                              ? Icons.check_circle_outline_rounded
+                              : Icons.search_off_rounded,
+                          color: Colors.grey.shade300,
+                          size: 30,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          "Empty",
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey.shade400,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 : ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-              itemCount: users.length,
-              itemBuilder: (context, index) {
-                var u = users[index];
-                bool isHighlighted = highlightedSet.contains(u['userid']);
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 5,
+                      horizontal: 8,
+                    ),
+                    itemCount: users.length,
+                    itemBuilder: (context, index) {
+                      var u = users[index];
+                      bool isHighlighted = highlightedSet.contains(u['userid']);
 
-                String initial = u['full_name'].toString().isNotEmpty ? u['full_name'].toString()[0].toUpperCase() : "?";
+                      String initial = u['full_name'].toString().isNotEmpty
+                          ? u['full_name'].toString()[0].toUpperCase()
+                          : "?";
 
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 6),
-                  decoration: BoxDecoration(
-                    color: isHighlighted ? attGradientStart.withOpacity(0.1) : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: isHighlighted ? attGradientStart.withOpacity(0.5) : Colors.grey.shade200),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => onTap(u['userid']),
-                      borderRadius: BorderRadius.circular(12),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 12,
-                              backgroundColor: isHighlighted ? attGradientStart : Colors.grey.shade200,
-                              child: Text(initial, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isHighlighted ? Colors.white : Colors.grey.shade600)),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                u['full_name'],
-                                style: TextStyle(fontSize: 11, color: isHighlighted ? attGradientStart : Colors.black87, fontWeight: isHighlighted ? FontWeight.bold : FontWeight.w600),
-                                maxLines: 2, overflow: TextOverflow.ellipsis,
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 6),
+                        decoration: BoxDecoration(
+                          color: isHighlighted
+                              ? attGradientStart.withOpacity(0.1)
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isHighlighted
+                                ? attGradientStart.withOpacity(0.5)
+                                : Colors.grey.shade200,
+                          ),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => onTap(u['userid']),
+                            borderRadius: BorderRadius.circular(12),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 8,
+                              ),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 12,
+                                    backgroundColor: isHighlighted
+                                        ? attGradientStart
+                                        : Colors.grey.shade200,
+                                    child: Text(
+                                      initial,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: isHighlighted
+                                            ? Colors.white
+                                            : Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      u['full_name'],
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: isHighlighted
+                                            ? attGradientStart
+                                            : Colors.black87,
+                                        fontWeight: isHighlighted
+                                            ? FontWeight.bold
+                                            : FontWeight.w600,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          )
+          ),
         ],
       ),
     );
@@ -487,15 +835,27 @@ class PreviewReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authData = Provider.of<AuthProvider>(context, listen: false);
-    String currentDate = DateFormat('M/d/yyyy, h:mm:ss a').format(DateTime.now());
+    String currentDate = DateFormat(
+      'M/d/yyyy, h:mm:ss a',
+    ).format(DateTime.now());
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF005696),
         elevation: 0,
-        title: const Text("Preview Reports", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-        leading: IconButton(icon: const Icon(Icons.arrow_back_rounded, color: Colors.white), onPressed: () => Navigator.pop(context)),
+        title: const Text(
+          "Preview Reports",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -516,17 +876,55 @@ class PreviewReportPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton.icon(
-                      onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Fitur Download Excel akan segera hadir!"))),
-                      icon: const Icon(Icons.insert_drive_file_outlined, color: Colors.white, size: 16),
-                      label: const Text("Download Excel", style: TextStyle(color: Colors.white, fontSize: 12)),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2EBD59), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5))),
+                      onPressed: () =>
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "Fitur Download Excel akan segera hadir!",
+                              ),
+                            ),
+                          ),
+                      icon: const Icon(
+                        Icons.insert_drive_file_outlined,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                      label: const Text(
+                        "Download Excel",
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2EBD59),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton.icon(
-                      onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Fitur Download PDF akan segera hadir!"))),
-                      icon: const Icon(Icons.picture_as_pdf_outlined, color: Colors.white, size: 16),
-                      label: const Text("Download PDF", style: TextStyle(color: Colors.white, fontSize: 12)),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE54D4D), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5))),
+                      onPressed: () =>
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "Fitur Download PDF akan segera hadir!",
+                              ),
+                            ),
+                          ),
+                      icon: const Icon(
+                        Icons.picture_as_pdf_outlined,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                      label: const Text(
+                        "Download PDF",
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE54D4D),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -539,66 +937,130 @@ class PreviewReportPage extends StatelessWidget {
           Expanded(
             child: reportData.isEmpty
                 ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.description_outlined, size: 80, color: Colors.grey.shade300),
-                  const SizedBox(height: 15),
-                  Text("No Data Found", style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold, fontSize: 18)),
-                  const SizedBox(height: 5),
-                  Text("Tidak ada absensi untuk user dan tanggal terpilih.", style: TextStyle(color: Colors.grey.shade400, fontSize: 12)),
-                ],
-              ),
-            )
-                : Container(
-              margin: const EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade300)),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SingleChildScrollView(
-                    child: DataTable(
-                      headingRowColor: MaterialStateProperty.all(const Color(0xFF2A3671)),
-                      headingTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
-                      dataTextStyle: const TextStyle(color: Colors.black87, fontSize: 12),
-                      columns: const [
-                        DataColumn(label: Text("#")),
-                        DataColumn(label: Text("Attendance ID")),
-                        DataColumn(label: Text("Date")),
-                        DataColumn(label: Text("Full Name")),
-                        DataColumn(label: Text("Schedule Attendance In")),
-                        DataColumn(label: Text("Schedule Attendance Out")),
-                        DataColumn(label: Text("Actual Attendance In")),
-                        DataColumn(label: Text("Actual Attendance Out")),
-                        DataColumn(label: Text("Attendance Status")),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.description_outlined,
+                          size: 80,
+                          color: Colors.grey.shade300,
+                        ),
+                        const SizedBox(height: 15),
+                        Text(
+                          "No Data Found",
+                          style: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          "Tidak ada absensi untuk user dan tanggal terpilih.",
+                          style: TextStyle(
+                            color: Colors.grey.shade400,
+                            fontSize: 12,
+                          ),
+                        ),
                       ],
-                      rows: List.generate(reportData.length, (index) {
-                        var data = reportData[index];
-                        return DataRow(
-                          cells: [
-                            DataCell(Text((index + 1).toString())),
-                            DataCell(Text(data['attendance_id']?.toString() ?? "-")),
-                            DataCell(Text(data['attendance_date']?.toString() ?? "-")),
-                            DataCell(Text(data['full_name']?.toString() ?? "-")),
-                            DataCell(Text(data['sch_attend_in']?.toString() ?? "-")),
-                            DataCell(Text(data['sch_attend_out']?.toString() ?? "-")),
-                            DataCell(Text(data['act_attend_in']?.toString() ?? "-")),
-                            DataCell(Text(data['act_attend_out']?.toString() ?? "-")),
-                            DataCell(
-                                Text(
-                                    data['attend_status']?.toString() ?? "-",
-                                    style: TextStyle(color: data['attend_status'] == 'Late' ? Colors.red : Colors.green, fontWeight: FontWeight.bold)
-                                )
+                    ),
+                  )
+                : Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: SingleChildScrollView(
+                          child: DataTable(
+                            headingRowColor: MaterialStateProperty.all(
+                              const Color(0xFF2A3671),
                             ),
-                          ],
-                        );
-                      }),
+                            headingTextStyle: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                            dataTextStyle: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 12,
+                            ),
+                            columns: const [
+                              DataColumn(label: Text("#")),
+                              DataColumn(label: Text("Attendance ID")),
+                              DataColumn(label: Text("Date")),
+                              DataColumn(label: Text("Full Name")),
+                              DataColumn(label: Text("Schedule Attendance In")),
+                              DataColumn(
+                                label: Text("Schedule Attendance Out"),
+                              ),
+                              DataColumn(label: Text("Actual Attendance In")),
+                              DataColumn(label: Text("Actual Attendance Out")),
+                              DataColumn(label: Text("Attendance Status")),
+                            ],
+                            rows: List.generate(reportData.length, (index) {
+                              var data = reportData[index];
+                              return DataRow(
+                                cells: [
+                                  DataCell(Text((index + 1).toString())),
+                                  DataCell(
+                                    Text(
+                                      data['attendance_id']?.toString() ?? "-",
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      data['attendance_date']?.toString() ??
+                                          "-",
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(data['full_name']?.toString() ?? "-"),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      data['sch_attend_in']?.toString() ?? "-",
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      data['sch_attend_out']?.toString() ?? "-",
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      data['act_attend_in']?.toString() ?? "-",
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      data['act_attend_out']?.toString() ?? "-",
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      data['attend_status']?.toString() ?? "-",
+                                      style: TextStyle(
+                                        color: data['attend_status'] == 'Late'
+                                            ? Colors.red
+                                            : Colors.green,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
           ),
           const SizedBox(height: 20),
         ],
@@ -611,10 +1073,24 @@ class PreviewReportPage extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 6.0),
       child: Row(
         children: [
-          SizedBox(width: 100, child: Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500))),
-          const Text(":", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+          SizedBox(
+            width: 100,
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+            ),
+          ),
+          const Text(
+            ":",
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          ),
           const SizedBox(width: 10),
-          Expanded(child: Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+          ),
         ],
       ),
     );

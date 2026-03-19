@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../viewmodel/school_activity_reports_viewmodel.dart';
-import 'school_activity_report_preview_page.dart';
+import '../../viewmodel/school_activity_reports_viewmodel.dart';
+import '../school_activity_report_preview_page.dart';
 
 class SchoolActivityReportsPage extends StatefulWidget {
   const SchoolActivityReportsPage({super.key});
 
   @override
-  State<SchoolActivityReportsPage> createState() => _SchoolActivityReportsPageState();
+  State<SchoolActivityReportsPage> createState() =>
+      _SchoolActivityReportsPageState();
 }
 
 class _SchoolActivityReportsPageState extends State<SchoolActivityReportsPage> {
-  final SchoolActivityReportsViewModel _viewModel = SchoolActivityReportsViewModel();
+  final SchoolActivityReportsViewModel _viewModel =
+      SchoolActivityReportsViewModel();
 
   bool _isLoading = true;
   DateTime? _startDate;
@@ -55,7 +57,13 @@ class _SchoolActivityReportsPageState extends State<SchoolActivityReportsPage> {
 
   void _showError(String msg) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: gradientEnd, behavior: SnackBarBehavior.floating));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          backgroundColor: gradientEnd,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -71,7 +79,9 @@ class _SchoolActivityReportsPageState extends State<SchoolActivityReportsPage> {
 
   void _selectAll() {
     setState(() {
-      _selectedClassIds = _allClasses.map((c) => c['userid'].toString()).toSet();
+      _selectedClassIds = _allClasses
+          .map((c) => c['userid'].toString())
+          .toSet();
     });
   }
 
@@ -89,17 +99,23 @@ class _SchoolActivityReportsPageState extends State<SchoolActivityReportsPage> {
       lastDate: DateTime(2030),
       builder: (context, child) {
         return Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.light(primary: gradientEnd, onPrimary: Colors.white, onSurface: textDark),
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: gradientEnd,
+              onPrimary: Colors.white,
+              onSurface: textDark,
             ),
-            child: child!
+          ),
+          child: child!,
         );
       },
     );
     if (picked != null && mounted) {
       setState(() {
-        if (isStart) _startDate = picked;
-        else _endDate = picked;
+        if (isStart)
+          _startDate = picked;
+        else
+          _endDate = picked;
       });
     }
   }
@@ -110,7 +126,11 @@ class _SchoolActivityReportsPageState extends State<SchoolActivityReportsPage> {
       return;
     }
 
-    showDialog(context: context, barrierDismissible: false, builder: (context) => const Center(child: CircularProgressIndicator()));
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
 
     try {
       String startStr = DateFormat('yyyy-MM-dd').format(_startDate!);
@@ -133,7 +153,13 @@ class _SchoolActivityReportsPageState extends State<SchoolActivityReportsPage> {
           return;
         }
 
-        Navigator.push(context, MaterialPageRoute(builder: (context) => SchoolActivityReportPreviewPage(reportData: rawReportData)));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                SchoolActivityReportPreviewPage(reportData: rawReportData),
+          ),
+        );
       } else {
         _showError(resp.message ?? "Gagal Generate Report.");
       }
@@ -160,18 +186,56 @@ class _SchoolActivityReportsPageState extends State<SchoolActivityReportsPage> {
               child: InkWell(
                 onTap: () => Navigator.pop(context),
                 borderRadius: BorderRadius.circular(12),
-                child: Container(decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white, size: 16)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_ios_rounded,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
               ),
             ),
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 60, bottom: 16),
-              title: const Text("Class Activity Report", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: -0.5)),
+              title: const Text(
+                "Class Activity Report",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 18,
+                  letterSpacing: -0.5,
+                ),
+              ),
               background: Container(
-                decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [gradientStart, gradientEnd])),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [gradientStart, gradientEnd],
+                  ),
+                ),
                 child: Stack(
                   children: [
-                    Positioned(right: -30, top: -20, child: CircleAvatar(radius: 60, backgroundColor: Colors.white.withOpacity(0.1))),
-                    Positioned(left: 40, bottom: -40, child: CircleAvatar(radius: 40, backgroundColor: Colors.white.withOpacity(0.05))),
+                    Positioned(
+                      right: -30,
+                      top: -20,
+                      child: CircleAvatar(
+                        radius: 60,
+                        backgroundColor: Colors.white.withOpacity(0.1),
+                      ),
+                    ),
+                    Positioned(
+                      left: 40,
+                      bottom: -40,
+                      child: CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Colors.white.withOpacity(0.05),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -184,14 +248,33 @@ class _SchoolActivityReportsPageState extends State<SchoolActivityReportsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Period Filter", style: TextStyle(color: textDark, fontWeight: FontWeight.w900, fontSize: 16)),
+                  Text(
+                    "Period Filter",
+                    style: TextStyle(
+                      color: textDark,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                    ),
+                  ),
                   const SizedBox(height: 15),
 
                   Row(
                     children: [
-                      Expanded(child: _buildDateCard("Start Date", _startDate, () => _selectDate(context, true))),
+                      Expanded(
+                        child: _buildDateCard(
+                          "Start Date",
+                          _startDate,
+                          () => _selectDate(context, true),
+                        ),
+                      ),
                       const SizedBox(width: 15),
-                      Expanded(child: _buildDateCard("End Date", _endDate, () => _selectDate(context, false))),
+                      Expanded(
+                        child: _buildDateCard(
+                          "End Date",
+                          _endDate,
+                          () => _selectDate(context, false),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 30),
@@ -201,10 +284,34 @@ class _SchoolActivityReportsPageState extends State<SchoolActivityReportsPage> {
                     children: [
                       Row(
                         children: [
-                          Text("Target Classes", style: TextStyle(color: textDark, fontWeight: FontWeight.w900, fontSize: 16)),
+                          Text(
+                            "Target Classes",
+                            style: TextStyle(
+                              color: textDark,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
+                            ),
+                          ),
                           const SizedBox(width: 8),
                           if (_selectedClassIds.isNotEmpty)
-                            Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: gradientStart, borderRadius: BorderRadius.circular(10)), child: Text("${_selectedClassIds.length}", style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold))),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: gradientStart,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                "${_selectedClassIds.length}",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
                         ],
                       ),
 
@@ -213,65 +320,150 @@ class _SchoolActivityReportsPageState extends State<SchoolActivityReportsPage> {
                           if (_selectedClassIds.isNotEmpty)
                             TextButton(
                               onPressed: _clearAll,
-                              style: TextButton.styleFrom(visualDensity: VisualDensity.compact, foregroundColor: Colors.redAccent),
-                              child: const Text("Clear", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                              style: TextButton.styleFrom(
+                                visualDensity: VisualDensity.compact,
+                                foregroundColor: Colors.redAccent,
+                              ),
+                              child: const Text(
+                                "Clear",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           TextButton(
                             onPressed: _selectAll,
-                            style: TextButton.styleFrom(visualDensity: VisualDensity.compact, foregroundColor: gradientEnd),
-                            child: const Text("Select All", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            style: TextButton.styleFrom(
+                              visualDensity: VisualDensity.compact,
+                              foregroundColor: gradientEnd,
+                            ),
+                            child: const Text(
+                              "Select All",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 10),
 
                   _isLoading
-                      ? SizedBox(height: 200, child: Center(child: CircularProgressIndicator(color: gradientEnd)))
+                      ? SizedBox(
+                          height: 200,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: gradientEnd,
+                            ),
+                          ),
+                        )
                       : _allClasses.isEmpty
                       ? Container(
-                    width: double.infinity, padding: const EdgeInsets.all(30),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.grey.shade200)),
-                    child: Column(
-                      children: [
-                        Icon(Icons.search_off_rounded, color: Colors.grey.shade300, size: 40),
-                        const SizedBox(height: 10),
-                        Text("No classes available", style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  )
-                      : Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: _allClasses.map((c) {
-                      String id = c['userid']?.toString() ?? "";
-                      String name = c['full_name']?.toString() ?? "Unknown";
-                      bool isSelected = _selectedClassIds.contains(id);
-
-                      return GestureDetector(
-                        onTap: () => _toggleSelection(id),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(30),
                           decoration: BoxDecoration(
-                            color: isSelected ? gradientEnd : Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: isSelected ? [BoxShadow(color: gradientEnd.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 4, offset: const Offset(0, 2))],
-                            border: Border.all(color: isSelected ? gradientEnd : Colors.grey.shade200),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.grey.shade200),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                          child: Column(
                             children: [
-                              Icon(isSelected ? Icons.check_circle_rounded : Icons.circle_outlined, size: 16, color: isSelected ? Colors.white : Colors.grey.shade400),
-                              const SizedBox(width: 8),
-                              Text(name, style: TextStyle(fontSize: 13, fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600, color: isSelected ? Colors.white : textDark)),
+                              Icon(
+                                Icons.search_off_rounded,
+                                color: Colors.grey.shade300,
+                                size: 40,
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                "No classes available",
+                                style: TextStyle(
+                                  color: Colors.grey.shade500,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ],
                           ),
+                        )
+                      : Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: _allClasses.map((c) {
+                            String id = c['userid']?.toString() ?? "";
+                            String name =
+                                c['full_name']?.toString() ?? "Unknown";
+                            bool isSelected = _selectedClassIds.contains(id);
+
+                            return GestureDetector(
+                              onTap: () => _toggleSelection(id),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? gradientEnd
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: isSelected
+                                      ? [
+                                          BoxShadow(
+                                            color: gradientEnd.withOpacity(0.3),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ]
+                                      : [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                              0.02,
+                                            ),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? gradientEnd
+                                        : Colors.grey.shade200,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      isSelected
+                                          ? Icons.check_circle_rounded
+                                          : Icons.circle_outlined,
+                                      size: 16,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.grey.shade400,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      name,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w800
+                                            : FontWeight.w600,
+                                        color: isSelected
+                                            ? Colors.white
+                                            : textDark,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
                         ),
-                      );
-                    }).toList(),
-                  ),
 
                   const SizedBox(height: 100),
                 ],
@@ -288,19 +480,38 @@ class _SchoolActivityReportsPageState extends State<SchoolActivityReportsPage> {
           width: double.infinity,
           child: Container(
             decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [gradientStart, gradientEnd]),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [BoxShadow(color: gradientEnd.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 8))]
+              gradient: LinearGradient(colors: [gradientStart, gradientEnd]),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: gradientEnd.withOpacity(0.4),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: ElevatedButton.icon(
               onPressed: _submitReport,
-              icon: const Icon(Icons.analytics_rounded, color: Colors.white, size: 20),
-              label: const Text("Generate Report", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+              icon: const Icon(
+                Icons.analytics_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+              label: const Text(
+                "Generate Report",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
             ),
           ),
@@ -316,24 +527,47 @@ class _SchoolActivityReportsPageState extends State<SchoolActivityReportsPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 5))],
-            border: Border.all(color: Colors.grey.shade100)
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+          border: Border.all(color: Colors.grey.shade100),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey.shade500)),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade500,
+              ),
+            ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  value != null ? DateFormat('dd MMM yy').format(value) : "Select",
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: value != null ? textDark : Colors.grey.shade400),
+                  value != null
+                      ? DateFormat('dd MMM yy').format(value)
+                      : "Select",
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: value != null ? textDark : Colors.grey.shade400,
+                  ),
                 ),
-                Icon(Icons.calendar_month_rounded, size: 16, color: gradientEnd),
+                Icon(
+                  Icons.calendar_month_rounded,
+                  size: 16,
+                  color: gradientEnd,
+                ),
               ],
             ),
           ],

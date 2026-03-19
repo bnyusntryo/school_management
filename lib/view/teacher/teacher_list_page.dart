@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import '../config/pref.dart';
-import '../model/teacher_info_model.dart';
-import '../viewmodel/teacher_viewmodel.dart';
-import 'sidebar_menu.dart';
+import '../../model/teacher_info_model.dart';
+import '../../viewmodel/teacher_viewmodel.dart';
+import '../sidebar_menu.dart';
 import 'teacher_profile_page.dart';
 import 'add_teacher_page.dart';
 
@@ -113,8 +112,8 @@ class _TeacherListPageState extends State<TeacherListPage> {
       debugPrint("📋 Response data type: ${resp.data?.runtimeType}");
 
       // ✅ Check success: code 200-299 atau code null (jika Network tidak wrap)
-      final bool isSuccess = resp.code == null ||
-          (resp.code! >= 200 && resp.code! < 300);
+      final bool isSuccess =
+          resp.code == null || (resp.code! >= 200 && resp.code! < 300);
 
       if (isSuccess && resp.data != null) {
         // ✅ Data bisa langsung List atau wrapped di Map
@@ -142,7 +141,9 @@ class _TeacherListPageState extends State<TeacherListPage> {
 
         // ✅ Parse ke TeacherInfoModel
         List<TeacherInfoModel> fetchedTeachers = data
-            .map((item) => TeacherInfoModel.fromJson(item as Map<String, dynamic>))
+            .map(
+              (item) => TeacherInfoModel.fromJson(item as Map<String, dynamic>),
+            )
             .toList();
 
         debugPrint("✅ Parsed ${fetchedTeachers.length} teachers successfully");
@@ -177,9 +178,11 @@ class _TeacherListPageState extends State<TeacherListPage> {
       // ✅ Filter lokal dari data yang sudah di-load
       setState(() {
         _filteredTeachers = _teachers
-            .where((t) =>
-        t.fullName.toLowerCase().contains(query.toLowerCase()) ||
-            t.userid.toLowerCase().contains(query.toLowerCase()))
+            .where(
+              (t) =>
+                  t.fullName.toLowerCase().contains(query.toLowerCase()) ||
+                  t.userid.toLowerCase().contains(query.toLowerCase()),
+            )
             .toList();
       });
     }
@@ -225,17 +228,19 @@ class _TeacherListPageState extends State<TeacherListPage> {
                   title: Text(
                     "Teacher Directory",
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: Colors.white),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
               leading: Container(
                 margin: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12)),
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: IconButton(
                   icon: const Icon(Icons.menu_rounded, color: Colors.white),
                   onPressed: () => _scaffoldKey.currentState?.openDrawer(),
@@ -245,17 +250,22 @@ class _TeacherListPageState extends State<TeacherListPage> {
                 Container(
                   margin: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12)),
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: IconButton(
-                    icon: const Icon(Icons.person_add_rounded,
-                        color: Colors.white, size: 24),
+                    icon: const Icon(
+                      Icons.person_add_rounded,
+                      color: Colors.white,
+                      size: 24,
+                    ),
                     tooltip: "Add Teacher",
                     onPressed: () async {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const AddTeacherPage()),
+                          builder: (context) => const AddTeacherPage(),
+                        ),
                       );
 
                       // ✅ Terima TeacherModel dari AddTeacherPage
@@ -282,31 +292,39 @@ class _TeacherListPageState extends State<TeacherListPage> {
                         Expanded(
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 2),
+                              horizontal: 20,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
-                                    color: Colors.pink.withOpacity(0.08),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 5)),
+                                  color: Colors.pink.withOpacity(0.08),
+                                  blurRadius: 15,
+                                  offset: const Offset(0, 5),
+                                ),
                               ],
                               border: Border.all(color: Colors.pink.shade50),
                             ),
                             child: TextField(
                               controller: _searchController,
                               onChanged: _filterTeachers,
-                              style:
-                              const TextStyle(fontWeight: FontWeight.w500),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
                               decoration: InputDecoration(
-                                icon: Icon(Icons.search_rounded,
-                                    color: Colors.pink.shade400, size: 22),
+                                icon: Icon(
+                                  Icons.search_rounded,
+                                  color: Colors.pink.shade400,
+                                  size: 22,
+                                ),
                                 hintText: "Search by name or subject...",
                                 hintStyle: TextStyle(
-                                    color: Colors.grey.shade400,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.normal),
+                                  color: Colors.grey.shade400,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.normal,
+                                ),
                                 border: InputBorder.none,
                               ),
                             ),
@@ -319,9 +337,10 @@ class _TeacherListPageState extends State<TeacherListPage> {
                             borderRadius: BorderRadius.circular(15),
                             boxShadow: [
                               BoxShadow(
-                                  color: Colors.grey.withOpacity(0.1),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5)),
+                                color: Colors.grey.withOpacity(0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
                             ],
                           ),
                           child: IconButton(
@@ -329,8 +348,11 @@ class _TeacherListPageState extends State<TeacherListPage> {
                               _searchController.clear();
                               _filterTeachers('');
                             },
-                            icon: Icon(Icons.filter_alt_off_rounded,
-                                color: Colors.grey.shade600, size: 20),
+                            icon: Icon(
+                              Icons.filter_alt_off_rounded,
+                              color: Colors.grey.shade600,
+                              size: 20,
+                            ),
                           ),
                         ),
                       ],
@@ -341,18 +363,23 @@ class _TeacherListPageState extends State<TeacherListPage> {
                         Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                              color: Colors.pink.shade50,
-                              shape: BoxShape.circle),
-                          child: Icon(Icons.school_rounded,
-                              size: 14, color: Colors.pink.shade600),
+                            color: Colors.pink.shade50,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.school_rounded,
+                            size: 14,
+                            color: Colors.pink.shade600,
+                          ),
                         ),
                         const SizedBox(width: 8),
                         Text(
                           "${_filteredTeachers.length} teachers found",
                           style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold),
+                            color: Colors.grey.shade600,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -365,66 +392,75 @@ class _TeacherListPageState extends State<TeacherListPage> {
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
               sliver: _isLoading
                   ? const SliverFillRemaining(
-                child: Center(
-                    child:
-                    CircularProgressIndicator(color: Colors.pink)),
-              )
+                      child: Center(
+                        child: CircularProgressIndicator(color: Colors.pink),
+                      ),
+                    )
                   : _filteredTeachers.isEmpty
                   ? SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 50),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Icon(Icons.person_off_rounded,
-                            size: 80, color: Colors.grey.shade300),
-                        const SizedBox(height: 15),
-                        Text("No teachers found",
-                            style: TextStyle(
-                                color: Colors.grey.shade500,
-                                fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ),
-                ),
-              )
-                  : SliverList(
-                delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                    // ✅ Tampilkan loading indicator di akhir list
-                    if (index == _filteredTeachers.length) {
-                      return _isLoadingMore
-                          ? const Padding(
-                        padding: EdgeInsets.all(20),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 50),
                         child: Center(
-                          child: CircularProgressIndicator(
-                              color: Colors.pink),
-                        ),
-                      )
-                          : const SizedBox.shrink();
-                    }
-
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TeacherProfilePage(
-                                teacherData:
-                                _filteredTeachers[index]),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.person_off_rounded,
+                                size: 80,
+                                color: Colors.grey.shade300,
+                              ),
+                              const SizedBox(height: 15),
+                              Text(
+                                "No teachers found",
+                                style: TextStyle(
+                                  color: Colors.grey.shade500,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(20),
-                      child: _buildTeacherCard(
-                          _filteredTeachers[index], index),
-                    );
-                  },
-                  // ✅ +1 untuk slot loading indicator
-                  childCount: _filteredTeachers.length +
-                      (_isLoadingMore ? 1 : 0),
-                ),
-              ),
+                        ),
+                      ),
+                    )
+                  : SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          // ✅ Tampilkan loading indicator di akhir list
+                          if (index == _filteredTeachers.length) {
+                            return _isLoadingMore
+                                ? const Padding(
+                                    padding: EdgeInsets.all(20),
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.pink,
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox.shrink();
+                          }
+
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TeacherProfilePage(
+                                    teacherData: _filteredTeachers[index],
+                                  ),
+                                ),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(20),
+                            child: _buildTeacherCard(
+                              _filteredTeachers[index],
+                              index,
+                            ),
+                          );
+                        },
+                        // ✅ +1 untuk slot loading indicator
+                        childCount:
+                            _filteredTeachers.length + (_isLoadingMore ? 1 : 0),
+                      ),
+                    ),
             ),
           ],
         ),
@@ -455,10 +491,7 @@ class _TeacherListPageState extends State<TeacherListPage> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(
-                width: 6,
-                color: cardColor,
-              ),
+              Container(width: 6, color: cardColor),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(15),
@@ -469,7 +502,9 @@ class _TeacherListPageState extends State<TeacherListPage> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                              color: cardColor.withOpacity(0.3), width: 2),
+                            color: cardColor.withOpacity(0.3),
+                            width: 2,
+                          ),
                         ),
                         child: CircleAvatar(
                           radius: 30,
@@ -490,9 +525,10 @@ class _TeacherListPageState extends State<TeacherListPage> {
                             Text(
                               teacher.displayName,
                               style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Color(0xFF2D3142)),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Color(0xFF2D3142),
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -500,9 +536,10 @@ class _TeacherListPageState extends State<TeacherListPage> {
                             Text(
                               "NIP: ${teacher.userid}",
                               style: TextStyle(
-                                  color: Colors.grey.shade500,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600),
+                                color: Colors.grey.shade500,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                             const SizedBox(height: 10),
                             Wrap(
@@ -511,19 +548,26 @@ class _TeacherListPageState extends State<TeacherListPage> {
                               children: [
                                 if (teacher.gender.isNotEmpty)
                                   _buildInfoBadge(
-                                      Icons.person_outline_rounded,
-                                      teacher.gender,
-                                      Colors.indigo),
+                                    Icons.person_outline_rounded,
+                                    teacher.gender,
+                                    Colors.indigo,
+                                  ),
                                 if (teacher.joinDate.isNotEmpty)
-                                  _buildInfoBadge(Icons.calendar_today_rounded,
-                                      teacher.joinDate, Colors.blue),
+                                  _buildInfoBadge(
+                                    Icons.calendar_today_rounded,
+                                    teacher.joinDate,
+                                    Colors.blue,
+                                  ),
                               ],
                             ),
                           ],
                         ),
                       ),
-                      Icon(Icons.chevron_right_rounded,
-                          color: Colors.grey.shade300, size: 28),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: Colors.grey.shade300,
+                        size: 28,
+                      ),
                     ],
                   ),
                 ),
@@ -539,22 +583,26 @@ class _TeacherListPageState extends State<TeacherListPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-          color: color.shade50,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: color.shade100)),
+        color: color.shade50,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.shade100),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 12, color: color.shade600),
           const SizedBox(width: 4),
           Flexible(
-            child: Text(label,
-                style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                    color: color.shade700),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.bold,
+                color: color.shade700,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),

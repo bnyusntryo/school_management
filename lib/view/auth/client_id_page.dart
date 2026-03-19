@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../config/pref.dart';
-import '../model/client_model.dart';
-import '../viewmodel/auth_viewmodel.dart';
+import '../../config/pref.dart';
+import '../../model/client_model.dart';
+import '../../viewmodel/auth_viewmodel.dart';
 import 'login_page.dart';
 
 class ClientIdPage extends StatefulWidget {
@@ -49,7 +49,9 @@ class _ClientIdPageState extends State<ClientIdPage> {
                 .map((e) => ClientModel.fromJson(e as Map<String, dynamic>))
                 .toList();
           } else if (resp.data is Map) {
-            _clients = [ClientModel.fromJson(resp.data as Map<String, dynamic>)];
+            _clients = [
+              ClientModel.fromJson(resp.data as Map<String, dynamic>),
+            ];
           } else {
             _clients = [];
             _errorMessage = "Format data tidak dikenali";
@@ -76,9 +78,7 @@ class _ClientIdPageState extends State<ClientIdPage> {
     if (!mounted) return;
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => const LoginPage(),
-      ),
+      MaterialPageRoute(builder: (_) => const LoginPage()),
     );
   }
 
@@ -123,9 +123,19 @@ class _ClientIdPageState extends State<ClientIdPage> {
                         errorBuilder: (context, error, stackTrace) {
                           return const Column(
                             children: [
-                              Icon(Icons.error_outline, color: Colors.red, size: 40),
-                              Text("Logo Not Found\nCheck pubspec.yaml & folder name",
-                                  textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: Colors.red))
+                              Icon(
+                                Icons.error_outline,
+                                color: Colors.red,
+                                size: 40,
+                              ),
+                              Text(
+                                "Logo Not Found\nCheck pubspec.yaml & folder name",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.red,
+                                ),
+                              ),
                             ],
                           );
                         },
@@ -185,7 +195,7 @@ class _ClientIdPageState extends State<ClientIdPage> {
 
                               _debounce = Timer(
                                 const Duration(milliseconds: 400),
-                                    () => _searchClient(cleaned),
+                                () => _searchClient(cleaned),
                               );
                             },
                             decoration: InputDecoration(
@@ -195,17 +205,23 @@ class _ClientIdPageState extends State<ClientIdPage> {
                               fillColor: Colors.white,
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.blue, width: 2),
+                                borderSide: const BorderSide(
+                                  color: Colors.blue,
+                                  width: 2,
+                                ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.grey.shade300),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade300,
+                                ),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 14,
+                                horizontal: 16,
+                                vertical: 14,
                               ),
                             ),
                           ),
@@ -228,7 +244,7 @@ class _ClientIdPageState extends State<ClientIdPage> {
                                     color: Colors.black.withOpacity(0.05),
                                     blurRadius: 5,
                                     offset: const Offset(0, 2),
-                                  )
+                                  ),
                                 ],
                               ),
                               constraints: const BoxConstraints(maxHeight: 150),
@@ -239,9 +255,23 @@ class _ClientIdPageState extends State<ClientIdPage> {
                                   final client = _clients[index];
 
                                   return ListTile(
-                                    title: Text(client.clientName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                                    subtitle: Text("ID: ${client.clientId}", style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-                                    trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+                                    title: Text(
+                                      client.clientName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      "ID: ${client.clientId}",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    trailing: const Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      size: 14,
+                                    ),
                                     onTap: () => _selectClient(client),
                                   );
                                 },
@@ -255,7 +285,10 @@ class _ClientIdPageState extends State<ClientIdPage> {
 
                 const SizedBox(height: 30),
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 24,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(50),
