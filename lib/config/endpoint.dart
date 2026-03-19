@@ -14,6 +14,8 @@ class Endpoint {
   static const String reportGetClassUrl = '/schoolactivity/reports/getclass';
   static const String reportSubmitUrl = '/schoolactivity/reports/classactivity';
 
+  static const String feedCommentListUrl = '/api/home/feeds/comment/list';
+
   static const String attendanceListUrl = '/api/attendance/myattendance-list';
   static const String attendanceLocationUrl = '/api/attendance/get-location';
   static const String attendanceLimitUrl = '/api/attendance/today-attendance-limit';
