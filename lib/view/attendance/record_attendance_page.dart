@@ -1,17 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-
 import 'package:camera/camera.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:school_management/view/auth/auth_provider.dart';
 
-import '../../config/pref.dart';
+import '../../model/attendance_model.dart';
+import '../../viewmodel/attendance_viewmodel.dart';
 
 class RecordAttendancePage extends StatelessWidget {
   const RecordAttendancePage({super.key});
@@ -38,6 +36,8 @@ class AdminAttendanceView extends StatefulWidget {
 
 class _AdminAttendanceViewState extends State<AdminAttendanceView>
     with TickerProviderStateMixin {
+  final _viewmodel = AttendanceViewmodel();
+
   int _currentView = 0;
   final TextEditingController _searchCtrl = TextEditingController();
 
@@ -45,8 +45,8 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
   final Color attGradientEnd = const Color(0xFFF06292);
   final Color textDark = const Color(0xFF1E293B);
 
-  List<Map<String, String>> _allAttendances = [];
-  List<Map<String, String>> _filteredAttendances = [];
+  List<AttendanceRecord> _allAttendances = [];
+  List<AttendanceRecord> _filteredAttendances = [];
 
   bool _isLoading = true;
 
@@ -70,67 +70,23 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
     if (!mounted) return;
     setState(() => _isLoading = true);
     try {
-      String? token = await Session().getUserToken();
-      var req = await http.get(
-        Uri.parse(
-          'https://schoolapp-api-dev.zeabur.app/api/attendance/myattendance-list',
-        ),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
-
-      if (req.statusCode == 200) {
-        var res = jsonDecode(req.body);
-        if (res['data'] != null && mounted) {
-          List dataList = res['data'];
-          int tempPresent = 0, tempLate = 0, tempAbsent = 0;
-
-          setState(() {
-            _allAttendances = dataList.map((item) {
-              String schIn = item['sch_attend_in']?.toString() ?? "00:00:00";
-              String actIn = item['act_attend_in']?.toString() ?? "";
-              String statusServer = item['attend_status']?.toString() ?? "";
-
-              String finalStatus = "On Time";
-              if (statusServer.isNotEmpty) {
-                finalStatus = statusServer;
-              } else if (actIn.isNotEmpty && actIn != "null" && actIn != "-") {
-                if (actIn.compareTo(schIn) > 0) finalStatus = "Late";
-              }
-
-              if (finalStatus == "On Time")
-                tempPresent++;
-              else if (finalStatus == "Late")
-                tempLate++;
-              else
-                tempAbsent++;
-
-              return {
-                "name": item['full_name']?.toString() ?? "Unknown",
-                "date": item['attendance_date']?.toString() ?? "-",
-                "schIn": schIn,
-                "schOut": item['sch_attend_out']?.toString() ?? "--:--:--",
-                "actIn": actIn.isEmpty || actIn == "null" ? "--:--:--" : actIn,
-                "actOut": item['act_attend_out']?.toString() ?? "--:--:--",
-                "status": finalStatus,
-              };
-            }).toList();
-
-            _filteredAttendances = _allAttendances;
-            _presentCount = tempPresent;
-            _lateCount = tempLate;
-            _absentCount = tempAbsent;
-            int total = _allAttendances.length;
-            if (total > 0) {
-              _attendancePercentage = (_presentCount + _lateCount) / total;
-            } else {
-              _attendancePercentage = 0.0;
-            }
-            _isLoading = false;
-          });
-        }
+      final resp = await _viewmodel.getAttendanceList();
+      if (!mounted) return;
+      if (resp.data != null) {
+        final records = (resp.data as List)
+            .map((e) => AttendanceRecord.fromJson(e))
+            .toList();
+        setState(() {
+          _allAttendances = records;
+          _filteredAttendances = records;
+          _presentCount = records.where((r) => r.status == 'On Time').length;
+          _lateCount = records.where((r) => r.isLate).length;
+          _absentCount = records.where((r) => r.isAbsent).length;
+          final total = records.length;
+          _attendancePercentage =
+              total > 0 ? (_presentCount + _lateCount) / total : 0.0;
+          _isLoading = false;
+        });
       } else {
         if (mounted) setState(() => _isLoading = false);
       }
@@ -153,9 +109,10 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Izin lokasi ditolak')));
+        if (!mounted) return false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Izin lokasi ditolak')),
+        );
         return false;
       }
     }
@@ -170,76 +127,29 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
     return true;
   }
 
-  Future<void> _startChangeBasePhotoFlow() async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) =>
-          const Center(child: CircularProgressIndicator(color: Colors.blue)),
+  void _startChangeBasePhotoFlow() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ChangeBasePhotoPage()),
     );
-    try {
-      String? token = await Session().getUserToken();
-      var refreshReq = http.get(
-        Uri.parse(
-          'https://schoolapp-api-dev.zeabur.app/api/attendance/refresh-token',
-        ),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
-      var listReq = _fetchAttendanceList();
-      await Future.wait([refreshReq, listReq]);
-      var refreshRes = await refreshReq;
-
-      if (!mounted) return;
-      Navigator.pop(context);
-
-      if (refreshRes.statusCode == 200 || refreshRes.statusCode != 200) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ChangeBasePhotoPage()),
-        );
-      }
-    } catch (e) {
-      if (mounted) Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Network error."),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
   }
 
   Future<void> _fetchTargetLocation() async {
     try {
-      String? token = await Session().getUserToken();
-      var req = await http.post(
-        Uri.parse(
-          'https://schoolapp-api-dev.zeabur.app/api/attendance/get-location',
-        ),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({}),
-      );
-      if (req.statusCode == 200) {
-        var res = jsonDecode(req.body);
-        if (res['data'] != null && res['data'].isNotEmpty) {
-          var locData = res['data'][0];
-          if (mounted) {
-            setState(() {
-              _targetLocationName =
-                  locData['location_name'] ?? "Unknown Location";
-              _targetLat = locData['latitude']?.toString() ?? "";
-              _targetLng = locData['longitude']?.toString() ?? "";
-            });
-          }
+      final resp = await _viewmodel.getTargetLocation();
+      if (resp.data != null && (resp.data as List).isNotEmpty) {
+        final location = AttendanceLocation.fromJson(resp.data[0]);
+        if (mounted) {
+          setState(() {
+            _targetLocationName = location.locationName;
+            _targetLat = location.latitude;
+            _targetLng = location.longitude;
+          });
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('Failed to fetch location: $e');
+    }
   }
 
   Future<void> _checkLimitAndRequestCamera() async {
@@ -250,27 +160,11 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
           const Center(child: CircularProgressIndicator(color: Colors.blue)),
     );
     try {
-      String? token = await Session().getUserToken();
-
-      var req = await http.get(
-        Uri.parse(
-          'https://schoolapp-api-dev.zeabur.app/api/attendance/today-attendance-limit',
-        ),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
-
+      final resp = await _viewmodel.getTodayAttendanceLimit();
       if (!mounted) return;
       Navigator.pop(context);
 
-      if (req.statusCode == 200) {
-        var res = jsonDecode(req.body);
-        _attendanceLimit = res['data']?.toString() ?? "0";
-      } else {
-        _attendanceLimit = "0 (API Error)";
-      }
+      _attendanceLimit = resp.data?.toString() ?? '0';
 
       final captured = await Navigator.push(
         context,
@@ -298,9 +192,9 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
     setState(() {
       _filteredAttendances = _allAttendances
           .where(
-            (data) =>
-                data['name']!.toLowerCase().contains(query.toLowerCase()) ||
-                data['date']!.toLowerCase().contains(query.toLowerCase()),
+            (record) =>
+                record.name.toLowerCase().contains(query.toLowerCase()) ||
+                record.date.toLowerCase().contains(query.toLowerCase()),
           )
           .toList();
     });
@@ -384,7 +278,6 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
           ),
           onPressed: () => Navigator.pop(context),
         ),
-
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(
@@ -461,7 +354,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                 borderRadius: BorderRadius.circular(25),
                 boxShadow: [
                   BoxShadow(
-                    color: attGradientEnd.withOpacity(0.3),
+                    color: attGradientEnd.withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -474,7 +367,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                     right: -10,
                     child: Icon(
                       Icons.stacked_bar_chart_rounded,
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       size: 100,
                     ),
                   ),
@@ -484,7 +377,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                       Text(
                         "My Attendance Progress",
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
@@ -537,9 +430,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                                   child: CircularProgressIndicator(
                                     value: _attendancePercentage,
                                     strokeWidth: 6,
-                                    backgroundColor: Colors.white.withOpacity(
-                                      0.2,
-                                    ),
+                                    backgroundColor: Colors.white.withValues(alpha: 0.2),
                                     valueColor:
                                         const AlwaysStoppedAnimation<Color>(
                                           Colors.white,
@@ -564,19 +455,19 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                             "ON TIME",
                             "$_presentCount",
                             Colors.white,
-                            Colors.white.withOpacity(0.7),
+                            Colors.white.withValues(alpha: 0.7),
                           ),
                           _buildStatItem(
                             "LATE",
                             "$_lateCount",
                             Colors.yellowAccent,
-                            Colors.white.withOpacity(0.7),
+                            Colors.white.withValues(alpha: 0.7),
                           ),
                           _buildStatItem(
                             "ABSENT",
                             "$_absentCount",
                             Colors.white,
-                            Colors.white.withOpacity(0.7),
+                            Colors.white.withValues(alpha: 0.7),
                           ),
                         ],
                       ),
@@ -600,7 +491,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                               flex: aFlex,
                               child: Container(
                                 height: 6,
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                               ),
                             ),
                           ],
@@ -620,7 +511,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: Colors.black.withValues(alpha: 0.03),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -712,7 +603,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
             "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000",
             fit: BoxFit.cover,
             colorBlendMode: BlendMode.srcOver,
-            color: const Color(0xFFE3EEFE).withOpacity(0.8),
+            color: const Color(0xFFE3EEFE).withValues(alpha: 0.8),
           ),
         ),
         Center(
@@ -722,13 +613,13 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: attGradientStart.withOpacity(0.2),
+                  color: attGradientStart.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: attGradientStart.withOpacity(0.4),
+                    color: attGradientStart.withValues(alpha: 0.4),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -757,7 +648,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                     borderRadius: BorderRadius.circular(15),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 10,
                       ),
                     ],
@@ -780,7 +671,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                     ),
                   ],
@@ -808,7 +699,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
               borderRadius: BorderRadius.circular(30),
               boxShadow: [
                 BoxShadow(
-                  color: attGradientStart.withOpacity(0.2),
+                  color: attGradientStart.withValues(alpha: 0.2),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -857,7 +748,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  "SMK Islamiyah, Jalan Springs Boulevard, South Tangerang, Banten, Indonesia",
+                  _targetLocationName,
                   style: TextStyle(
                     fontSize: 15,
                     color: textDark,
@@ -878,7 +769,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: attGradientEnd.withOpacity(0.4),
+                          color: attGradientEnd.withValues(alpha: 0.4),
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
@@ -950,9 +841,11 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
     );
   }
 
-  Widget _buildDynamicAttendanceCard(Map<String, String> data) {
-    bool isLate = data['status'] == 'Late';
-    Color statusColor = isLate ? Colors.orange.shade700 : Colors.green.shade700;
+  Widget _buildDynamicAttendanceCard(AttendanceRecord record) {
+    final Color statusColor = record.isLate
+        ? Colors.orange.shade700
+        : Colors.green.shade700;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -964,7 +857,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: attGradientEnd.withOpacity(0.3),
+            color: attGradientEnd.withValues(alpha: 0.3),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -977,7 +870,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
             right: 30,
             child: Icon(
               Icons.add,
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               size: 24,
             ),
           ),
@@ -986,7 +879,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
             left: 20,
             child: Icon(
               Icons.add,
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               size: 30,
             ),
           ),
@@ -999,7 +892,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: const Icon(
@@ -1014,7 +907,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            data['name']!,
+                            record.name,
                             style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               fontSize: 16,
@@ -1033,7 +926,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                data['date']!,
+                                record.date,
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: Colors.white70,
@@ -1055,13 +948,13 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 5,
                           ),
                         ],
                       ),
                       child: Text(
-                        data['status']!,
+                        record.status,
                         style: TextStyle(
                           color: statusColor,
                           fontWeight: FontWeight.w900,
@@ -1118,7 +1011,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                                 ),
                               ),
                               Text(
-                                data['schIn']!,
+                                record.schIn,
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey.shade500,
@@ -1142,10 +1035,10 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                                 ),
                               ),
                               Text(
-                                data['actIn']!,
+                                record.actIn,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: isLate
+                                  color: record.isLate
                                       ? Colors.orange.shade700
                                       : textDark,
                                   fontWeight: FontWeight.w900,
@@ -1200,7 +1093,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                                   ),
                                 ),
                                 Text(
-                                  data['schOut']!,
+                                  record.schOut,
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey.shade500,
@@ -1224,7 +1117,7 @@ class _AdminAttendanceViewState extends State<AdminAttendanceView>
                                   ),
                                 ),
                                 Text(
-                                  data['actOut']!,
+                                  record.actOut,
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: textDark,
@@ -1264,7 +1157,7 @@ class _StudentAttendanceViewState extends State<StudentAttendanceView> {
 class FaceScannerOverlayPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final backgroundPaint = Paint()..color = Colors.black.withOpacity(0.7);
+    final backgroundPaint = Paint()..color = Colors.black.withValues(alpha: 0.7);
     final centerX = size.width / 2;
     final centerY = size.height * 0.45;
     final radius = size.width * 0.35;
@@ -1279,7 +1172,7 @@ class FaceScannerOverlayPainter extends CustomPainter {
       backgroundPaint,
     );
     final borderPaint = Paint()
-      ..color = Colors.white.withOpacity(0.5)
+      ..color = Colors.white.withValues(alpha: 0.5)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
     canvas.drawCircle(Offset(centerX, centerY), radius, borderPaint);
@@ -1555,7 +1448,7 @@ class _AttendanceCameraPageState extends State<AttendanceCameraPage>
       await _cameraController!.initialize();
       if (mounted) setState(() {});
     } catch (e) {
-      print("🚨 Kamera Absen gagal: $e");
+      debugPrint('Camera init failed: $e');
       setState(() => _cameraError = true);
     }
   }
@@ -1634,7 +1527,7 @@ class _AttendanceCameraPageState extends State<AttendanceCameraPage>
                 borderRadius: BorderRadius.circular(15),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                   ),
                 ],
@@ -1705,7 +1598,7 @@ class _AttendanceCameraPageState extends State<AttendanceCameraPage>
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 4),
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white.withValues(alpha: 0.3),
                   ),
                   child: Center(
                     child: Container(
